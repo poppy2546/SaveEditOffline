@@ -1,0 +1,6 @@
+node_modules/
+raw_save.json
+*.sav
+*.bak
+.DS_Store
+Thumbs.db
