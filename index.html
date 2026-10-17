@@ -1025,6 +1025,7 @@ if (typeof module !== 'undefined') {
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('file-input');
 
+  dropzone.onclick = (e) => { if (e.target.tagName !== 'BUTTON') fileInput.click(); };
   dropzone.ondragover = (e) => { e.preventDefault(); dropzone.style.borderColor = '#388bfd'; };
   dropzone.ondragleave = () => { dropzone.style.borderColor = 'var(--border-color)'; };
   dropzone.ondrop = (e) => {
@@ -1442,8 +1443,10 @@ if (typeof module !== 'undefined') {
     }
 
     // Save buttons
-    document.getElementById('btn-detail-download').onclick = downloadDatabaseFile;
-    document.getElementById('btn-detail-save-disk').onclick = saveDatabaseToDisk;
+    const btnDetDl = document.getElementById('btn-detail-download');
+    if (btnDetDl) btnDetDl.onclick = downloadDatabaseFile;
+    const btnDetSave = document.getElementById('btn-detail-save-disk');
+    if (btnDetSave) btnDetSave.onclick = saveDatabaseToDisk;
   }
 
   // File System Access API & Download
@@ -1481,6 +1484,9 @@ if (typeof module !== 'undefined') {
     URL.revokeObjectURL(url);
     showToast(`Downloaded ${currentDb.fileName}`, 'success');
   }
+
+  const btnDbDl = document.getElementById('btn-db-download');
+  if (btnDbDl) btnDbDl.onclick = downloadDatabaseFile;
 
   // Open DB file directly via Picker
   document.getElementById('btn-open-db-file').onclick = async () => {
@@ -1620,7 +1626,6 @@ if (typeof module !== 'undefined') {
     return { party: partyObj, actors: actorsObj, variables: varsObj, switches: swObj };
   }
 
-  let originalGold = 0;
   let saveChanges = new Set();
 
   function markSaveModified(field) {
@@ -1663,24 +1668,42 @@ if (typeof module !== 'undefined') {
 
     const goldInput = document.getElementById('quick-gold-input');
     goldInput.value = goldVal;
+    const revBtn = document.getElementById('gold-revert-btn');
+    if (revBtn) revBtn.classList.remove('show');
 
-    function applyGold(newVal) {
-      const num = Math.max(0, parseInt(newVal, 10) || 0);
+    function applyGold(newVal, syncInput = true) {
+      const cleaned = String(newVal).replace(/[^0-9-]/g, '');
+      const num = Math.max(0, parseInt(cleaned, 10) || 0);
       if (goldParty && goldKey) {
         goldParty[goldKey] = num;
       }
-      goldInput.value = num;
-      const rev = document.getElementById('gold-revert-btn');
-      if (rev) rev.classList.toggle('show', num !== originalGold);
+      if (syncInput) {
+        goldInput.value = num;
+      }
+      if (revBtn) revBtn.classList.toggle('show', num !== originalGold);
       markSaveModified('Gold');
     }
 
-    goldInput.onchange = () => applyGold(goldInput.value);
-    goldInput.oninput = () => applyGold(goldInput.value);
-    document.getElementById('btn-gold-add-10k').onclick = () => applyGold((parseInt(goldInput.value, 10) || 0) + 10000);
-    document.getElementById('btn-gold-add-100k').onclick = () => applyGold((parseInt(goldInput.value, 10) || 0) + 100000);
-    document.getElementById('btn-gold-max').onclick = () => applyGold(9999999);
-    document.getElementById('gold-revert-btn').onclick = () => applyGold(originalGold);
+    goldInput.oninput = () => applyGold(goldInput.value, false);
+    goldInput.onchange = () => applyGold(goldInput.value, true);
+    document.getElementById('btn-gold-add-10k').onclick = () => {
+      applyGold((parseInt(goldInput.value, 10) || 0) + 10000, true);
+      showToast('💰 +10,000 Gold added!', 'success');
+    };
+    document.getElementById('btn-gold-add-100k').onclick = () => {
+      applyGold((parseInt(goldInput.value, 10) || 0) + 100000, true);
+      showToast('💰 +100,000 Gold added!', 'success');
+    };
+    document.getElementById('btn-gold-max').onclick = () => {
+      applyGold(9999999, true);
+      showToast('💰 Gold maxed to 9,999,999!', 'success');
+    };
+    if (revBtn) {
+      revBtn.onclick = () => {
+        applyGold(originalGold, true);
+        showToast('↺ Gold reverted to ' + originalGold, 'info');
+      };
+    }
 
     // Search and filter inputs bindings
     document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
@@ -1689,6 +1712,10 @@ if (typeof module !== 'undefined') {
     document.getElementById('armors-search').oninput = () => renderArmorsTab(adapt.party);
     document.getElementById('variables-search').oninput = () => renderVariablesTab(adapt.variables);
     document.getElementById('vars-nonzero-only').onchange = () => renderVariablesTab(adapt.variables);
+    const swSearch = document.getElementById('switches-search');
+    if (swSearch) swSearch.oninput = () => renderSwitchesTab(adapt.switches);
+    const swFilter = document.getElementById('switches-filter');
+    if (swFilter) swFilter.onchange = () => renderSwitchesTab(adapt.switches);
 
     renderCharactersTab(adapt.actors);
     renderInventoryTab(adapt.party);
@@ -2038,14 +2065,24 @@ if (typeof module !== 'undefined') {
     container.innerHTML = '';
     if (!swObj) return;
     const swArr = getJsonExArray(swObj['@data'] || swObj._data || swObj);
+    const qEl = document.getElementById('switches-search');
+    const q = qEl ? qEl.value.trim().toLowerCase() : '';
+    const fEl = document.getElementById('switches-filter');
+    const filter = fEl ? fEl.value : 'all';
+
     let trueCount = 0;
     for (let id = 1; id < Math.min(swArr.length, 500); id++) {
       const val = Boolean(swArr[id]);
       if (val) trueCount++;
+      if (filter === 'on' && !val) continue;
+      if (filter === 'off' && val) continue;
+      const name = (gameData && gameData.switches && gameData.switches[id]) || `Switch #${id}`;
+      if (q && !String(id).includes(q) && !name.toLowerCase().includes(q)) continue;
+
       const card = document.createElement('div');
       card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
       card.innerHTML = `
-        <span style="color:#fff; font-weight:600;">Switch #${id}</span>
+        <span style="color:#fff; font-weight:600;">${name}</span>
         <label class="toggle-switch"><input type="checkbox" ${val?'checked':''}><span class="slider"></span></label>
       `;
       card.querySelector('input').onchange = (e) => {
@@ -2057,8 +2094,20 @@ if (typeof module !== 'undefined') {
     document.getElementById('badge-switch-count').textContent = trueCount;
   }
 
+  function setByTokens(obj, tokens, val) {
+    let cur = obj;
+    for (let i = 0; i < tokens.length - 1; i++) {
+      if (!cur) return;
+      cur = cur[tokens[i]];
+    }
+    if (cur && tokens.length > 0) {
+      cur[tokens[tokens.length - 1]] = val;
+    }
+  }
+
   function renderRawTable() {
     const tbody = document.getElementById('raw-tbody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     flatEntries.slice(0, 50).forEach(entry => {
       const tr = document.createElement('tr');
@@ -2067,9 +2116,24 @@ if (typeof module !== 'undefined') {
         <td style="padding:8px 14px; font-family:var(--font-mono); color:#79c0ff;">${entry.path}</td>
         <td style="padding:8px 14px;"><span class="meta-tag">${entry.type}</span></td>
         <td style="padding:8px 14px; color:var(--text-secondary); font-family:var(--font-mono);">${String(entry.origVal)}</td>
-        <td style="padding:8px 14px;"><input type="text" class="stat-input" value="${entry.currentVal}" style="padding:4px 8px;"></td>
-        <td style="padding:8px 14px;"><button class="btn btn-secondary btn-sm">↺</button></td>
+        <td style="padding:8px 14px;"><input type="text" class="stat-input raw-val-input" value="${entry.currentVal}" style="padding:4px 8px;"></td>
+        <td style="padding:8px 14px;"><button class="btn btn-secondary btn-sm raw-rev-btn">↺</button></td>
       `;
+      const inp = tr.querySelector('.raw-val-input');
+      const rev = tr.querySelector('.raw-rev-btn');
+      inp.onchange = () => {
+        let v = inp.value;
+        if (entry.type === 'number') v = Number(v) || 0;
+        else if (entry.type === 'boolean') v = (v === 'true' || v === '1');
+        entry.currentVal = v;
+        setByTokens(currentFile.parsedRoot, entry.pathTokens, v);
+        markSaveModified('Raw: ' + entry.path);
+      };
+      rev.onclick = () => {
+        entry.currentVal = entry.origVal;
+        inp.value = entry.origVal;
+        setByTokens(currentFile.parsedRoot, entry.pathTokens, entry.origVal);
+      };
       tbody.appendChild(tr);
     });
   }
@@ -2087,6 +2151,39 @@ if (typeof module !== 'undefined') {
       }
     }
     return result;
+  }
+
+  // Optional Game Data Files Loader (Tab 7)
+  const dataDropzone = document.getElementById('data-dropzone');
+  const dataFileInput = document.getElementById('data-file-input');
+  function handleDataFiles(files) {
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const json = JSON.parse(reader.result);
+          const lower = file.name.toLowerCase();
+          if (Array.isArray(json)) {
+            const target = lower.includes('item') ? gameData.items : (lower.includes('weapon') ? gameData.weapons : (lower.includes('armor') ? gameData.armors : null));
+            if (target) {
+              json.forEach(x => { if (x && x.id && x.name) target[x.id] = x.name; });
+            }
+          } else if (json && typeof json === 'object') {
+            if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
+            if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+          }
+          setupVisualEditor();
+          showToast(`Loaded names from ${file.name}`, 'success');
+        } catch(e) {}
+      };
+      reader.readAsText(file);
+    });
+  }
+  if (dataDropzone && dataFileInput) {
+    dataDropzone.onclick = () => dataFileInput.click();
+    dataDropzone.ondragover = (e) => e.preventDefault();
+    dataDropzone.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer && e.dataTransfer.files) handleDataFiles(e.dataTransfer.files); };
+    dataFileInput.onchange = (e) => { if (e.target.files) handleDataFiles(e.target.files); };
   }
 
   // Save Export
@@ -2118,8 +2215,7 @@ if (typeof module !== 'undefined') {
     showToast('Download started!', 'success');
   }
 
-  document.getElementById('btn-review-download').onclick = downloadEditedSave;
-  document.getElementById('btn-backup-raw').onclick = () => {
+  function downloadBackupRaw() {
     if (!currentFile || !currentFile.rawBytes) return;
     const blob = new Blob([currentFile.rawBytes], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
@@ -2129,21 +2225,43 @@ if (typeof module !== 'undefined') {
     a.click();
     URL.revokeObjectURL(url);
     showToast('Original backup (.bak) downloaded!', 'success');
-  };
-  document.getElementById('btn-export-json').onclick = () => {
-    if (!currentFile || !currentFile.parsedRoot) return;
-    const blob = new Blob([JSON.stringify(currentFile.parsedRoot, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = (currentFile.name ? currentFile.name.replace(/.[^/.]+$/, '') : 'save') + '_decrypted.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Decrypted JSON exported!', 'success');
-  };
-  document.getElementById('btn-change-file').onclick = () => {
-    fileInput.click();
-  };
+  }
+
+  const btnRevDl = document.getElementById('btn-review-download');
+  if (btnRevDl) btnRevDl.onclick = downloadEditedSave;
+  const btnBakRaw = document.getElementById('btn-backup-raw');
+  if (btnBakRaw) btnBakRaw.onclick = downloadBackupRaw;
+  const btnModalBak = document.getElementById('btn-modal-bak');
+  if (btnModalBak) btnModalBak.onclick = downloadBackupRaw;
+  const btnModalDl = document.getElementById('btn-modal-download');
+  if (btnModalDl) btnModalDl.onclick = downloadEditedSave;
+  const diffModal = document.getElementById('diff-modal');
+  const btnCloseModal = document.getElementById('btn-close-modal');
+  if (btnCloseModal && diffModal) btnCloseModal.onclick = () => { diffModal.style.display = 'none'; };
+  const btnCancelModal = document.getElementById('btn-modal-cancel');
+  if (btnCancelModal && diffModal) btnCancelModal.onclick = () => { diffModal.style.display = 'none'; };
+
+  const btnExpJson = document.getElementById('btn-export-json');
+  if (btnExpJson) {
+    btnExpJson.onclick = () => {
+      if (!currentFile || !currentFile.parsedRoot) return;
+      const blob = new Blob([JSON.stringify(currentFile.parsedRoot, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (currentFile.name ? currentFile.name.replace(/.[^/.]+$/, '') : 'save') + '_decrypted.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Decrypted JSON exported!', 'success');
+    };
+  }
+
+  const btnChangeFile = document.getElementById('btn-change-file');
+  if (btnChangeFile) {
+    btnChangeFile.onclick = () => {
+      fileInput.click();
+    };
+  }
 
   // Tab switching in Save Editor
   window.switchTab = (tabId) => {

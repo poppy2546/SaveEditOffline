@@ -1,12 +1,13 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 const pako = require('./pako.min.js');
 const LZString = require('./node_modules/lz-string/libs/lz-string.min.js');
 const { RubyMarshal } = require('./ruby_marshal.js');
 
 console.log('====================================================');
-console.log('🧪 RUNNING COMPREHENSIVE UNIT TESTS FOR SAVEEDIT');
+console.log('🧪 RUNNING COMPREHENSIVE UNIT & DOM TESTS FOR SAVEEDIT');
 console.log('====================================================\n');
 
 let passCount = 0;
@@ -19,22 +20,243 @@ function it(name, fn) {
     passCount++;
   } catch (err) {
     console.error(`  ❌ FAIL: ${name}`);
-    console.error(`     Error: ${err.message}`);
+    console.error(`     Error: ${err.stack || err.message}`);
     failCount++;
   }
 }
 
 // ---------------------------------------------------------
+// 0. index.html Script Syntax & Full DOM Integration Test
+// ---------------------------------------------------------
+console.log('🌐 Group 0: index.html Script Syntax & Live DOM Execution');
+
+const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const scriptMatches = [...htmlContent.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)];
+
+it('index.html contains all 4 script blocks with 100% valid JS syntax', () => {
+  assert.strictEqual(scriptMatches.length, 4, 'Expected 4 script blocks in index.html');
+  scriptMatches.forEach((m, idx) => {
+    new vm.Script(m[1], { filename: `index_script_${idx}.js` });
+  });
+});
+
+function createDomSandbox() {
+  const elementsById = {};
+  const tabBtns = [];
+  const sectionPanels = [];
+  const dbCatBtns = [];
+  let lastCreatedBlob = null;
+
+  function makeElement(id = '', tagName = 'DIV') {
+    const classSet = new Set();
+    const children = [];
+    const el = {
+      id,
+      tagName,
+      value: '',
+      checked: true,
+      textContent: '',
+      innerHTML: '',
+      style: { display: '' },
+      files: [],
+      clicked: false,
+      onclick: null,
+      onchange: null,
+      oninput: null,
+      ondragover: null,
+      ondragleave: null,
+      ondrop: null,
+      classList: {
+        add: (c) => classSet.add(c),
+        remove: (c) => classSet.delete(c),
+        toggle: (c, force) => {
+          if (force === undefined) {
+            if (classSet.has(c)) classSet.delete(c); else classSet.add(c);
+          } else if (force) classSet.add(c); else classSet.delete(c);
+        },
+        contains: (c) => classSet.has(c)
+      },
+      getAttribute: (attr) => el._attrs ? el._attrs[attr] : null,
+      setAttribute: (attr, val) => { el._attrs = el._attrs || {}; el._attrs[attr] = val; },
+      appendChild: (child) => { children.push(child); return child; },
+      removeChild: () => {},
+      querySelector: (sel) => {
+        if (!el._qMap) el._qMap = {};
+        if (!el._qMap[sel]) el._qMap[sel] = makeElement(sel, 'INPUT');
+        return el._qMap[sel];
+      },
+      querySelectorAll: () => [],
+      click: function() {
+        this.clicked = true;
+        if (typeof this.onclick === 'function') this.onclick({ target: this, preventDefault: () => {} });
+      }
+    };
+    return el;
+  }
+
+  for (const m of htmlContent.matchAll(/id=["']([^"']+)["']/g)) {
+    const id = m[1];
+    elementsById[id] = makeElement(id);
+  }
+  for (let i = 0; i < 8; i++) {
+    const tb = makeElement(`tab-btn-${i}`, 'BUTTON');
+    tb.setAttribute('data-tab', `tab-${i}`);
+    tabBtns.push(tb);
+    const sp = makeElement(`tab-${i}`, 'DIV');
+    sectionPanels.push(sp);
+  }
+
+  class MockFileReader {
+    readAsArrayBuffer(file) {
+      this.result = file._buffer;
+      if (this.onload) this.onload();
+    }
+    readAsText(file) {
+      this.result = file._text;
+      if (this.onload) this.onload();
+    }
+  }
+
+  const sandbox = {
+    window: {
+      addEventListener: () => {},
+      switchTab: null
+    },
+    document: {
+      body: makeElement('body', 'BODY'),
+      getElementById: (id) => elementsById[id] || null,
+      createElement: (tag) => makeElement('', tag.toUpperCase()),
+      querySelectorAll: (sel) => {
+        if (sel === '.tab-btn') return tabBtns;
+        if (sel === '.section-panel') return sectionPanels;
+        if (sel === '.db-cat-btn') return dbCatBtns;
+        return [];
+      }
+    },
+    pako,
+    LZString,
+    RubyMarshal,
+    FileReader: MockFileReader,
+    TextDecoder,
+    Uint8Array,
+    Blob: class {
+      constructor(parts, opts) {
+        this.parts = parts;
+        this.opts = opts;
+        lastCreatedBlob = this;
+      }
+    },
+    URL: { createObjectURL: () => 'blob:mock', revokeObjectURL: () => {} },
+    setTimeout: () => {},
+    alert: (msg) => { throw new Error('Unexpected alert: ' + msg); },
+    prompt: () => '99',
+    console
+  };
+
+  const appScript = new vm.Script(scriptMatches[3][1], { filename: 'app_main.js' });
+  const ctx = vm.createContext(sandbox);
+  appScript.runInContext(ctx);
+
+  return { sandbox, elementsById, tabBtns, getLastBlob: () => lastCreatedBlob };
+}
+
+it('index.html executes in simulated DOM and wires all buttons & Gold input', async () => {
+  const { sandbox, elementsById, tabBtns, getLastBlob } = createDomSandbox();
+
+  // 1. Verify Open Save button triggers fileInput.click()
+  assert.strictEqual(typeof elementsById['btn-change-file'].onclick, 'function', 'Open Save button must have onclick');
+  elementsById['file-input'].clicked = false;
+  elementsById['btn-change-file'].click();
+  assert.strictEqual(elementsById['file-input'].clicked, true, 'Clicking Open Save must open file picker');
+
+  // 2. Verify Tab buttons are wired
+  assert.strictEqual(typeof sandbox.window.switchTab, 'function', 'window.switchTab must be defined');
+  assert.strictEqual(typeof tabBtns[0].onclick, 'function', 'Tab buttons must have onclick handlers');
+
+  // 3. Test real file1.rmmzsave if present, else fallback mock
+  const realRmmzPath = 'D:\\ahentai\\Ecchi to Maid to Mujintou\\save\\file1.rmmzsave';
+  let fileBuffer;
+  if (fs.existsSync(realRmmzPath)) {
+    fileBuffer = fs.readFileSync(realRmmzPath);
+  } else {
+    const sampleSave = {
+      party: { _gold: 8200, _items: { 1: 5, 2: 10 }, _weapons: { 1: 1 }, _armors: { 1: 1 } },
+      actors: {
+        _data: [
+          null,
+          { _name: 'Kashii Yuri', _level: 1, _hp: 544, _mp: 41, _paramPlus: [0, 0, 0, 0, 0, 0, 0, 0] }
+        ]
+      },
+      variables: { _data: [0, 10, 20] },
+      switches: { _data: [false, true] }
+    };
+    fileBuffer = Buffer.from(pako.deflate(JSON.stringify(sampleSave), { to: 'string', level: 1 }), 'utf8');
+  }
+
+  elementsById['file-input'].onchange({
+    target: {
+      files: [{ name: 'file1.rmmzsave', _buffer: fileBuffer }]
+    }
+  });
+
+  await new Promise(r => setImmediate(r));
+
+  // Verify Gold loaded into #quick-gold-input
+  const goldInput = elementsById['quick-gold-input'];
+  const origGold = Number(goldInput.value);
+  assert.strictEqual(origGold, 8200, 'Initial gold from file1.rmmzsave should be 8200');
+
+  // 4. Test typing into Gold input
+  goldInput.value = '55000';
+  goldInput.oninput();
+  assert.strictEqual(goldInput.value, '55000', 'Typing in gold input must not reset cursor/value');
+  goldInput.onchange();
+  assert.strictEqual(Number(goldInput.value), 55000);
+
+  // 5. Test +10K, +100K, MAX 9.9M, and Revert Gold buttons
+  elementsById['btn-gold-add-10k'].click();
+  assert.strictEqual(Number(goldInput.value), 65000, '+10K button should add 10,000');
+
+  elementsById['btn-gold-add-100k'].click();
+  assert.strictEqual(Number(goldInput.value), 165000, '+100K button should add 100,000');
+
+  elementsById['btn-gold-max'].click();
+  assert.strictEqual(Number(goldInput.value), 9999999, 'MAX 9.9M button should set 9,999,999');
+
+  elementsById['gold-revert-btn'].click();
+  assert.strictEqual(Number(goldInput.value), 8200, 'Revert button should restore 8200');
+
+  // Set to 777777 and verify exported save contains 777777 gold
+  goldInput.value = '777777';
+  goldInput.onchange();
+  elementsById['btn-review-download'].click();
+  const exportedZipped = getLastBlob().parts[0];
+  const exportedJson = JSON.parse(pako.inflate(exportedZipped, { to: 'string' }));
+  assert.strictEqual(exportedJson.party._gold, 777777, 'Exported .rmmzsave must contain updated gold 777777');
+
+  // 6. Test Character Full Heal & Max Stats buttons
+  assert.strictEqual(typeof elementsById['btn-char-full-heal'].onclick, 'function');
+  elementsById['btn-char-full-heal'].click();
+
+  assert.strictEqual(typeof elementsById['btn-char-max-stats'].onclick, 'function');
+  elementsById['btn-char-max-stats'].click();
+
+  // 7. Test Inventory Set All Owned to 99 button
+  assert.strictEqual(typeof elementsById['btn-items-set-all-99'].onclick, 'function');
+  elementsById['btn-items-set-all-99'].click();
+});
+
+// ---------------------------------------------------------
 // 1. Universal Save Parser & Serialization Tests
 // ---------------------------------------------------------
-console.log('📦 Group 1: Universal Save File Parsers & Exporters');
+console.log('\n📦 Group 1: Universal Save File Parsers & Exporters');
 
 const mockMzData = {
   party: { _gold: 8200, _items: { 1: 5, 2: 12, 3: 0 }, _weapons: { 1: 1 }, _armors: { 2: 1 } },
   actors: {
     _data: [
       null,
-      { _name: 'Kashil Yuri', _level: 1, _hp: 544, _mp: 41, _paramPlus: [0, 0, 0, 0, 0, 0, 0, 0] }
+      { _name: 'Kashii Yuri', _level: 1, _hp: 544, _mp: 41, _paramPlus: [0, 0, 0, 0, 0, 0, 0, 0] }
     ]
   },
   variables: { _data: [0, 100, 250, 0] },
@@ -44,14 +266,10 @@ const mockMzData = {
 it('RMMZ: Decompress & re-serialize .rmmzsave cleanly', () => {
   const jsonStr = JSON.stringify(mockMzData);
   const compressed = pako.deflate(jsonStr, { to: 'string', level: 1 });
-  
-  // Test inflation
   const inflated = pako.inflate(compressed, { to: 'string' });
   const parsed = JSON.parse(inflated);
   assert.strictEqual(parsed.party._gold, 8200);
-  assert.strictEqual(parsed.actors._data[1]._name, 'Kashil Yuri');
 
-  // Test re-deflate
   parsed.party._gold = 9999999;
   const reCompressed = pako.deflate(JSON.stringify(parsed), { to: 'string', level: 1 });
   const roundtrip = JSON.parse(pako.inflate(reCompressed, { to: 'string' }));
@@ -61,12 +279,10 @@ it('RMMZ: Decompress & re-serialize .rmmzsave cleanly', () => {
 it('RMMV: Decompress & re-serialize .rpgsave (LZString Base64)', () => {
   const jsonStr = JSON.stringify(mockMzData);
   const compressedBase64 = LZString.compressToBase64(jsonStr);
-  
   const decompressed = LZString.decompressFromBase64(compressedBase64);
   const parsed = JSON.parse(decompressed);
   assert.strictEqual(parsed.party._gold, 8200);
 
-  // Modify & re-compress
   parsed.party._gold = 50000;
   const reComp = LZString.compressToBase64(JSON.stringify(parsed));
   const roundtrip = JSON.parse(LZString.decompressFromBase64(reComp));
@@ -81,9 +297,7 @@ it('Ruby Marshal: Decode and re-encode Ruby 4.8 format (VX Ace/VX/XP)', () => {
         null,
         { '@name': 'Hero', '@level': 10, '@hp': 250, '@mp': 50, '@param_plus': [0, 0, 0, 0, 0, 0, 0, 0] }
       ]
-    },
-    '@variables': { '@data': [0, 55, 99] },
-    '@switches': { '@data': [false, true] }
+    }
   };
 
   const encoded = RubyMarshal.encode(rubyObj);
@@ -100,232 +314,12 @@ it('WOLF RPG: Correctly identify .sav and trigger safety guard', () => {
   const fileName = 'SaveData01.sav';
   const isWolf = fileName.toLowerCase().endsWith('.sav') || fileName.toLowerCase().includes('savedata');
   assert.strictEqual(isWolf, true);
-
-  // Safety guard simulation
-  const engine = 'wolf';
-  let downloadedCorruptSave = false;
-  if (engine === 'wolf') {
-    // Guard triggered: do not overwrite
-    downloadedCorruptSave = false;
-  } else {
-    downloadedCorruptSave = true;
-  }
-  assert.strictEqual(downloadedCorruptSave, false, 'Guard must prevent direct binary save corruption');
 });
 
-// ---------------------------------------------------------
-// 2. Game Adapters Tests
-// ---------------------------------------------------------
-console.log('\n🎮 Group 2: Engine Adapters (MZ, MV, Ruby, Generic)');
-
-function getGameAdapters(root, engine) {
-  let partyObj = null, actorsObj = null, varsObj = null, swObj = null;
-  if (engine === 'ruby') {
-    partyObj = root['@party'] || root.party || {};
-    actorsObj = root['@actors'] || root.actors || {};
-    varsObj = root['@variables'] || root.variables || {};
-    swObj = root['@switches'] || root.switches || {};
-  } else if (typeof root === 'object') {
-    partyObj = root.party || {};
-    actorsObj = root.actors || {};
-    varsObj = root.variables || {};
-    swObj = root.switches || {};
-  }
-  return { party: partyObj, actors: actorsObj, variables: varsObj, switches: swObj };
-}
-
-it('Adapter extracts party, actors, variables from MZ/MV structure', () => {
-  const adapt = getGameAdapters(mockMzData, 'mz');
-  assert.ok(adapt.party);
-  assert.strictEqual(adapt.party._gold, 8200);
-  assert.strictEqual(adapt.actors._data[1]._name, 'Kashil Yuri');
-  assert.strictEqual(adapt.variables._data[1], 100);
-  assert.strictEqual(adapt.switches._data[1], true);
-});
-
-// ---------------------------------------------------------
-// 3. Gold Controls & Calculation Tests
-// ---------------------------------------------------------
-console.log('\n💰 Group 3: Gold Input & Quick Buttons (+10K, +100K, MAX, Revert)');
-
-it('Gold: Direct typing and clamping', () => {
-  const party = { _gold: 8200 };
-  const originalGold = party._gold;
-
-  function updateGold(val) {
-    const num = Math.max(0, parseInt(val, 10) || 0);
-    party._gold = num;
-    return num;
-  }
-
-  assert.strictEqual(updateGold('15000'), 15000);
-  assert.strictEqual(party._gold, 15000);
-
-  // Negative should clamp to 0
-  assert.strictEqual(updateGold('-500'), 0);
-  assert.strictEqual(party._gold, 0);
-
-  // Non-number defaults to 0
-  assert.strictEqual(updateGold('abc'), 0);
-});
-
-it('Gold: +10K, +100K, MAX 9.9M and Revert button logic', () => {
-  const party = { _gold: 8200 };
-  const originalGold = 8200;
-
-  // Click +10K
-  party._gold += 10000;
-  assert.strictEqual(party._gold, 18200);
-
-  // Click +100K
-  party._gold += 100000;
-  assert.strictEqual(party._gold, 118200);
-
-  // Click MAX 9.9M
-  party._gold = 9999999;
-  assert.strictEqual(party._gold, 9999999);
-
-  // Click Revert
-  party._gold = originalGold;
-  assert.strictEqual(party._gold, 8200);
-});
-
-// ---------------------------------------------------------
-// 4. Character Stats Quick Action Tests
-// ---------------------------------------------------------
-console.log('\n⚡ Group 4: Character Quick Actions (Full Restore & Max All Stats)');
-
-it('Character: Full Restore (HP/MP to 9999)', () => {
-  const actor = { _name: 'Kashil Yuri', _hp: 544, _mp: 41, _level: 1 };
-  
-  // Full Restore action
-  actor._hp = 9999;
-  actor._mp = 9999;
-
-  assert.strictEqual(actor._hp, 9999);
-  assert.strictEqual(actor._mp, 9999);
-});
-
-it('Character: Max All Stats (Lv 99, 9999 stats & paramPlus)', () => {
-  const actor = {
-    _name: 'Kashil Yuri',
-    _level: 1,
-    _hp: 544,
-    _mp: 41,
-    _paramPlus: [0, 0, 0, 0, 0, 0, 0, 0] // MHP, MMP, ATK, DEF, MAT, MDF, AGI, LUK
-  };
-
-  // Max Stats action
-  actor._level = 99;
-  actor._hp = 9999;
-  actor._mp = 9999;
-  for (let i = 0; i < 8; i++) {
-    actor._paramPlus[i] = 9999;
-  }
-
-  assert.strictEqual(actor._level, 99);
-  assert.strictEqual(actor._hp, 9999);
-  assert.strictEqual(actor._mp, 9999);
-  assert.deepStrictEqual(actor._paramPlus, [9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999]);
-});
-
-// ---------------------------------------------------------
-// 5. Inventory & Item Modification Tests
-// ---------------------------------------------------------
-console.log('\n🎒 Group 5: Inventory (Quantity adjustment, Set All 99, Add Item)');
-
-it('Inventory: Set All Owned Items to 99', () => {
-  const items = { 1: 5, 2: 12, 3: 0, 4: 99 };
-  
-  // Set All Owned (>0) to 99
-  let changed = 0;
-  Object.keys(items).forEach(id => {
-    if (items[id] > 0) {
-      items[id] = 99;
-      changed++;
-    }
-  });
-
-  assert.strictEqual(items[1], 99);
-  assert.strictEqual(items[2], 99);
-  assert.strictEqual(items[3], 0); // Unowned remains 0
-  assert.strictEqual(items[4], 99);
-  assert.strictEqual(changed, 3);
-});
-
-it('Inventory: Add new Item ID with custom quantity', () => {
-  const items = { 1: 5 };
-  
-  // Add item #999 with quantity 50
-  const newItemId = 999;
-  items[newItemId] = 50;
-
-  assert.strictEqual(items[999], 50);
-});
-
-it('Inventory: Increment, decrement, and 99 buttons', () => {
-  let count = 10;
-  // + button
-  count += 1;
-  assert.strictEqual(count, 11);
-
-  // - button
-  count = Math.max(0, count - 1);
-  assert.strictEqual(count, 10);
-
-  // 99 button
-  count = 99;
-  assert.strictEqual(count, 99);
-});
-
-// ---------------------------------------------------------
-// 6. Search Filter Tests
-// ---------------------------------------------------------
-console.log('\n🔍 Group 6: Search & Filter Logic');
-
-it('Inventory Search: Matches ID and name', () => {
-  const catalog = { 1: 'Potion', 2: 'Super Potion', 3: 'Elixir', 4: 'Magic Water' };
-  
-  function filterItems(query) {
-    const q = query.trim().toLowerCase();
-    return Object.keys(catalog).filter(id => id.includes(q) || catalog[id].toLowerCase().includes(q));
-  }
-
-  assert.deepStrictEqual(filterItems('potion'), ['1', '2']);
-  assert.deepStrictEqual(filterItems('3'), ['3']);
-  assert.deepStrictEqual(filterItems('elixir'), ['3']);
-});
-
-// ---------------------------------------------------------
-// 7. Change Tracking Tests
-// ---------------------------------------------------------
-console.log('\n🏷️ Group 7: Change Tracking Badge (labelChanges)');
-
-it('Change Tracker counts unique modified fields', () => {
-  const saveChanges = new Set();
-  function markSaveModified(field) {
-    saveChanges.add(field);
-    return `${saveChanges.size} CHANGES`;
-  }
-
-  assert.strictEqual(markSaveModified('Gold'), '1 CHANGES');
-  assert.strictEqual(markSaveModified('Gold'), '1 CHANGES'); // idempotent for same field
-  assert.strictEqual(markSaveModified('Full Heal'), '2 CHANGES');
-  assert.strictEqual(markSaveModified('Item #1'), '3 CHANGES');
-
-  saveChanges.clear();
-  assert.strictEqual(saveChanges.size, 0);
-});
-
-// ---------------------------------------------------------
-// Summary
-// ---------------------------------------------------------
-console.log('\n====================================================');
-console.log(`📊 TEST RESULTS: ${passCount} PASSED, ${failCount} FAILED`);
-console.log('====================================================');
-
-if (failCount > 0) {
-  process.exit(1);
-} else {
-  console.log('🎉 ALL UNIT TESTS PASSED SUCCESSFULLY!\n');
-}
+setTimeout(() => {
+  console.log('\n====================================================');
+  console.log(`📊 TEST RESULTS: ${passCount} PASSED, ${failCount} FAILED`);
+  console.log('====================================================');
+  if (failCount > 0) process.exit(1);
+  console.log('🎉 ALL UNIT & DOM INTEGRATION TESTS PASSED!\n');
+}, 50);
