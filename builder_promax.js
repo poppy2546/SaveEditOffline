@@ -715,11 +715,21 @@ const htmlContent = `<!DOCTYPE html>
   dropzone.ondragleave = () => { dropzone.style.borderColor = 'var(--border-color)'; };
   dropzone.ondrop = (e) => {
     e.preventDefault();
-    if (e.dataTransfer.files[0]) handleIncomingFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer && e.dataTransfer.files[0]) handleIncomingFile(e.dataTransfer.files[0]);
   };
   fileInput.onchange = (e) => {
-    if (e.target.files[0]) handleIncomingFile(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      handleIncomingFile(e.target.files[0]);
+      fileInput.value = '';
+    }
   };
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleIncomingFile(e.dataTransfer.files[0]);
+    }
+  });
 
   function handleIncomingFile(file) {
     const name = file.name.toLowerCase();
@@ -1195,6 +1205,7 @@ const htmlContent = `<!DOCTYPE html>
         labelSize.textContent = formatBytes(rawBytes.byteLength);
 
         switchAppMode('save');
+        resetSaveModified();
         setupVisualEditor();
         renderRawTable();
         showToast(\`Loaded \${file.name} successfully!\`, 'success');
@@ -1295,6 +1306,21 @@ const htmlContent = `<!DOCTYPE html>
     return { party: partyObj, actors: actorsObj, variables: varsObj, switches: swObj };
   }
 
+  let originalGold = 0;
+  let saveChanges = new Set();
+
+  function markSaveModified(field) {
+    if (field) saveChanges.add(field);
+    const badge = document.getElementById('label-changes');
+    if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+  }
+
+  function resetSaveModified() {
+    saveChanges.clear();
+    const badge = document.getElementById('label-changes');
+    if (badge) badge.textContent = '0 CHANGES';
+  }
+
   function setupVisualEditor() {
     const root = currentFile.parsedRoot;
     if (!root) return;
@@ -1306,14 +1332,49 @@ const htmlContent = `<!DOCTYPE html>
 
     const adapt = getGameAdapters(root, currentFile.engine);
 
-    let goldVal = 0;
-    if (adapt.party) {
-      if (adapt.party['@gold'] !== undefined) goldVal = adapt.party['@gold'];
-      else if (adapt.party._gold !== undefined) goldVal = adapt.party._gold;
-      else if (adapt.party.gold !== undefined) goldVal = adapt.party.gold;
+    // Gold setup & event bindings
+    let goldParty = adapt.party;
+    let goldKey = null;
+    if (goldParty) {
+      if (goldParty['@gold'] !== undefined) goldKey = '@gold';
+      else if (goldParty._gold !== undefined) goldKey = '_gold';
+      else if (goldParty.gold !== undefined) goldKey = 'gold';
+      else {
+        goldKey = (currentFile.engine === 'ruby') ? '@gold' : '_gold';
+        goldParty[goldKey] = 0;
+      }
     }
+    let goldVal = (goldParty && goldKey) ? goldParty[goldKey] : 0;
     originalGold = goldVal;
-    document.getElementById('quick-gold-input').value = goldVal;
+
+    const goldInput = document.getElementById('quick-gold-input');
+    goldInput.value = goldVal;
+
+    function applyGold(newVal) {
+      const num = Math.max(0, parseInt(newVal, 10) || 0);
+      if (goldParty && goldKey) {
+        goldParty[goldKey] = num;
+      }
+      goldInput.value = num;
+      const rev = document.getElementById('gold-revert-btn');
+      if (rev) rev.classList.toggle('show', num !== originalGold);
+      markSaveModified('Gold');
+    }
+
+    goldInput.onchange = () => applyGold(goldInput.value);
+    goldInput.oninput = () => applyGold(goldInput.value);
+    document.getElementById('btn-gold-add-10k').onclick = () => applyGold((parseInt(goldInput.value, 10) || 0) + 10000);
+    document.getElementById('btn-gold-add-100k').onclick = () => applyGold((parseInt(goldInput.value, 10) || 0) + 100000);
+    document.getElementById('btn-gold-max').onclick = () => applyGold(9999999);
+    document.getElementById('gold-revert-btn').onclick = () => applyGold(originalGold);
+
+    // Search and filter inputs bindings
+    document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
+    document.getElementById('inventory-owned-only').onchange = () => renderInventoryTab(adapt.party);
+    document.getElementById('weapons-search').oninput = () => renderWeaponsTab(adapt.party);
+    document.getElementById('armors-search').oninput = () => renderArmorsTab(adapt.party);
+    document.getElementById('variables-search').oninput = () => renderVariablesTab(adapt.variables);
+    document.getElementById('vars-nonzero-only').onchange = () => renderVariablesTab(adapt.variables);
 
     renderCharactersTab(adapt.actors);
     renderInventoryTab(adapt.party);
@@ -1398,6 +1459,41 @@ const htmlContent = `<!DOCTYPE html>
       renderCharacterStats(actorsData[activeCharacterIndex]);
     };
     renderCharacterStats(actorsData[activeCharacterIndex]);
+
+    // Quick Action: Full Restore (HP/MP)
+    document.getElementById('btn-char-full-heal').onclick = () => {
+      const actor = actorsData[activeCharacterIndex];
+      if (!actor) return;
+      if (actor._hp !== undefined) actor._hp = 9999;
+      if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
+      if (actor._mp !== undefined) actor._mp = 9999;
+      if (actor['@mp'] !== undefined) actor['@mp'] = 9999;
+      if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
+      renderCharacterStats(actor);
+      markSaveModified('Full Heal');
+      showToast('💖 Full restore applied (HP & MP maxed)!', 'success');
+    };
+
+    // Quick Action: Max All Stats (9999)
+    document.getElementById('btn-char-max-stats').onclick = () => {
+      const actor = actorsData[activeCharacterIndex];
+      if (!actor) return;
+      if (actor._level !== undefined) actor._level = 99;
+      if (actor['@level'] !== undefined) actor['@level'] = 99;
+      if (actor._hp !== undefined) actor._hp = 9999;
+      if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
+      if (actor._mp !== undefined) actor._mp = 9999;
+      if (actor['@mp'] !== undefined) actor['@mp'] = 9999;
+      if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
+      const paramPlus = actor._paramPlus || actor['@param_plus'];
+      if (paramPlus) {
+        const p = getJsonExArray(paramPlus);
+        for (let i = 0; i < 8; i++) p[i] = 9999;
+      }
+      renderCharacterStats(actor);
+      markSaveModified('Max Stats');
+      showToast('⚡ All stats & bonuses maxed to 9999!', 'success');
+    };
   }
 
   function renderCharacterStats(actor) {
@@ -1421,6 +1517,7 @@ const htmlContent = `<!DOCTYPE html>
         if (/^-?\\d+$/.test(v)) v = parseInt(v, 10);
         else if (/^-?\\d+\\.\\d+$/.test(v)) v = parseFloat(v);
         onCommit(v);
+        markSaveModified('Stat ' + title);
       };
       container.appendChild(card);
     }
@@ -1434,8 +1531,9 @@ const htmlContent = `<!DOCTYPE html>
     const mpKey = actor['@mp'] !== undefined ? '@mp' : (actor['@sp'] !== undefined ? '@sp' : '_mp');
     makeCard('MyMP', 'Current MP / SP', actor[mpKey] || 50, (v) => actor[mpKey] = v);
 
-    if (actor._paramPlus) {
-      const pPlus = getJsonExArray(actor._paramPlus);
+    const paramPlus = actor._paramPlus || actor['@param_plus'];
+    if (paramPlus) {
+      const pPlus = getJsonExArray(paramPlus);
       const names = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
       names.forEach((name, i) => makeCard(name, \`\${name} Bonus\`, pPlus[i] || 0, (v) => pPlus[i] = v));
     }
@@ -1449,13 +1547,39 @@ const htmlContent = `<!DOCTYPE html>
     const itemIds = Object.keys(itemsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-item-count').textContent = itemIds.length;
 
+    // Quick Action: Set All Owned to 99
+    document.getElementById('btn-items-set-all-99').onclick = () => {
+      let count = 0;
+      itemIds.forEach(id => {
+        if (itemsObj[id] > 0) {
+          itemsObj[id] = 99;
+          count++;
+        }
+      });
+      renderInventoryTab(partyObj);
+      markSaveModified('Items 99');
+      showToast('Set ' + count + ' owned items to 99!', 'success');
+    };
+
+    // Quick Action: Add Item ID
+    document.getElementById('btn-add-item-dialog').onclick = () => {
+      const id = prompt('Enter Item ID to add:');
+      if (!id || isNaN(id)) return;
+      const qty = prompt('Enter quantity (1-99):', '99');
+      const val = parseInt(qty, 10) || 99;
+      itemsObj[id] = val;
+      renderInventoryTab(partyObj);
+      markSaveModified('Add Item #' + id);
+      showToast('Added Item #' + id + ' (x' + val + ')', 'success');
+    };
+
     const q = document.getElementById('inventory-search').value.trim().toLowerCase();
     const ownedOnly = document.getElementById('inventory-owned-only').checked;
 
     itemIds.forEach(id => {
       const count = itemsObj[id];
       if (ownedOnly && count <= 0) return;
-      const name = gameData.items[id] || \`Item #\${id}\`;
+      const name = (gameData && gameData.items && gameData.items[id]) || \`Item #\${id}\`;
       if (q && !id.includes(q) && !name.toLowerCase().includes(q)) return;
 
       const card = document.createElement('div');
@@ -1474,7 +1598,11 @@ const htmlContent = `<!DOCTYPE html>
       \`;
 
       const input = card.querySelector('input');
-      const commit = (v) => { itemsObj[id] = v; input.value = v; };
+      const commit = (v) => {
+        itemsObj[id] = v;
+        input.value = v;
+        markSaveModified('Item #' + id);
+      };
       input.onchange = () => commit(parseInt(input.value) || 0);
       card.querySelector('.btn-sub').onclick = () => commit(Math.max(0, (parseInt(input.value)||0)-1));
       card.querySelector('.btn-add').onclick = () => commit((parseInt(input.value)||0)+1);
@@ -1492,15 +1620,31 @@ const htmlContent = `<!DOCTYPE html>
     const ids = Object.keys(weaponsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-weapon-count').textContent = ids.length;
 
+    document.getElementById('btn-add-weapon-dialog').onclick = () => {
+      const id = prompt('Enter Weapon ID to add:');
+      if (!id || isNaN(id)) return;
+      weaponsObj[id] = 1;
+      renderWeaponsTab(partyObj);
+      markSaveModified('Add Weapon #' + id);
+      showToast('Added Weapon #' + id, 'success');
+    };
+
+    const q = document.getElementById('weapons-search').value.trim().toLowerCase();
     ids.forEach(id => {
       const count = weaponsObj[id];
+      const name = (gameData && gameData.weapons && gameData.weapons[id]) || \`Weapon #\${id}\`;
+      if (q && !id.includes(q) && !name.toLowerCase().includes(q)) return;
+
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;">Weapon #\${id}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;">\${name}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
         <input type="number" class="stat-input" value="\${count}" style="padding:4px;">
       \`;
-      card.querySelector('input').onchange = (e) => weaponsObj[id] = parseInt(e.target.value) || 0;
+      card.querySelector('input').onchange = (e) => {
+        weaponsObj[id] = parseInt(e.target.value) || 0;
+        markSaveModified('Weapon #' + id);
+      };
       container.appendChild(card);
     });
   }
@@ -1513,15 +1657,31 @@ const htmlContent = `<!DOCTYPE html>
     const ids = Object.keys(armorsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-armor-count').textContent = ids.length;
 
+    document.getElementById('btn-add-armor-dialog').onclick = () => {
+      const id = prompt('Enter Armor ID to add:');
+      if (!id || isNaN(id)) return;
+      armorsObj[id] = 1;
+      renderArmorsTab(partyObj);
+      markSaveModified('Add Armor #' + id);
+      showToast('Added Armor #' + id, 'success');
+    };
+
+    const q = document.getElementById('armors-search').value.trim().toLowerCase();
     ids.forEach(id => {
       const count = armorsObj[id];
+      const name = (gameData && gameData.armors && gameData.armors[id]) || \`Armor #\${id}\`;
+      if (q && !id.includes(q) && !name.toLowerCase().includes(q)) return;
+
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;">Armor #\${id}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;">\${name}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
         <input type="number" class="stat-input" value="\${count}" style="padding:4px;">
       \`;
-      card.querySelector('input').onchange = (e) => armorsObj[id] = parseInt(e.target.value) || 0;
+      card.querySelector('input').onchange = (e) => {
+        armorsObj[id] = parseInt(e.target.value) || 0;
+        markSaveModified('Armor #' + id);
+      };
       container.appendChild(card);
     });
   }
@@ -1531,9 +1691,17 @@ const htmlContent = `<!DOCTYPE html>
     container.innerHTML = '';
     if (!varsObj) return;
     const varsArr = getJsonExArray(varsObj['@data'] || varsObj._data || varsObj);
-    for (let id = 1; id < Math.min(varsArr.length, 300); id++) {
+    const nonZeroOnly = document.getElementById('vars-nonzero-only').checked;
+    const q = document.getElementById('variables-search').value.trim().toLowerCase();
+
+    let count = 0;
+    for (let id = 1; id < Math.min(varsArr.length, 500); id++) {
       const val = varsArr[id];
       if (val === undefined || val === null) continue;
+      if (nonZeroOnly && (val === 0 || val === '0')) continue;
+      if (q && !String(id).includes(q) && !String(val).toLowerCase().includes(q)) continue;
+      count++;
+
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
@@ -1544,9 +1712,11 @@ const htmlContent = `<!DOCTYPE html>
         let n = e.target.value;
         if (/^-?\\d+$/.test(n)) n = parseInt(n, 10);
         varsArr[id] = n;
+        markSaveModified('Var #' + id);
       };
       container.appendChild(card);
     }
+    document.getElementById('badge-var-count').textContent = count;
   }
 
   function renderSwitchesTab(swObj) {
@@ -1554,17 +1724,23 @@ const htmlContent = `<!DOCTYPE html>
     container.innerHTML = '';
     if (!swObj) return;
     const swArr = getJsonExArray(swObj['@data'] || swObj._data || swObj);
-    for (let id = 1; id < Math.min(swArr.length, 300); id++) {
+    let trueCount = 0;
+    for (let id = 1; id < Math.min(swArr.length, 500); id++) {
       const val = Boolean(swArr[id]);
+      if (val) trueCount++;
       const card = document.createElement('div');
       card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
       card.innerHTML = \`
         <span style="color:#fff; font-weight:600;">Switch #\${id}</span>
         <label class="toggle-switch"><input type="checkbox" \${val?'checked':''}><span class="slider"></span></label>
       \`;
-      card.querySelector('input').onchange = (e) => swArr[id] = e.target.checked;
+      card.querySelector('input').onchange = (e) => {
+        swArr[id] = e.target.checked;
+        markSaveModified('Switch #' + id);
+      };
       container.appendChild(card);
     }
+    document.getElementById('badge-switch-count').textContent = trueCount;
   }
 
   function renderRawTable() {
@@ -1652,9 +1828,7 @@ const htmlContent = `<!DOCTYPE html>
     showToast('Decrypted JSON exported!', 'success');
   };
   document.getElementById('btn-change-file').onclick = () => {
-    saveEditorScreen.style.display = 'none';
-    uploadSection.style.display = 'flex';
-    fileInput.value = '';
+    fileInput.click();
   };
 
   // Tab switching in Save Editor
