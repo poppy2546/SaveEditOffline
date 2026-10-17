@@ -50,13 +50,22 @@ function createDomSandbox() {
   function makeElement(id = '', tagName = 'DIV') {
     const classSet = new Set();
     const children = [];
+    let _innerHTML = '';
     const el = {
       id,
       tagName,
       value: '',
-      checked: true,
+      checked: false,
       textContent: '',
-      innerHTML: '',
+      get innerHTML() { return _innerHTML; },
+      set innerHTML(val) {
+        _innerHTML = String(val || '');
+        // Dynamically register any id="..." inside innerHTML so getElementById finds dynamically rendered controls
+        for (const m of _innerHTML.matchAll(/id=["']([^"']+)["']/g)) {
+          const dynId = m[1];
+          if (!elementsById[dynId]) elementsById[dynId] = makeElement(dynId);
+        }
+      },
       style: { display: '' },
       files: [],
       clicked: false,
@@ -88,7 +97,7 @@ function createDomSandbox() {
       querySelectorAll: () => [],
       click: function() {
         this.clicked = true;
-        if (typeof this.onclick === 'function') this.onclick({ target: this, preventDefault: () => {} });
+        if (typeof this.onclick === 'function') this.onclick({ target: this, preventDefault: () => {}, stopPropagation: () => {} });
       }
     };
     return el;
@@ -98,6 +107,12 @@ function createDomSandbox() {
     const id = m[1];
     elementsById[id] = makeElement(id);
   }
+  ['weapons', 'armors', 'items', 'skills'].forEach(cat => {
+    const btn = elementsById[`slot-btn-${cat}`] || makeElement(`slot-btn-${cat}`, 'BUTTON');
+    btn.setAttribute('data-cat', cat);
+    elementsById[`slot-btn-${cat}`] = btn;
+    dbCatBtns.push(btn);
+  });
   for (let i = 0; i < 8; i++) {
     const tb = makeElement(`tab-btn-${i}`, 'BUTTON');
     tb.setAttribute('data-tab', `tab-${i}`);
@@ -157,7 +172,7 @@ function createDomSandbox() {
   const ctx = vm.createContext(sandbox);
   appScript.runInContext(ctx);
 
-  return { sandbox, elementsById, tabBtns, getLastBlob: () => lastCreatedBlob };
+  return { sandbox, elementsById, tabBtns, dbCatBtns, getLastBlob: () => lastCreatedBlob };
 }
 
 it('index.html executes in simulated DOM and wires all buttons & Gold input', async () => {
@@ -244,6 +259,75 @@ it('index.html executes in simulated DOM and wires all buttons & Gold input', as
   // 7. Test Inventory Set All Owned to 99 button
   assert.strictEqual(typeof elementsById['btn-items-set-all-99'].onclick, 'function');
   elementsById['btn-items-set-all-99'].click();
+});
+
+it('Database Modder supports multi-file drop, independent category store, presets, bulk mods & item revert', () => {
+  const { elementsById, getLastBlob } = createDomSandbox();
+
+  const mockItems = [
+    null,
+    { id: 1, name: 'Herb', price: 50, consumable: true, scope: 7, description: 'Heals 50 HP [Weight: 5W]', note: '<Weight: 5>', effects: [{ code: 11, dataId: 0, value1: 0.2, value2: 50 }] },
+    { id: 2, name: 'Energy Drink', price: 200, consumable: true, scope: 11, description: 'Fully restores AP. [Weight: 2W]', note: '<Weight: 2>', effects: [] }
+  ];
+  const mockWeapons = [
+    null,
+    { id: 1, name: 'Iron Sword', price: 500, params: [0, 0, 25, 0, 0, 0, 0, 0], description: 'Basic sword' }
+  ];
+
+  // 1. Simulate dropping Items.json AND Weapons.json at the same time
+  elementsById['db-multi-file-input'].onchange({
+    target: {
+      files: [
+        { name: 'Items.json', _text: JSON.stringify(mockItems) },
+        { name: 'Weapons.json', _text: JSON.stringify(mockWeapons) }
+      ]
+    }
+  });
+
+  // Verify both slots show loaded status
+  assert.ok(elementsById['db-slot-status-items'].innerHTML.includes('2'), 'Items slot badge should show 2 items loaded');
+  assert.ok(elementsById['db-slot-status-weapons'].innerHTML.includes('1'), 'Weapons slot badge should show 1 weapon loaded');
+
+  // Verify current category is 'items' (first file dropped)
+  assert.strictEqual(elementsById['db-label-filename'].textContent, 'Items.json');
+  assert.strictEqual(elementsById['db-label-count'].textContent, '2 ITEMS');
+
+  // 2. Test Item presets on Item #1 (Herb): Infinite, Zero Weight, Full Heal, and Revert
+  elementsById['btn-db-make-infinite'].click();
+  elementsById['btn-db-zero-weight'].click();
+  elementsById['btn-db-full-heal-item'].click();
+
+  // Verify modified badge shows 1 modified
+  assert.ok(elementsById['db-label-modified'].textContent.includes('1'), 'Should show 1 modified item');
+
+  // Test Revert single item
+  elementsById['btn-db-revert-item'].click();
+  assert.strictEqual(elementsById['db-label-modified'].style.display, 'none', 'After revert, modified count should be 0');
+
+  // 3. Test Bulk Infinite All & Bulk Price 0 All on Items.json
+  elementsById['btn-bulk-infinite-all'].click();
+  elementsById['btn-bulk-free-all'].click();
+  elementsById['btn-db-download'].click();
+  const downloadedItems = JSON.parse(getLastBlob().parts[0]);
+  assert.strictEqual(downloadedItems[1].consumable, false, 'Bulk infinite should set consumable=false');
+  assert.strictEqual(downloadedItems[1].price, 0, 'Bulk free should set price=0');
+  assert.strictEqual(downloadedItems[2].consumable, false, 'Bulk infinite should set item #2 consumable=false');
+
+  // 4. Switch to Weapons tab and verify Weapons.json is preserved independently
+  elementsById['slot-btn-weapons'].click();
+  assert.strictEqual(elementsById['db-label-filename'].textContent, 'Weapons.json');
+  assert.strictEqual(elementsById['db-label-count'].textContent, '1 ITEMS');
+
+  // Apply God Weapon preset
+  elementsById['btn-db-god-weapon'].click();
+  elementsById['btn-db-download'].click();
+  const downloadedWeapons = JSON.parse(getLastBlob().parts[0]);
+  assert.strictEqual(downloadedWeapons[1].params[2], 9999, 'God weapon should set ATK to 9999');
+
+  // 5. Switch to unloaded category (Skills) and verify it does NOT show stale items from Weapons.json
+  elementsById['slot-btn-skills'].click();
+  assert.strictEqual(elementsById['db-label-filename'].textContent, 'Skills.json');
+  assert.strictEqual(elementsById['db-label-count'].textContent, '0 ITEMS');
 });
 
 // ---------------------------------------------------------

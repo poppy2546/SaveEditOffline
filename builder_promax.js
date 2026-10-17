@@ -303,6 +303,52 @@ const htmlContent = `<!DOCTYPE html>
     border: 1px dashed var(--border-color);
   }
 
+  /* DB Drop Banner & Category Slots */
+  .db-drop-banner {
+    background: linear-gradient(135deg, rgba(110, 64, 201, 0.14), rgba(31, 111, 235, 0.1));
+    border: 2px dashed #6e40c9; border-radius: 12px; padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    flex-wrap: wrap; transition: all 0.2s ease; cursor: pointer;
+  }
+  .db-drop-banner:hover, .db-drop-banner.drag-over {
+    border-color: #bc8cff; background: rgba(163, 113, 247, 0.18);
+  }
+  .db-slot-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%;
+  }
+  @media (max-width: 900px) {
+    .db-slot-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .db-cat-btn {
+    background: #151924; border: 1px solid var(--border-color); border-radius: 10px;
+    padding: 10px 14px; display: flex; flex-direction: column; align-items: flex-start;
+    gap: 6px; cursor: pointer; transition: all 0.15s ease; text-align: left; color: #fff;
+  }
+  .db-cat-btn:hover { background: #1e2436; border-color: #58a6ff; }
+  .db-cat-btn.active {
+    background: #201a35; border: 2px solid #a371f7;
+    box-shadow: 0 0 14px rgba(163, 113, 247, 0.25);
+  }
+  .db-cat-btn.loaded { border-left: 4px solid #2ea043; }
+  .db-slot-top {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    font-weight: 700; font-size: 0.9rem;
+  }
+  .db-slot-sub {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    font-size: 0.75rem; color: var(--text-secondary);
+  }
+  .db-bulk-bar {
+    background: #141824; border: 1px solid var(--border-color); border-radius: 10px;
+    padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+  }
+  .effect-tag {
+    display: inline-flex; align-items: center; gap: 6px; background: #1e2638;
+    border: 1px solid #35415f; border-radius: 6px; padding: 4px 10px;
+    font-size: 0.78rem; color: #79c0ff;
+  }
+
   /* Toast & Modals */
   .toast {
     position: fixed; bottom: 24px; right: 24px;
@@ -367,9 +413,9 @@ const htmlContent = `<!DOCTYPE html>
       <div style="color:var(--text-secondary); font-size:0.9rem; max-width:680px;">
         Auto-detects: <b>Save Files</b> (<code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rxdata</code>, <code>.lsd</code>) or <b>Database Files</b> (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>)
       </div>
-      <input type="file" id="file-input" style="display:none;">
+      <input type="file" id="file-input" multiple style="display:none;">
       <div style="display:flex; gap:10px; margin-top:10px;">
-        <button class="btn btn-blue" onclick="document.getElementById('file-input').click()">Browse File</button>
+        <button class="btn btn-blue" onclick="document.getElementById('file-input').click()">Browse File(s)</button>
         <button class="btn btn-purple" id="btn-quick-open-db">🛠️ Open Game Database (data/*.json)</button>
       </div>
     </div>
@@ -528,20 +574,82 @@ const htmlContent = `<!DOCTYPE html>
   <!-- 3. GAME DATABASE MODDER STUDIO                            -->
   <!-- ========================================================= -->
   <div id="db-modder-screen">
-    <!-- DB Meta Toolbar -->
-    <div class="db-toolbar">
+    <!-- Top Multi-File Drop Guide & 4 Category Slots -->
+    <div class="db-drop-banner" id="db-drop-banner">
       <div style="display:flex; align-items:center; gap:12px;">
-        <span style="font-size:1.2rem; font-weight:800; color:#bc8cff;" id="db-label-type">⚔️ WEAPONS DATABASE</span>
+        <div style="font-size:2rem;">📂</div>
+        <div>
+          <div style="font-weight:800; font-size:0.98rem; color:#fff;">ลากไฟล์ Database (.json) มาวางที่นี่ได้พร้อมกันหลายไฟล์!</div>
+          <div style="font-size:0.8rem; color:var(--text-secondary);">
+            หาไฟล์ได้จากโฟลเดอร์เกม <code>data/</code> หรือ <code>www/data/</code> (เช่น <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>) ลากมาวางรวดเดียวได้เลย
+          </div>
+        </div>
+      </div>
+      <input type="file" id="db-multi-file-input" multiple accept=".json" style="display:none;">
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-purple btn-sm" id="btn-db-browse-multi">📂 เลือกไฟล์ .json (เลือกหลายไฟล์ได้)</button>
+      </div>
+    </div>
+
+    <!-- 4 Category Status Cards -->
+    <div class="db-slot-grid">
+      <button class="db-cat-btn active" data-cat="weapons" id="slot-btn-weapons">
+        <div class="db-slot-top">
+          <span>⚔️ อาวุธ (Weapons)</span>
+          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Weapons.json</span>
+        </div>
+        <div class="db-slot-sub">
+          <span id="db-slot-status-weapons" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
+          <span id="db-slot-mod-weapons" style="color:#7ee787; font-weight:700;"></span>
+        </div>
+      </button>
+
+      <button class="db-cat-btn" data-cat="armors" id="slot-btn-armors">
+        <div class="db-slot-top">
+          <span>🛡️ เครื่องป้องกัน (Armors)</span>
+          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Armors.json</span>
+        </div>
+        <div class="db-slot-sub">
+          <span id="db-slot-status-armors" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
+          <span id="db-slot-mod-armors" style="color:#7ee787; font-weight:700;"></span>
+        </div>
+      </button>
+
+      <button class="db-cat-btn" data-cat="items" id="slot-btn-items">
+        <div class="db-slot-top">
+          <span>🎒 ไอเทม (Items)</span>
+          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Items.json</span>
+        </div>
+        <div class="db-slot-sub">
+          <span id="db-slot-status-items" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
+          <span id="db-slot-mod-items" style="color:#7ee787; font-weight:700;"></span>
+        </div>
+      </button>
+
+      <button class="db-cat-btn" data-cat="skills" id="slot-btn-skills">
+        <div class="db-slot-top">
+          <span>⚡ สกิล (Skills)</span>
+          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Skills.json</span>
+        </div>
+        <div class="db-slot-sub">
+          <span id="db-slot-status-skills" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
+          <span id="db-slot-mod-skills" style="color:#7ee787; font-weight:700;"></span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Active Category Toolbar & Bulk Actions -->
+    <div class="db-toolbar">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-size:1.1rem; font-weight:800; color:#bc8cff;" id="db-label-type">⚔️ WEAPONS DATABASE</span>
         <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:#7ee787;" id="db-label-filename">Weapons.json</span>
         <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:var(--text-secondary);" id="db-label-count">0 ITEMS</span>
+        <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:#7ee787; display:none;" id="db-label-modified">0 MODIFIED</span>
       </div>
 
-      <!-- Category Quick Switcher -->
-      <div style="display:flex; gap:6px;">
-        <button class="btn btn-secondary btn-sm db-cat-btn active" data-cat="weapons">⚔️ Weapons</button>
-        <button class="btn btn-secondary btn-sm db-cat-btn" data-cat="armors">🛡️ Armors</button>
-        <button class="btn btn-secondary btn-sm db-cat-btn" data-cat="items">🎒 Items</button>
-        <button class="btn btn-secondary btn-sm db-cat-btn" data-cat="skills">⚡ Skills</button>
+      <!-- Bulk Quick-Mod Actions for Current File -->
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;" id="db-bulk-actions">
+        <!-- Populated dynamically per category -->
       </div>
     </div>
 
@@ -549,8 +657,14 @@ const htmlContent = `<!DOCTYPE html>
     <div class="db-layout">
       <!-- Left List Panel -->
       <div class="db-list-panel">
-        <div class="db-search-box">
-          <input type="text" class="db-search-input" id="db-search-input" placeholder="Search name, ID, or description...">
+        <div class="db-search-box" style="display:flex; flex-direction:column; gap:8px;">
+          <input type="text" class="db-search-input" id="db-search-input" placeholder="🔍 ค้นหาชื่อ, ID (เช่น 2), หรือคำอธิบาย...">
+          <div style="display:flex; align-items:center; justify-content:space-between; font-size:0.78rem; color:var(--text-secondary);">
+            <label style="cursor:pointer; display:flex; align-items:center; gap:6px;">
+              <input type="checkbox" id="db-filter-modified"> ✏️ แสดงเฉพาะที่แก้ไขแล้ว
+            </label>
+            <span id="db-list-showing-label">แสดง 0 รายการ</span>
+          </div>
         </div>
         <div class="db-items-scroll" id="db-items-list-container">
           <!-- Dynamically populated list rows -->
@@ -560,9 +674,9 @@ const htmlContent = `<!DOCTYPE html>
       <!-- Right Detail Panel -->
       <div class="db-detail-panel" id="db-detail-container">
         <div style="text-align:center; padding:60px 20px; color:var(--text-muted);">
-          <div style="font-size:3rem; margin-bottom:10px;">👈</div>
-          <div style="font-size:1.1rem; font-weight:600; color:#fff;">Select an item from the list to edit</div>
-          <div style="font-size:0.85rem; margin-top:4px;">You can customize stats, damage formulas, costs, and effects.</div>
+          <div style="font-size:3rem; margin-bottom:10px;">📂</div>
+          <div style="font-size:1.1rem; font-weight:600; color:#fff;">ลากไฟล์ .json จากโฟลเดอร์ data/ มาวางเพื่อเริ่มแก้ไข</div>
+          <div style="font-size:0.85rem; margin-top:6px;">รองรับการลากวางหลายไฟล์พร้อมกัน (Weapons.json, Armors.json, Items.json, Skills.json)</div>
         </div>
       </div>
     </div>
@@ -606,12 +720,21 @@ const htmlContent = `<!DOCTYPE html>
     name: '', size: 0, rawBytes: null, format: '', formatLabel: '', parsedRoot: null, engine: ''
   };
 
+  // Multi-file Database Store (keeps Weapons, Armors, Items, Skills in memory simultaneously)
+  const dbStore = {
+    weapons: null,
+    armors: null,
+    items: null,
+    skills: null
+  };
+
   // Active Database State
   let currentDb = {
     category: 'weapons', // 'weapons', 'armors', 'items', 'skills'
     fileName: 'Weapons.json',
     fileHandle: null,    // File System Access API handle
     items: [],
+    origItemsJson: '[]',
     selectedId: null,
     modifiedIds: new Set()
   };
@@ -691,10 +814,9 @@ const htmlContent = `<!DOCTYPE html>
       uploadSection.style.display = 'none';
       saveEditorScreen.style.display = 'none';
       dbModderScreen.style.display = 'flex';
-      if (currentDb.items.length === 0) {
-        // Auto-prompt to load a database file
-        showToast('Please open or drop a data JSON file (Weapons, Armors, Items, Skills)', 'info');
-      }
+      updateDbSlotBadges();
+      renderDbBulkActions();
+      renderDbMasterList();
     }
   }
 
@@ -706,69 +828,152 @@ const htmlContent = `<!DOCTYPE html>
   };
 
   // -------------------------------------------------------------
-  // UNIVERSAL SAVE & DB DISPATCHER ON FILE DROP
+  // UNIVERSAL SAVE & DB DISPATCHER ON FILE DROP (MULTI-FILE READY)
   // -------------------------------------------------------------
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('file-input');
+  const dbDropBanner = document.getElementById('db-drop-banner');
+  const dbMultiFileInput = document.getElementById('db-multi-file-input');
+  const btnDbBrowseMulti = document.getElementById('btn-db-browse-multi');
 
   dropzone.onclick = (e) => { if (e.target.tagName !== 'BUTTON') fileInput.click(); };
   dropzone.ondragover = (e) => { e.preventDefault(); dropzone.style.borderColor = '#388bfd'; };
   dropzone.ondragleave = () => { dropzone.style.borderColor = 'var(--border-color)'; };
   dropzone.ondrop = (e) => {
     e.preventDefault();
-    if (e.dataTransfer && e.dataTransfer.files[0]) handleIncomingFile(e.dataTransfer.files[0]);
+    dropzone.style.borderColor = 'var(--border-color)';
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleIncomingFiles(e.dataTransfer.files);
+    }
   };
   fileInput.onchange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      handleIncomingFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      handleIncomingFiles(e.target.files);
       fileInput.value = '';
     }
   };
-  window.addEventListener('dragover', (e) => e.preventDefault());
+
+  if (btnDbBrowseMulti && dbMultiFileInput) {
+    btnDbBrowseMulti.onclick = (e) => {
+      e.stopPropagation();
+      dbMultiFileInput.click();
+    };
+    dbDropBanner.onclick = (e) => {
+      if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') dbMultiFileInput.click();
+    };
+    dbMultiFileInput.onchange = (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleIncomingFiles(e.target.files);
+        dbMultiFileInput.value = '';
+      }
+    };
+  }
+
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (dbDropBanner) dbDropBanner.classList.add('drag-over');
+  });
+  window.addEventListener('dragleave', (e) => {
+    if (dbDropBanner && (!e.relatedTarget || e.relatedTarget.nodeName === 'HTML')) {
+      dbDropBanner.classList.remove('drag-over');
+    }
+  });
   window.addEventListener('drop', (e) => {
     e.preventDefault();
-    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleIncomingFile(e.dataTransfer.files[0]);
+    if (dbDropBanner) dbDropBanner.classList.remove('drag-over');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleIncomingFiles(e.dataTransfer.files);
     }
   });
 
+  function isDatabaseJsonFilename(name) {
+    const n = name.toLowerCase();
+    return n === 'weapons.json' || n === 'armors.json' || n === 'items.json' || n === 'skills.json' || n === 'enemies.json' || n === 'system.json' || n === 'actors.json';
+  }
+
   function handleIncomingFile(file) {
-    const name = file.name.toLowerCase();
-    // Check if it is a database file
-    if (name === 'weapons.json' || name === 'armors.json' || name === 'items.json' || name === 'skills.json' || name === 'enemies.json') {
-      loadDatabaseFile(file);
-    } else {
-      loadSaveFile(file);
+    handleIncomingFiles([file]);
+  }
+
+  function handleIncomingFiles(fileList) {
+    const files = Array.from(fileList || []);
+    if (files.length === 0) return;
+
+    // Separate database JSON files from save files
+    const jsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.json') && (isDatabaseJsonFilename(f.name) || currentAppMode === 'database' || files.length > 1));
+    if (jsonFiles.length > 0) {
+      jsonFiles.forEach((f, idx) => loadDatabaseFile(f, null, idx === 0));
+      return;
     }
+
+    // Otherwise load first file as save file
+    loadSaveFile(files[0]);
   }
 
   // -------------------------------------------------------------
   // DATABASE MODDER LOGIC
   // -------------------------------------------------------------
-  function loadDatabaseFile(file, handle = null) {
+  function detectDbCategory(fileName, jsonArr) {
+    const baseName = fileName.replace(/\.json$/i, '').toLowerCase();
+    if (baseName.includes('weapon')) return 'weapons';
+    if (baseName.includes('armor')) return 'armors';
+    if (baseName.includes('item')) return 'items';
+    if (baseName.includes('skill')) return 'skills';
+    // Fallback heuristic based on RPG Maker object keys
+    const sample = (jsonArr || []).find(x => x && typeof x === 'object' && x.id);
+    if (sample) {
+      if ('wtypeId' in sample) return 'weapons';
+      if ('atypeId' in sample || 'etypeId' in sample) return 'armors';
+      if ('stypeId' in sample || 'mpCost' in sample) return 'skills';
+      if ('itypeId' in sample || 'consumable' in sample) return 'items';
+    }
+    return currentDb.category || 'items';
+  }
+
+  function loadDatabaseFile(file, handle = null, autoSwitch = true) {
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const json = JSON.parse(reader.result);
-        if (!Array.isArray(json)) throw new Error('Database file must contain a JSON array.');
+        const lower = file.name.toLowerCase();
 
-        const baseName = file.name.replace(/\.json$/i, '').toLowerCase();
-        let cat = 'weapons';
-        if (baseName.includes('armor')) cat = 'armors';
-        else if (baseName.includes('item')) cat = 'items';
-        else if (baseName.includes('skill')) cat = 'skills';
+        // Support System.json for variable/switch names if dropped together
+        if (!Array.isArray(json) && json && typeof json === 'object') {
+          if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
+          if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+          showToast(\`โหลดชื่อ Variables/Switches จาก \${file.name} แล้ว!\`, 'success');
+          return;
+        }
 
-        currentDb.category = cat;
-        currentDb.fileName = file.name;
-        currentDb.fileHandle = handle;
-        currentDb.items = json;
-        currentDb.modifiedIds.clear();
+        if (!Array.isArray(json)) throw new Error('ไฟล์ Database (.json) ต้องเป็น JSON Array ของ RPG Maker');
 
-        // Update UI
+        const cat = detectDbCategory(file.name, json);
+        const validItems = json.filter(x => x && x.id);
+
+        // Also sync names into Save Editor's gameData dictionary
+        if (gameData[cat]) {
+          validItems.forEach(x => { if (x.id && x.name) gameData[cat][x.id] = x.name; });
+        }
+
+        dbStore[cat] = {
+          category: cat,
+          fileName: file.name,
+          fileHandle: handle,
+          items: json,
+          origItemsJson: JSON.stringify(json),
+          selectedId: validItems.length > 0 ? validItems[0].id : null,
+          modifiedIds: new Set()
+        };
+
+        if (autoSwitch || !dbStore[currentDb.category]) {
+          syncCurrentDbFromStore(cat);
+        }
         switchAppMode('database');
-        updateDbCategoryButtons(cat);
+        updateDbCategoryButtons(currentDb.category);
+        updateDbSlotBadges();
+        renderDbBulkActions();
         renderDbMasterList();
-        showToast(\`Loaded \${file.name} successfully!\`, 'success');
+        showToast(\`โหลด \${file.name} (\${validItems.length} รายการ) สำเร็จ!\`, 'success');
       } catch(e) {
         alert('Error parsing database JSON:\\n' + e.message);
       }
@@ -776,52 +981,266 @@ const htmlContent = `<!DOCTYPE html>
     reader.readAsText(file);
   }
 
+  function syncCurrentDbFromStore(cat) {
+    const defaultNames = { weapons: 'Weapons.json', armors: 'Armors.json', items: 'Items.json', skills: 'Skills.json' };
+    if (dbStore[cat]) {
+      currentDb.category = cat;
+      currentDb.fileName = dbStore[cat].fileName;
+      currentDb.fileHandle = dbStore[cat].fileHandle;
+      currentDb.items = dbStore[cat].items;
+      currentDb.origItemsJson = dbStore[cat].origItemsJson;
+      currentDb.selectedId = dbStore[cat].selectedId;
+      currentDb.modifiedIds = dbStore[cat].modifiedIds;
+    } else {
+      currentDb.category = cat;
+      currentDb.fileName = defaultNames[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1) + '.json');
+      currentDb.fileHandle = null;
+      currentDb.items = [];
+      currentDb.origItemsJson = '[]';
+      currentDb.selectedId = null;
+      currentDb.modifiedIds = new Set();
+    }
+  }
+
+  function updateDbSlotBadges() {
+    ['weapons', 'armors', 'items', 'skills'].forEach(cat => {
+      const slotBtn = document.getElementById('slot-btn-' + cat);
+      const statusEl = document.getElementById('db-slot-status-' + cat);
+      const modEl = document.getElementById('db-slot-mod-' + cat);
+      const store = dbStore[cat];
+      if (!slotBtn || !statusEl || !modEl) return;
+
+      if (store && store.items && store.items.length > 0) {
+        const count = store.items.filter(x => x && x.id).length;
+        slotBtn.classList.add('loaded');
+        statusEl.innerHTML = \`🟢 โหลดแล้ว <b>\${count}</b> ชิ้น\`;
+        statusEl.style.color = '#7ee787';
+        modEl.textContent = store.modifiedIds.size > 0 ? \`✏️ แก้ \${store.modifiedIds.size}\` : '';
+      } else {
+        slotBtn.classList.remove('loaded');
+        statusEl.textContent = '⚪ ยังไม่โหลด (คลิก/ลากวาง)';
+        statusEl.style.color = '#8b949e';
+        modEl.textContent = '';
+      }
+    });
+
+    const modBadge = document.getElementById('db-label-modified');
+    if (modBadge) {
+      const modCount = currentDb.modifiedIds ? currentDb.modifiedIds.size : 0;
+      modBadge.style.display = modCount > 0 ? 'inline-block' : 'none';
+      modBadge.textContent = \`✏️ แก้ไขแล้ว \${modCount} รายการ\`;
+    }
+  }
+
   function updateDbCategoryButtons(cat) {
     document.querySelectorAll('.db-cat-btn').forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
     });
     document.getElementById('db-label-filename').textContent = currentDb.fileName;
-    const catTitles = { weapons: '⚔️ WEAPONS DATABASE', armors: '🛡️ ARMORS DATABASE', items: '🎒 ITEMS DATABASE', skills: '⚡ SKILLS DATABASE' };
+    const catTitles = {
+      weapons: '⚔️ WEAPONS DATABASE (คลังอาวุธ)',
+      armors: '🛡️ ARMORS DATABASE (คลังเครื่องป้องกัน)',
+      items: '🎒 ITEMS DATABASE (คลังไอเทม)',
+      skills: '⚡ SKILLS DATABASE (คลังสกิล)'
+    };
     document.getElementById('db-label-type').textContent = catTitles[cat] || 'DATABASE MODDER';
   }
 
   document.querySelectorAll('.db-cat-btn').forEach(btn => {
     btn.onclick = () => {
       const cat = btn.getAttribute('data-cat');
-      currentDb.category = cat;
-      currentDb.fileName = cat.charAt(0).toUpperCase() + cat.slice(1) + '.json';
+      syncCurrentDbFromStore(cat);
       updateDbCategoryButtons(cat);
-      showToast(\`Switched to \${cat}. Please open or drop \${currentDb.fileName} if not loaded.\`, 'info');
+      updateDbSlotBadges();
+      renderDbBulkActions();
+      renderDbMasterList();
     };
   });
+
+  function renderDbBulkActions() {
+    const bulkContainer = document.getElementById('db-bulk-actions');
+    if (!bulkContainer) return;
+    const validItems = currentDb.items.filter(x => x && x.id);
+    if (validItems.length === 0) {
+      bulkContainer.innerHTML = '';
+      return;
+    }
+
+    const cat = currentDb.category;
+    let buttonsHtml = \`<span style="font-size:0.78rem; color:var(--text-secondary); font-weight:700;">⚡ แก้ทั้งไฟล์:</span>\`;
+    if (cat === 'weapons' || cat === 'armors') {
+      buttonsHtml += \`
+        <button class="btn btn-gold btn-sm" id="btn-bulk-god-all">\${cat==='weapons'?'⚔️ อาวุธทุกชิ้น ATK+9999':'🛡️ เกราะทุกชิ้น DEF+9999'}</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-free-all">🪙 ราคา 0 ทั้งไฟล์</button>
+      \`;
+    } else if (cat === 'items') {
+      buttonsHtml += \`
+        <button class="btn btn-blue btn-sm" id="btn-bulk-infinite-all">♾️ ใช้ไม่หมดทั้งไฟล์</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-free-all">🪙 ราคา 0 ทั้งไฟล์</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-zero-weight-all">⚖️ ลบน้ำหนัก [0W] ทั้งไฟล์</button>
+      \`;
+    } else if (cat === 'skills') {
+      buttonsHtml += \`
+        <button class="btn btn-blue btn-sm" id="btn-bulk-free-mp-all">⚡ สกิล 0 MP/TP ทั้งไฟล์</button>
+      \`;
+    }
+    buttonsHtml += \`<button class="btn btn-secondary btn-sm" id="btn-bulk-revert-all" title="คืนค่าเดิมทั้งไฟล์">↺ คืนค่าทั้งไฟล์</button>\`;
+    bulkContainer.innerHTML = buttonsHtml;
+
+    const btnBulkFree = document.getElementById('btn-bulk-free-all');
+    if (btnBulkFree) {
+      btnBulkFree.onclick = () => {
+        currentDb.items.filter(x => x && x.id).forEach(it => { if (it.price !== undefined) { it.price = 0; currentDb.modifiedIds.add(it.id); } });
+        finishBulkAction('ปรับราคาทุกชิ้นในไฟล์เป็น 0 G แล้ว!');
+      };
+    }
+    const btnBulkGod = document.getElementById('btn-bulk-god-all');
+    if (btnBulkGod) {
+      btnBulkGod.onclick = () => {
+        currentDb.items.filter(x => x && x.id).forEach(it => {
+          if (!it.params) it.params = [0,0,0,0,0,0,0,0];
+          if (cat === 'weapons') { it.params[2] = 9999; it.params[4] = 9999; }
+          else { it.params[3] = 9999; it.params[5] = 9999; }
+          currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('ปรับสเตตัส 9999 ทั้งไฟล์แล้ว!');
+      };
+    }
+    const btnBulkInf = document.getElementById('btn-bulk-infinite-all');
+    if (btnBulkInf) {
+      btnBulkInf.onclick = () => {
+        currentDb.items.filter(x => x && x.id).forEach(it => {
+          if (it.consumable) { it.consumable = false; currentDb.modifiedIds.add(it.id); }
+        });
+        finishBulkAction('ปรับไอเทมทุกชิ้นให้ใช้ไม่หมด (Infinite) แล้ว!');
+      };
+    }
+    const btnBulkWeight = document.getElementById('btn-bulk-zero-weight-all');
+    if (btnBulkWeight) {
+      btnBulkWeight.onclick = () => {
+        currentDb.items.filter(x => x && x.id).forEach(it => {
+          if (zeroItemWeight(it)) currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('ปรับน้ำหนัก [Weight: 0W] ทุกชิ้นแล้ว!');
+      };
+    }
+    const btnBulkMp = document.getElementById('btn-bulk-free-mp-all');
+    if (btnBulkMp) {
+      btnBulkMp.onclick = () => {
+        currentDb.items.filter(x => x && x.id).forEach(it => {
+          it.mpCost = 0;
+          it.tpCost = 0;
+          currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('ปรับสกิลทุกอันให้ใช้ 0 MP / 0 TP แล้ว!');
+      };
+    }
+    const btnBulkRev = document.getElementById('btn-bulk-revert-all');
+    if (btnBulkRev) {
+      btnBulkRev.onclick = () => {
+        if (!currentDb.origItemsJson) return;
+        currentDb.items = JSON.parse(currentDb.origItemsJson);
+        currentDb.modifiedIds.clear();
+        if (dbStore[cat]) {
+          dbStore[cat].items = currentDb.items;
+        }
+        updateDbSlotBadges();
+        renderDbBulkActions();
+        renderDbMasterList();
+        showToast('คืนค่าเดิมทั้งไฟล์เรียบร้อย!', 'info');
+      };
+    }
+  }
+
+  function zeroItemWeight(item) {
+    let changed = false;
+    if (typeof item.description === 'string' && /weight\s*:\s*\d+/i.test(item.description)) {
+      item.description = item.description.replace(/(weight\s*:\s*)\d+(\s*w?)/gi, '$10$2');
+      changed = true;
+    }
+    if (typeof item.note === 'string' && /weight\s*:\s*\d+/i.test(item.note)) {
+      item.note = item.note.replace(/(weight\s*:\s*)\d+(\s*w?)/gi, '$10$2');
+      changed = true;
+    }
+    return changed;
+  }
+
+  function finishBulkAction(msg) {
+    updateDbSlotBadges();
+    renderDbMasterList();
+    const cur = currentDb.items.find(x => x && x.id === currentDb.selectedId);
+    if (cur) renderDbDetail(cur);
+    showToast(msg, 'success');
+  }
 
   // Render Master List (Left Pane)
   function renderDbMasterList() {
     const container = document.getElementById('db-items-list-container');
+    const detailContainer = document.getElementById('db-detail-container');
+    const showingLabel = document.getElementById('db-list-showing-label');
+    if (!container) return;
     container.innerHTML = '';
 
-    const q = document.getElementById('db-search-input').value.trim().toLowerCase();
     const validItems = currentDb.items.filter(x => x && x.id);
     document.getElementById('db-label-count').textContent = \`\${validItems.length} ITEMS\`;
 
+    // If current category file is not loaded yet, show a clear, friendly drop prompt
+    if (validItems.length === 0) {
+      if (showingLabel) showingLabel.textContent = 'ยังไม่ได้โหลดไฟล์';
+      container.innerHTML = \`
+        <div style="padding:36px 20px; text-align:center; color:var(--text-secondary);">
+          <div style="font-size:2.4rem; margin-bottom:8px;">📥</div>
+          <div style="font-weight:700; color:#fff; margin-bottom:6px;">ยังไม่ได้โหลดไฟล์ \${currentDb.fileName}</div>
+          <div style="font-size:0.8rem; margin-bottom:14px;">ลากไฟล์ <b>\${currentDb.fileName}</b> จากโฟลเดอร์ <code>data/</code> มาวาง หรือกดปุ่มด้านล่าง</div>
+          <button class="btn btn-purple btn-sm" id="btn-empty-load-cat">📂 เลือกไฟล์ \${currentDb.fileName}</button>
+        </div>
+      \`;
+      if (detailContainer) {
+        detailContainer.innerHTML = \`
+          <div style="text-align:center; padding:60px 20px; color:var(--text-muted); border:2px dashed #353f58; border-radius:12px; margin:auto 0;">
+            <div style="font-size:3.2rem; margin-bottom:12px;">📂</div>
+            <div style="font-size:1.15rem; font-weight:700; color:#fff;">หมวด \${currentDb.fileName} ยังไม่ได้โหลดไฟล์</div>
+            <div style="font-size:0.88rem; margin-top:6px; color:var(--text-secondary);">
+              คุณสามารถลากไฟล์ <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code><br>
+              จากโฟลเดอร์ <code>data/</code> ของเกมมาวางพร้อมกันทีเดียวได้เลย!
+            </div>
+            <button class="btn btn-purple" style="margin-top:16px;" id="btn-detail-empty-browse">📂 เลือกไฟล์ .json จากเครื่อง</button>
+          </div>
+        \`;
+        const b2 = document.getElementById('btn-detail-empty-browse');
+        if (b2) b2.onclick = () => dbMultiFileInput ? dbMultiFileInput.click() : fileInput.click();
+      }
+      const b1 = document.getElementById('btn-empty-load-cat');
+      if (b1) b1.onclick = () => dbMultiFileInput ? dbMultiFileInput.click() : fileInput.click();
+      return;
+    }
+
+    const q = (document.getElementById('db-search-input').value || '').trim().toLowerCase();
+    const onlyModEl = document.getElementById('db-filter-modified');
+    const onlyMod = onlyModEl && onlyModEl.checked;
+
+    let shownCount = 0;
     validItems.forEach(item => {
-      const name = item.name || '(Unnamed)';
+      const name = item.name || '(ไม่มีชื่อ / Unnamed)';
       const idStr = String(item.id);
       const desc = item.description || '';
-      if (q && !idStr.includes(q) && !name.toLowerCase().includes(q) && !desc.toLowerCase().includes(q)) return;
+      if (onlyMod && !currentDb.modifiedIds.has(item.id)) return;
+      if (q && !idStr.includes(q.replace(/^#/, '')) && !name.toLowerCase().includes(q) && !desc.toLowerCase().includes(q)) return;
 
+      shownCount++;
       const row = document.createElement('div');
       row.className = \`db-list-row \${currentDb.selectedId === item.id ? 'active' : ''} \${currentDb.modifiedIds.has(item.id) ? 'is-modified' : ''}\`;
       row.innerHTML = \`
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
           <span class="db-row-id">#\${item.id}</span>
           <span class="db-row-name" title="\${name}">\${name}</span>
         </div>
-        <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">\${getQuickPreviewBadge(item)}</span>
+        <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono); white-space:nowrap;">\${getQuickPreviewBadge(item)}</span>
       \`;
 
       row.onclick = () => {
         currentDb.selectedId = item.id;
+        if (dbStore[currentDb.category]) dbStore[currentDb.category].selectedId = item.id;
         document.querySelectorAll('.db-list-row').forEach(r => r.classList.remove('active'));
         row.classList.add('active');
         renderDbDetail(item);
@@ -830,9 +1249,12 @@ const htmlContent = `<!DOCTYPE html>
       container.appendChild(row);
     });
 
-    if (!currentDb.selectedId && validItems.length > 0) {
-      currentDb.selectedId = validItems[0].id;
-      renderDbDetail(validItems[0]);
+    if (showingLabel) showingLabel.textContent = \`แสดง \${shownCount} / \${validItems.length} รายการ\`;
+
+    const selectedObj = validItems.find(x => x.id === currentDb.selectedId) || validItems[0];
+    if (selectedObj) {
+      currentDb.selectedId = selectedObj.id;
+      renderDbDetail(selectedObj);
     }
   }
 
@@ -847,12 +1269,39 @@ const htmlContent = `<!DOCTYPE html>
       return \`\${item.mpCost || 0} MP\`;
     }
     if (currentDb.category === 'items') {
-      return item.price !== undefined ? \`\${item.price} G\` : '';
+      const inf = item.consumable === false ? '♾️ ' : '';
+      return inf + (item.price !== undefined ? \`\${item.price} G\` : '');
     }
     return '';
   }
 
   document.getElementById('db-search-input').oninput = renderDbMasterList;
+  const dbFilterMod = document.getElementById('db-filter-modified');
+  if (dbFilterMod) dbFilterMod.onchange = renderDbMasterList;
+
+  function getEffectValue(item, code, field) {
+    if (!Array.isArray(item.effects)) return 0;
+    const eff = item.effects.find(e => e && e.code === code && (!e.dataId || e.dataId === 0));
+    if (!eff) return 0;
+    if (field === 'pct') return Math.round((eff.value1 || 0) * 100);
+    return eff.value2 || eff.value1 || 0;
+  }
+
+  function setEffectValue(item, code, pctVal, flatVal) {
+    if (!Array.isArray(item.effects)) item.effects = [];
+    let eff = item.effects.find(e => e && e.code === code && (!e.dataId || e.dataId === 0));
+    if (!eff) {
+      eff = { code: code, dataId: 0, value1: 0, value2: 0 };
+      item.effects.push(eff);
+    }
+    if (code === 13) {
+      eff.value1 = Number(pctVal) || 0;
+      eff.value2 = 0;
+    } else {
+      eff.value1 = (Number(pctVal) || 0) / 100;
+      eff.value2 = Number(flatVal) || 0;
+    }
+  }
 
   // Render Detail Editor (Right Pane)
   function renderDbDetail(item) {
@@ -863,13 +1312,16 @@ const htmlContent = `<!DOCTYPE html>
     let specificHtml = '';
 
     if (cat === 'weapons' || cat === 'armors') {
-      const paramNames = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
+      const paramLabels = [
+        'MHP (เลือดสูงสุด)', 'MMP (มานาสูงสุด)', 'ATK (พลังโจมตี)', 'DEF (พลังป้องกัน)',
+        'MAT (โจมตีเวท)', 'MDF (ป้องกันเวท)', 'AGI (ความเร็ว)', 'LUK (โชค)'
+      ];
       const p = item.params || [0,0,0,0,0,0,0,0];
       let paramInputs = '';
-      paramNames.forEach((name, i) => {
+      paramLabels.forEach((label, i) => {
         paramInputs += \`
           <div class="db-field-box">
-            <span class="db-field-label">\${name} \${i===2?'(Attack)':(i===3?'(Defense)':'')}</span>
+            <span class="db-field-label">\${label}</span>
             <input type="number" class="stat-input db-stat-input" data-idx="\${i}" value="\${p[i]||0}">
           </div>
         \`;
@@ -877,50 +1329,99 @@ const htmlContent = `<!DOCTYPE html>
 
       specificHtml = \`
         <div class="preset-bar">
-          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ Quick Presets:</span>
-          <button class="btn btn-gold btn-sm" id="btn-db-god-weapon">\${cat==='weapons'?'⚔️ God Weapon (ATK 9999)':'🛡️ Invincible Armor (DEF 9999)'}</button>
-          <button class="btn btn-secondary btn-sm" id="btn-db-free-price">🪙 Set Price 0</button>
+          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ ปุ่มลัดชิ้นนี้:</span>
+          <button class="btn btn-gold btn-sm" id="btn-db-god-weapon">\${cat==='weapons'?'⚔️ อาวุธเทพ (ATK/MAT 9999)':'🛡️ เกราะอมตะ (DEF 9999 / MHP 99999)'}</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-free-price">🪙 ราคา 0 G</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-zero-weight">⚖️ ลบน้ำหนัก [0W]</button>
         </div>
 
-        <div style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:6px;">Combat Attributes &amp; Stats:</div>
+        <div style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:4px;">ค่าพลังสเตตัส (Combat Stats):</div>
         <div class="db-field-grid">\${paramInputs}</div>
       \`;
     } else if (cat === 'items') {
       const dmg = item.damage || {};
+      const hpPct = getEffectValue(item, 11, 'pct');
+      const hpFlat = getEffectValue(item, 11, 'flat');
+      const mpPct = getEffectValue(item, 12, 'pct');
+      const mpFlat = getEffectValue(item, 12, 'flat');
+      const tpEff = getEffectValue(item, 13, 'flat');
+
       specificHtml = \`
         <div class="preset-bar">
-          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ Quick Presets:</span>
-          <button class="btn btn-blue btn-sm" id="btn-db-make-infinite">♾️ Make Infinite (Never Consumed)</button>
-          <button class="btn btn-secondary btn-sm" id="btn-db-free-price">🪙 Set Price 0</button>
+          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ ปุ่มลัดชิ้นนี้:</span>
+          <button class="btn btn-blue btn-sm" id="btn-db-make-infinite">♾️ ใช้ไม่หมด (Infinite)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-free-price">🪙 ราคา 0 G</button>
+          <button class="btn btn-gold btn-sm" id="btn-db-full-heal-item">💖 ฟื้นฟู HP/MP 100%</button>
+          <button class="btn btn-purple btn-sm" id="btn-db-max-tp-item">🔥 เพิ่ม TP/AP +100</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-zero-weight">⚖️ ลบน้ำหนัก [0W]</button>
         </div>
 
         <div class="db-field-grid">
           <div class="db-field-box">
-            <span class="db-field-label">Consumable on Use</span>
+            <span class="db-field-label">ใช้แล้วหมดไป (Consumable)</span>
             <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
               <label class="toggle-switch">
                 <input type="checkbox" id="item-consumable" \${item.consumable?'checked':''}>
                 <span class="slider"></span>
               </label>
-              <span style="font-size:0.82rem; color:var(--text-muted);">Turn OFF for Infinite Item!</span>
+              <span style="font-size:0.8rem; color:\${item.consumable ? 'var(--text-muted)' : '#7ee787; font-weight:700'};">
+                \${item.consumable ? 'เปิดอยู่ (ใช้แล้วลดลง)' : '♾️ ปิดอยู่ (ใช้ได้ไม่จำกัด!)'}
+              </span>
             </div>
           </div>
 
           <div class="db-field-box">
-            <span class="db-field-label">Target Scope</span>
+            <span class="db-field-label">เป้าหมาย (Target Scope)</span>
             <select id="item-scope" class="stat-input" style="font-size:0.85rem; padding:6px;">
-              <option value="1" \${item.scope===1?'selected':''}>One Enemy</option>
-              <option value="2" \${item.scope===2?'selected':''}>All Enemies</option>
-              <option value="7" \${item.scope===7?'selected':''}>One Ally</option>
-              <option value="8" \${item.scope===8?'selected':''}>All Allies</option>
-              <option value="11" \${item.scope===11?'selected':''}>The User</option>
-              <option value="0" \${item.scope===0?'selected':''}>None</option>
+              <option value="1" \${item.scope===1?'selected':''}>ศัตรู 1 ตัว (One Enemy)</option>
+              <option value="2" \${item.scope===2?'selected':''}>ศัตรูทั้งหมด (All Enemies)</option>
+              <option value="7" \${item.scope===7?'selected':''}>เพื่อนร่วมทีม 1 คน (One Ally)</option>
+              <option value="8" \${item.scope===8?'selected':''}>ทั้งปาร์ตี้ (All Allies)</option>
+              <option value="9" \${item.scope===9?'selected':''}>ชุบชีวิตเพื่อน 1 คน (Dead Ally)</option>
+              <option value="11" \${item.scope===11?'selected':''}>ตัวเอง (The User)</option>
+              <option value="0" \${item.scope===0?'selected':''}>ไม่ระบุ (None)</option>
             </select>
           </div>
 
-          <div class="db-field-box" style="grid-column: 1 / -1;">
-            <span class="db-field-label">Damage / Healing Formula</span>
-            <input type="text" class="stat-input" id="item-formula" value="\${dmg.formula || '0'}" placeholder="e.g. 200 + b.mhp * 0.2">
+          <div class="db-field-box">
+            <span class="db-field-label">จำนวนครั้งที่ออกผล (Repeats)</span>
+            <input type="number" class="stat-input" id="item-repeats" value="\${item.repeats || 1}" min="1" max="99">
+          </div>
+
+          <div class="db-field-box">
+            <span class="db-field-label">ได้รับ TP/AP ทันที (TP Gain)</span>
+            <input type="number" class="stat-input" id="item-tp-gain" value="\${item.tpGain || 0}">
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:4px;">💖 ผลลัพธ์การฟื้นฟู (Item Recovery Effects):</div>
+        <div class="db-field-grid">
+          <div class="db-field-box">
+            <span class="db-field-label">ฟื้นฟู HP (%) + ค่าคงที่</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="number" class="stat-input" id="item-eff-hp-pct" value="\${hpPct}" placeholder="%" title="เปอร์เซ็นต์ HP" style="width:50%;">
+              <span style="color:var(--text-secondary); font-size:0.8rem;">% +</span>
+              <input type="number" class="stat-input" id="item-eff-hp-flat" value="\${hpFlat}" placeholder="หน่วย" title="ค่าคงที่ HP" style="width:50%;">
+            </div>
+          </div>
+
+          <div class="db-field-box">
+            <span class="db-field-label">ฟื้นฟู MP (%) + ค่าคงที่</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="number" class="stat-input" id="item-eff-mp-pct" value="\${mpPct}" placeholder="%" title="เปอร์เซ็นต์ MP" style="width:50%;">
+              <span style="color:var(--text-secondary); font-size:0.8rem;">% +</span>
+              <input type="number" class="stat-input" id="item-eff-mp-flat" value="\${mpFlat}" placeholder="หน่วย" title="ค่าคงที่ MP" style="width:50%;">
+            </div>
+          </div>
+
+          <div class="db-field-box">
+            <span class="db-field-label">เพิ่มค่า TP/AP จากเอฟเฟกต์</span>
+            <input type="number" class="stat-input" id="item-eff-tp" value="\${tpEff}">
+          </div>
+
+          <div class="db-field-box">
+            <span class="db-field-label">สูตรดาเมจ / ฟื้นฟู (Damage Formula)</span>
+            <input type="text" class="stat-input" id="item-formula" value="\${dmg.formula || '0'}" placeholder="เช่น 200 + b.mhp * 0.2">
           </div>
         </div>
       \`;
@@ -928,38 +1429,46 @@ const htmlContent = `<!DOCTYPE html>
       const dmg = item.damage || {};
       specificHtml = \`
         <div class="preset-bar">
-          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ Quick Presets:</span>
-          <button class="btn btn-blue btn-sm" id="btn-db-free-mp">⚡ 0 MP / 0 TP Cost</button>
-          <button class="btn btn-danger btn-sm" id="btn-db-instakill">💥 99,999 Damage (Instant Kill)</button>
+          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ ปุ่มลัดสกิลนี้:</span>
+          <button class="btn btn-blue btn-sm" id="btn-db-free-mp">⚡ ใช้ 0 MP / 0 TP</button>
+          <button class="btn btn-danger btn-sm" id="btn-db-instakill">💥 ดาเมจ 99,999 (วันฮิตคิล)</button>
         </div>
 
         <div class="db-field-grid">
           <div class="db-field-box">
-            <span class="db-field-label">MP Cost</span>
+            <span class="db-field-label">ใช้ MP (MP Cost)</span>
             <input type="number" class="stat-input" id="skill-mp-cost" value="\${item.mpCost || 0}">
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">TP Cost</span>
+            <span class="db-field-label">ใช้ TP/AP (TP Cost)</span>
             <input type="number" class="stat-input" id="skill-tp-cost" value="\${item.tpCost || 0}">
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">Can Critical Hit?</span>
+            <span class="db-field-label">ติดคริติคอลได้? (Critical)</span>
             <label class="toggle-switch" style="margin-top:4px;">
               <input type="checkbox" id="skill-critical" \${dmg.critical?'checked':''}>
               <span class="slider"></span>
             </label>
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">Hit Type</span>
+            <span class="db-field-label">ประเภทการโจมตี (Hit Type)</span>
             <select id="skill-hit-type" class="stat-input" style="font-size:0.85rem; padding:6px;">
-              <option value="0" \${item.hitType===0?'selected':''}>Certain Hit</option>
-              <option value="1" \${item.hitType===1?'selected':''}>Physical Attack</option>
-              <option value="2" \${item.hitType===2?'selected':''}>Magical Attack</option>
+              <option value="0" \${item.hitType===0?'selected':''}>โดนแน่นอน 100% (Certain Hit)</option>
+              <option value="1" \${item.hitType===1?'selected':''}>กายภาพ (Physical Attack)</option>
+              <option value="2" \${item.hitType===2?'selected':''}>เวทมนตร์ (Magical Attack)</option>
             </select>
           </div>
+          <div class="db-field-box">
+            <span class="db-field-label">จำนวนครั้งที่โจมตี (Repeats)</span>
+            <input type="number" class="stat-input" id="skill-repeats" value="\${item.repeats || 1}" min="1" max="99">
+          </div>
+          <div class="db-field-box">
+            <span class="db-field-label">ได้รับ TP เมื่อใช้ (TP Gain)</span>
+            <input type="number" class="stat-input" id="skill-tp-gain" value="\${item.tpGain || 0}">
+          </div>
           <div class="db-field-box" style="grid-column: 1 / -1;">
-            <span class="db-field-label">Damage Formula (JavaScript)</span>
-            <input type="text" class="stat-input" id="skill-formula" value="\${dmg.formula || ''}" placeholder="e.g. a.atk * 4 - b.def * 2">
+            <span class="db-field-label">สูตรคำนวณดาเมจ (Damage Formula)</span>
+            <input type="text" class="stat-input" id="skill-formula" value="\${dmg.formula || ''}" placeholder="เช่น a.atk * 4 - b.def * 2">
           </div>
         </div>
       \`;
@@ -969,29 +1478,38 @@ const htmlContent = `<!DOCTYPE html>
       <div class="db-item-header">
         <div class="db-item-title-group">
           <div class="db-icon-box">\${getCategoryIcon(cat)}</div>
-          <input type="text" class="db-name-input" id="detail-name" value="\${item.name || ''}">
+          <input type="text" class="db-name-input" id="detail-name" value="\${item.name || ''}" placeholder="ชื่อไอเทม / สกิล">
           <span style="background:#20283c; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.8rem; font-family:var(--font-mono); color:#79c0ff;">ID #\${item.id}</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
           \${item.price !== undefined ? \`
             <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:0.85rem; color:var(--accent-gold); font-weight:700;">Price:</span>
-              <input type="number" class="stat-input" id="detail-price" value="\${item.price}" style="width:100px; padding:4px 8px;">
+              <span style="font-size:0.85rem; color:var(--accent-gold); font-weight:700;">💰 ราคา (Price):</span>
+              <input type="number" class="stat-input" id="detail-price" value="\${item.price}" style="width:110px; padding:4px 8px;">
             </div>
           \` : ''}
         </div>
       </div>
 
-      <div class="db-field-box">
-        <span class="db-field-label">Description</span>
-        <textarea class="db-textarea" id="detail-desc">\${item.description || ''}</textarea>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+        <div class="db-field-box">
+          <span class="db-field-label">คำอธิบายในเกม (Description)</span>
+          <textarea class="db-textarea" id="detail-desc" style="height:64px;">\${item.description || ''}</textarea>
+        </div>
+        <div class="db-field-box">
+          <span class="db-field-label">แท็กพิเศษ / Note (เช่น &lt;Weight: 0&gt; หรือ Plugin)</span>
+          <textarea class="db-textarea" id="detail-note" style="height:64px; font-family:var(--font-mono);" placeholder="แท็ก Note ของ RPG Maker...">\${item.note || ''}</textarea>
+        </div>
       </div>
 
       \${specificHtml}
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:16px; border-top:1px solid var(--border-color);">
-        <button class="btn btn-secondary btn-sm" id="btn-db-revert-item">↺ Revert Item</button>
-        <button class="btn btn-primary btn-sm" id="btn-detail-download">📥 Download \${currentDb.fileName}</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:16px; border-top:1px solid var(--border-color); flex-wrap:wrap; gap:10px;">
+        <button class="btn btn-secondary btn-sm" id="btn-db-revert-item">↺ คืนค่าเดิมชิ้นนี้ (Revert #\${item.id})</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-blue btn-sm" id="btn-detail-save-disk">💾 บันทึกทับไฟล์เดิม (Save to Disk)</button>
+          <button class="btn btn-primary btn-sm" id="btn-detail-download">📥 ดาวน์โหลด \${currentDb.fileName}</button>
+        </div>
       </div>
     \`;
 
@@ -1013,16 +1531,19 @@ const htmlContent = `<!DOCTYPE html>
         row.classList.add('is-modified');
       }
     });
+    updateDbSlotBadges();
   }
 
   function bindDetailEvents(item) {
-    // Name & Desc
+    // Name, Desc, Note, Price
     const nameEl = document.getElementById('detail-name');
-    nameEl.onchange = () => { item.name = nameEl.value; markModified(item); };
+    if (nameEl) nameEl.onchange = () => { item.name = nameEl.value; markModified(item); renderDbMasterList(); };
     const descEl = document.getElementById('detail-desc');
-    descEl.onchange = () => { item.description = descEl.value; markModified(item); };
+    if (descEl) descEl.onchange = () => { item.description = descEl.value; markModified(item); };
+    const noteEl = document.getElementById('detail-note');
+    if (noteEl) noteEl.onchange = () => { item.note = noteEl.value; markModified(item); };
     const priceEl = document.getElementById('detail-price');
-    if (priceEl) priceEl.onchange = () => { item.price = parseInt(priceEl.value) || 0; markModified(item); };
+    if (priceEl) priceEl.onchange = () => { item.price = parseInt(priceEl.value) || 0; markModified(item); renderDbMasterList(); };
 
     // Stats for weapons & armors
     document.querySelectorAll('.db-stat-input').forEach(inp => {
@@ -1031,6 +1552,7 @@ const htmlContent = `<!DOCTYPE html>
         if (!item.params) item.params = [0,0,0,0,0,0,0,0];
         item.params[idx] = parseInt(inp.value) || 0;
         markModified(item);
+        renderDbMasterList();
       };
     });
 
@@ -1047,8 +1569,9 @@ const htmlContent = `<!DOCTYPE html>
           item.params[0] = 99999; // MHP
         }
         markModified(item);
+        renderDbMasterList();
         renderDbDetail(item);
-        showToast('God stats applied!', 'success');
+        showToast('ปรับค่าพลัง 9999 เรียบร้อย!', 'success');
       };
     }
 
@@ -1057,16 +1580,31 @@ const htmlContent = `<!DOCTYPE html>
       btnFree.onclick = () => {
         item.price = 0;
         markModified(item);
+        renderDbMasterList();
         renderDbDetail(item);
-        showToast('Price set to 0 G!', 'success');
+        showToast('ปรับราคาเป็น 0 G แล้ว!', 'success');
+      };
+    }
+
+    const btnZeroWeight = document.getElementById('btn-db-zero-weight');
+    if (btnZeroWeight) {
+      btnZeroWeight.onclick = () => {
+        zeroItemWeight(item);
+        markModified(item);
+        renderDbDetail(item);
+        showToast('ปรับน้ำหนักเป็น 0W แล้ว!', 'success');
       };
     }
 
     // Items events
     const chkCons = document.getElementById('item-consumable');
-    if (chkCons) chkCons.onchange = () => { item.consumable = chkCons.checked; markModified(item); };
+    if (chkCons) chkCons.onchange = () => { item.consumable = chkCons.checked; markModified(item); renderDbMasterList(); renderDbDetail(item); };
     const selScope = document.getElementById('item-scope');
     if (selScope) selScope.onchange = () => { item.scope = parseInt(selScope.value); markModified(item); };
+    const inpRepeats = document.getElementById('item-repeats');
+    if (inpRepeats) inpRepeats.onchange = () => { item.repeats = parseInt(inpRepeats.value) || 1; markModified(item); };
+    const inpTpGain = document.getElementById('item-tp-gain');
+    if (inpTpGain) inpTpGain.onchange = () => { item.tpGain = parseInt(inpTpGain.value) || 0; markModified(item); };
     const txtFormula = document.getElementById('item-formula');
     if (txtFormula) txtFormula.onchange = () => {
       if (!item.damage) item.damage = { type: 1, formula: '0' };
@@ -1074,19 +1612,72 @@ const htmlContent = `<!DOCTYPE html>
       markModified(item);
     };
 
+    // Item Recovery Effects inputs
+    const effHpPct = document.getElementById('item-eff-hp-pct');
+    const effHpFlat = document.getElementById('item-eff-hp-flat');
+    if (effHpPct || effHpFlat) {
+      const updateHpEff = () => {
+        setEffectValue(item, 11, effHpPct ? effHpPct.value : 0, effHpFlat ? effHpFlat.value : 0);
+        markModified(item);
+      };
+      if (effHpPct) effHpPct.onchange = updateHpEff;
+      if (effHpFlat) effHpFlat.onchange = updateHpEff;
+    }
+    const effMpPct = document.getElementById('item-eff-mp-pct');
+    const effMpFlat = document.getElementById('item-eff-mp-flat');
+    if (effMpPct || effMpFlat) {
+      const updateMpEff = () => {
+        setEffectValue(item, 12, effMpPct ? effMpPct.value : 0, effMpFlat ? effMpFlat.value : 0);
+        markModified(item);
+      };
+      if (effMpPct) effMpPct.onchange = updateMpEff;
+      if (effMpFlat) effMpFlat.onchange = updateMpEff;
+    }
+    const effTp = document.getElementById('item-eff-tp');
+    if (effTp) {
+      effTp.onchange = () => {
+        setEffectValue(item, 13, effTp.value, 0);
+        markModified(item);
+      };
+    }
+
     const btnInf = document.getElementById('btn-db-make-infinite');
     if (btnInf) {
       btnInf.onclick = () => {
         item.consumable = false;
         markModified(item);
+        renderDbMasterList();
         renderDbDetail(item);
-        showToast('Item is now INFINITE (not consumed on use)!', 'success');
+        showToast('ปรับเป็นไอเทมใช้ไม่หมด (Infinite) แล้ว!', 'success');
+      };
+    }
+
+    const btnFullHealItem = document.getElementById('btn-db-full-heal-item');
+    if (btnFullHealItem) {
+      btnFullHealItem.onclick = () => {
+        setEffectValue(item, 11, 100, 9999);
+        setEffectValue(item, 12, 100, 9999);
+        if (!item.scope || item.scope === 0) item.scope = 7;
+        markModified(item);
+        renderDbDetail(item);
+        showToast('เพิ่มเอฟเฟกต์ฟื้นฟู HP/MP 100% แล้ว!', 'success');
+      };
+    }
+
+    const btnMaxTpItem = document.getElementById('btn-db-max-tp-item');
+    if (btnMaxTpItem) {
+      btnMaxTpItem.onclick = () => {
+        item.tpGain = 100;
+        setEffectValue(item, 13, 100, 0);
+        markModified(item);
+        renderDbDetail(item);
+        showToast('ปรับเพิ่ม TP/AP +100 แล้ว!', 'success');
       };
     }
 
     // Skills events
     const mpCost = document.getElementById('skill-mp-cost');
-    if (mpCost) mpCost.onchange = () => { item.mpCost = parseInt(mpCost.value) || 0; markModified(item); };
+    if (mpCost) mpCost.onchange = () => { item.mpCost = parseInt(mpCost.value) || 0; markModified(item); renderDbMasterList(); };
     const tpCost = document.getElementById('skill-tp-cost');
     if (tpCost) tpCost.onchange = () => { item.tpCost = parseInt(tpCost.value) || 0; markModified(item); };
     const chkCrit = document.getElementById('skill-critical');
@@ -1097,6 +1688,10 @@ const htmlContent = `<!DOCTYPE html>
     };
     const selHit = document.getElementById('skill-hit-type');
     if (selHit) selHit.onchange = () => { item.hitType = parseInt(selHit.value); markModified(item); };
+    const skillRepeats = document.getElementById('skill-repeats');
+    if (skillRepeats) skillRepeats.onchange = () => { item.repeats = parseInt(skillRepeats.value) || 1; markModified(item); };
+    const skillTpGain = document.getElementById('skill-tp-gain');
+    if (skillTpGain) skillTpGain.onchange = () => { item.tpGain = parseInt(skillTpGain.value) || 0; markModified(item); };
     const skillFormula = document.getElementById('skill-formula');
     if (skillFormula) skillFormula.onchange = () => {
       if (!item.damage) item.damage = { type: 1 };
@@ -1110,8 +1705,9 @@ const htmlContent = `<!DOCTYPE html>
         item.mpCost = 0;
         item.tpCost = 0;
         markModified(item);
+        renderDbMasterList();
         renderDbDetail(item);
-        showToast('MP & TP costs set to 0!', 'success');
+        showToast('ปรับใช้ 0 MP & 0 TP แล้ว!', 'success');
       };
     }
 
@@ -1124,7 +1720,26 @@ const htmlContent = `<!DOCTYPE html>
         item.damage.critical = true;
         markModified(item);
         renderDbDetail(item);
-        showToast('Formula set to 99,999 Damage!', 'success');
+        showToast('ปรับสูตรดาเมจ 99,999 แล้ว!', 'success');
+      };
+    }
+
+    // Revert Single Item button
+    const btnRevertItem = document.getElementById('btn-db-revert-item');
+    if (btnRevertItem) {
+      btnRevertItem.onclick = () => {
+        if (!currentDb.origItemsJson) return;
+        const origArr = JSON.parse(currentDb.origItemsJson);
+        const origItem = origArr.find(x => x && x.id === item.id);
+        const idx = currentDb.items.findIndex(x => x && x.id === item.id);
+        if (origItem && idx !== -1) {
+          currentDb.items[idx] = JSON.parse(JSON.stringify(origItem));
+          currentDb.modifiedIds.delete(item.id);
+          updateDbSlotBadges();
+          renderDbMasterList();
+          renderDbDetail(currentDb.items[idx]);
+          showToast(\`คืนค่าเดิมของ #\${item.id} เรียบร้อย!\`, 'info');
+        }
       };
     }
 
@@ -1137,6 +1752,10 @@ const htmlContent = `<!DOCTYPE html>
 
   // File System Access API & Download
   async function saveDatabaseToDisk() {
+    if (!currentDb.items || currentDb.items.length === 0) {
+      showToast('ยังไม่มีข้อมูลไฟล์ให้บันทึก', 'warn');
+      return;
+    }
     const jsonStr = JSON.stringify(currentDb.items, null, 2);
     try {
       if (window.showSaveFilePicker) {
@@ -1147,7 +1766,7 @@ const htmlContent = `<!DOCTYPE html>
         const writable = await handle.createWritable();
         await writable.write(jsonStr);
         await writable.close();
-        showToast(\`Saved directly to \${currentDb.fileName}!\`, 'success');
+        showToast(\`บันทึกทับไฟล์ \${currentDb.fileName} สำเร็จ!\`, 'success');
         return;
       }
     } catch(e) {
@@ -1158,6 +1777,10 @@ const htmlContent = `<!DOCTYPE html>
   }
 
   function downloadDatabaseFile() {
+    if (!currentDb.items || currentDb.items.length === 0) {
+      showToast('ยังไม่ได้โหลดไฟล์ Database (.json)', 'warn');
+      return;
+    }
     const jsonStr = JSON.stringify(currentDb.items, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -1168,25 +1791,31 @@ const htmlContent = `<!DOCTYPE html>
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(\`Downloaded \${currentDb.fileName}\`, 'success');
+    showToast(\`ดาวน์โหลด \${currentDb.fileName} แล้ว!\`, 'success');
   }
 
   const btnDbDl = document.getElementById('btn-db-download');
   if (btnDbDl) btnDbDl.onclick = downloadDatabaseFile;
 
-  // Open DB file directly via Picker
+  // Open DB file(s) directly via Picker (supports selecting multiple .json files at once!)
   document.getElementById('btn-open-db-file').onclick = async () => {
     try {
       if (window.showOpenFilePicker) {
-        const [handle] = await window.showOpenFilePicker({
+        const handles = await window.showOpenFilePicker({
+          multiple: true,
           types: [{ description: 'RPG Maker Database JSON', accept: { 'application/json': ['.json'] } }]
         });
-        const file = await handle.getFile();
-        loadDatabaseFile(file, handle);
+        for (let i = 0; i < handles.length; i++) {
+          const file = await handles[i].getFile();
+          loadDatabaseFile(file, handles[i], i === 0);
+        }
         return;
       }
-    } catch(e) {}
-    fileInput.click();
+    } catch(e) {
+      if (e && e.name === 'AbortError') return;
+    }
+    if (dbMultiFileInput) dbMultiFileInput.click();
+    else fileInput.click();
   };
 
   // -------------------------------------------------------------
