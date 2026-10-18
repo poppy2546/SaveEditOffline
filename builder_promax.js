@@ -10,29 +10,31 @@ const htmlContent = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none';">
 <title>SaveEdit &amp; Database Studio PRO MAX - Universal RPG Maker Tool</title>
 <style>
   :root {
-    --bg-main: #121622;
-    --bg-card: #1b2130;
-    --bg-card-hover: #22293c;
-    --bg-input: #0f131d;
-    --border-color: #2b3449;
-    --border-focus: #388bfd;
+    --bg-main: #0b0e14;
+    --bg-card: #131720;
+    --bg-card-hover: #19202c;
+    --bg-input: #080b10;
+    --border-color: #262d3d;
+    --border-subtle: #1c2230;
+    --border-focus: #58a6ff;
     --text-primary: #e6edf3;
     --text-secondary: #8b949e;
-    --text-muted: #586069;
-    --accent-green: #2ea043;
-    --accent-green-hover: #3fb950;
-    --accent-blue: #388bfd;
-    --accent-blue-hover: #58a6ff;
-    --accent-gold: #e3b341;
+    --text-muted: #656d76;
+    --accent-green: #238636;
+    --accent-green-hover: #2ea043;
+    --accent-blue: #1f6feb;
+    --accent-blue-hover: #388bfd;
+    --accent-gold: #d29922;
     --accent-warn: #d29922;
-    --accent-danger: #f85149;
-    --accent-purple: #bc8cff;
-    --card-shadow: 0 4px 14px rgba(0,0,0,0.4);
-    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --accent-danger: #da3633;
+    --accent-purple: #8957e5;
+    --card-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,7 +50,7 @@ const htmlContent = `<!DOCTYPE html>
 
   /* Header */
   header {
-    background: #171c2b;
+    background: #0f131a;
     border-bottom: 1px solid var(--border-color);
     padding: 10px 24px;
     display: flex;
@@ -60,28 +62,30 @@ const htmlContent = `<!DOCTYPE html>
   }
   .logo-wrap { display: flex; align-items: center; gap: 12px; }
   .logo-icon {
-    width: 34px; height: 34px;
-    background: linear-gradient(135deg, #388bfd, #2ea043);
-    border-radius: 8px;
+    width: 32px; height: 32px;
+    background: #18202e;
+    border: 1px solid #323d52;
+    border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 18px; color: #fff;
-    box-shadow: 0 2px 10px rgba(56, 139, 253, 0.4);
+    font-weight: 800; font-size: 15px; color: #58a6ff;
+    font-family: var(--font-mono);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .mode-switch-bar {
-    display: flex; background: #10141f; border: 1px solid var(--border-color);
-    border-radius: 8px; padding: 3px; gap: 4px;
+    display: flex; background: #080b10; border: 1px solid var(--border-color);
+    border-radius: 6px; padding: 3px; gap: 3px;
   }
   .mode-btn {
-    padding: 6px 14px; border-radius: 6px; border: none; background: transparent;
+    padding: 6px 14px; border-radius: 4px; border: none; background: transparent;
     color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer;
-    transition: all 0.15s ease; display: flex; align-items: center; gap: 6px;
+    transition: all 0.12s ease; display: flex; align-items: center; gap: 6px;
   }
   .mode-btn:hover { color: #fff; }
   .mode-btn.active {
-    background: #232a3d; color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    background: #1f2736; color: #fff; border: 1px solid #36445d;
   }
   .mode-btn.active-db {
-    background: #2e1d42; color: var(--accent-purple); box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    background: #241a34; color: #d2a8ff; border: 1px solid #5c3b88;
   }
 
   .container {
@@ -92,22 +96,32 @@ const htmlContent = `<!DOCTYPE html>
   /* Buttons */
   .btn {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 14px; border-radius: 6px; font-size: 0.85rem;
+    padding: 6px 13px; border-radius: 6px; font-size: 0.84rem;
     font-weight: 600; cursor: pointer; border: 1px solid transparent;
-    transition: all 0.15s ease; user-select: none;
+    transition: all 0.12s ease; user-select: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
   }
-  .btn-primary { background: var(--accent-green); color: #fff; }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--accent-green); color: #fff; border-color: #2da44e; }
   .btn-primary:hover { background: var(--accent-green-hover); }
-  .btn-blue { background: var(--accent-blue); color: #fff; }
+  .btn-blue { background: var(--accent-blue); color: #fff; border-color: #388bfd; }
   .btn-blue:hover { background: var(--accent-blue-hover); }
-  .btn-secondary { background: #23293a; color: var(--text-primary); border-color: var(--border-color); }
-  .btn-secondary:hover { background: #2e364c; border-color: #8b949e; }
-  .btn-gold { background: #3d3113; color: var(--accent-gold); border-color: #795d17; }
-  .btn-gold:hover { background: #574519; }
-  .btn-purple { background: #2e1d42; color: var(--accent-purple); border-color: #613b8b; }
-  .btn-purple:hover { background: #40285d; }
-  .btn-danger { background: #381a1d; color: var(--accent-danger); border-color: #6e252a; }
-  .btn-danger:hover { background: #4f2227; }
+  .btn-secondary { background: #19202c; color: var(--text-primary); border-color: var(--border-color); }
+  .btn-secondary:hover { background: #232d3e; border-color: #4b5873; }
+  .btn-gold { background: #2a200a; color: var(--accent-gold); border-color: #6e5012; }
+  .btn-gold:hover { background: #3d2f0e; border-color: #9e751b; }
+  .btn-purple { background: #231633; color: var(--accent-purple); border-color: #583380; }
+  .btn-purple:hover { background: #321f4a; }
+  .btn-danger { background: #2d1316; color: var(--accent-danger); border-color: #5c2025; }
+  .btn-danger:hover { background: #40191e; }
+  .btn-secret {
+    background: #241d08; color: #f2cc60; border: 1px solid #856114;
+    font-family: var(--font-mono); letter-spacing: 0.02em;
+  }
+  .btn-secret:hover {
+    background: #382c0a; border-color: #d29922; color: #fff;
+    box-shadow: 0 0 10px rgba(210, 153, 34, 0.35);
+  }
   .btn-sm { padding: 4px 10px; font-size: 0.78rem; border-radius: 5px; }
 
   /* Tabs */
@@ -126,18 +140,19 @@ const htmlContent = `<!DOCTYPE html>
   .tab-btn.active {
     color: var(--accent-blue-hover);
     border-bottom-color: var(--accent-blue);
-    background: rgba(56, 139, 253, 0.08);
-    border-radius: 8px 8px 0 0;
+    background: rgba(31, 111, 235, 0.08);
+    border-radius: 6px 6px 0 0;
   }
   .tab-badge {
-    background: #252c3d; color: var(--text-secondary); padding: 1px 7px;
-    border-radius: 10px; font-size: 0.72rem; font-family: var(--font-mono);
+    background: #19202c; color: var(--text-secondary); padding: 1px 7px;
+    border-radius: 8px; font-size: 0.72rem; font-family: var(--font-mono);
+    border: 1px solid var(--border-color);
   }
-  .tab-btn.active .tab-badge { background: #1f3a60; color: #79c0ff; }
+  .tab-btn.active .tab-badge { background: #162638; color: #79c0ff; border-color: #1f6feb; }
 
   /* Info Green Notice Bar */
   .info-notice {
-    background: #143522; border: 1px solid #2ea043; border-radius: 8px;
+    background: #0d2215; border: 1px solid #238636; border-radius: 8px;
     padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;
     gap: 12px; font-size: 0.85rem; color: #7ee787;
   }
@@ -449,14 +464,17 @@ const htmlContent = `<!DOCTYPE html>
         <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:var(--accent-green-hover);" id="label-changes">0 CHANGES</span>
       </div>
 
-      <!-- Quick Gold Edit -->
-      <div style="background:#191c28; border:1px solid #c69026; border-radius:8px; padding:6px 14px; display:flex; align-items:center; gap:8px;">
-        <span style="font-weight:700; color:var(--accent-gold); font-size:0.95rem;">💰 Gold:</span>
-        <input type="number" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff; font-family:var(--font-mono); font-size:1rem; font-weight:bold; width:120px; padding:4px 8px;" id="quick-gold-input" value="0">
-        <button class="revert-btn" id="gold-revert-btn" title="Revert Gold">↺</button>
-        <button class="btn btn-secondary btn-sm" id="btn-gold-add-10k">+10K</button>
-        <button class="btn btn-secondary btn-sm" id="btn-gold-add-100k">+100K</button>
-        <button class="btn btn-gold btn-sm" id="btn-gold-max">MAX 9.9M</button>
+      <!-- Quick Gold Edit & Secret God Mode -->
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div style="background:#141a24; border:1px solid #6e5012; border-radius:8px; padding:6px 14px; display:flex; align-items:center; gap:8px;">
+          <span style="font-weight:700; color:var(--accent-gold); font-size:0.95rem;">💰 Gold:</span>
+          <input type="number" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff; font-family:var(--font-mono); font-size:1rem; font-weight:bold; width:120px; padding:4px 8px;" id="quick-gold-input" value="0">
+          <button class="revert-btn" id="gold-revert-btn" title="Revert Gold">↺</button>
+          <button class="btn btn-secondary btn-sm" id="btn-gold-add-10k">+10K</button>
+          <button class="btn btn-secondary btn-sm" id="btn-gold-add-100k">+100K</button>
+          <button class="btn btn-gold btn-sm" id="btn-gold-max">MAX 9.9M</button>
+        </div>
+        <button class="btn btn-secret btn-sm" id="btn-secret-godmode" title="ปุ่มลับ: ปลดล็อกเงินเต็ม 9.9M + เลือดมานาเต็ม + สเตตัส 9999 + ไอเทม/อาวุธ/เกราะ 99 ทุกชิ้น (คีย์ลัด Ctrl+Shift+G)">🗝️ ปุ่มลับ: SUPER GOD MODE</button>
       </div>
     </div>
 
@@ -774,6 +792,16 @@ const htmlContent = `<!DOCTYPE html>
     return parseFloat((b/Math.pow(k,i)).toFixed(1)) + ' ' + s[i];
   }
 
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function getJsonExArray(val) {
     if (!val) return [];
     if (Array.isArray(val)) return val;
@@ -931,6 +959,10 @@ const htmlContent = `<!DOCTYPE html>
   }
 
   function loadDatabaseFile(file, handle = null, autoSwitch = true) {
+    if (file && file.size > 50 * 1024 * 1024) {
+      showToast('ไฟล์มีขนาดเกิน 50MB เพื่อความปลอดภัยระบบจำกัดขนาดไฟล์ไม่เกิน 50MB', 'danger');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       try {
@@ -1084,8 +1116,38 @@ const htmlContent = `<!DOCTYPE html>
         <button class="btn btn-blue btn-sm" id="btn-bulk-free-mp-all">⚡ สกิล 0 MP/TP ทั้งไฟล์</button>
       \`;
     }
-    buttonsHtml += \`<button class="btn btn-secondary btn-sm" id="btn-bulk-revert-all" title="คืนค่าเดิมทั้งไฟล์">↺ คืนค่าทั้งไฟล์</button>\`;
+    buttonsHtml += \`
+      <button class="btn btn-secret btn-sm" id="btn-secret-db-god" title="ปุ่มลับ: ปรับสเตตัสเทพและราคา 0 ทั้งหมวด">🗝️ ปุ่มลับ: Turbo God Mod</button>
+      <button class="btn btn-secondary btn-sm" id="btn-bulk-revert-all" title="คืนค่าเดิมทั้งไฟล์">↺ คืนค่าทั้งไฟล์</button>
+    \`;
     bulkContainer.innerHTML = buttonsHtml;
+
+    const btnSecretDb = document.getElementById('btn-secret-db-god');
+    if (btnSecretDb) {
+      btnSecretDb.onclick = () => {
+        validItems.forEach(it => {
+          if (cat === 'weapons') {
+            if (!it.params) it.params = [0,0,0,0,0,0,0,0];
+            it.params[2] = 9999; it.params[4] = 9999;
+            if (it.price !== undefined) it.price = 0;
+          } else if (cat === 'armors') {
+            if (!it.params) it.params = [0,0,0,0,0,0,0,0];
+            it.params[3] = 9999; it.params[5] = 9999;
+            if (it.price !== undefined) it.price = 0;
+          } else if (cat === 'items') {
+            if (it.consumable !== undefined) it.consumable = false;
+            if (it.price !== undefined) it.price = 0;
+            if (it.description && !it.description.includes('[0W]')) it.description += ' [0W]';
+            if (it.note && !it.note.includes('<Weight: 0>')) it.note += '\\n<Weight: 0>';
+          } else if (cat === 'skills') {
+            if (it.mpCost !== undefined) it.mpCost = 0;
+            if (it.tpCost !== undefined) it.tpCost = 0;
+          }
+          currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('🗝️ [SECRET ACTIVATED] Turbo God Mod ปรับสเตตัสเทพและราคา 0 ทั้งหมวดแล้ว!');
+      };
+    }
 
     const btnBulkFree = document.getElementById('btn-bulk-free-all');
     if (btnBulkFree) {
@@ -1233,7 +1295,7 @@ const htmlContent = `<!DOCTYPE html>
       row.innerHTML = \`
         <div style="display:flex; align-items:center; gap:8px; min-width:0;">
           <span class="db-row-id">#\${item.id}</span>
-          <span class="db-row-name" title="\${name}">\${name}</span>
+          <span class="db-row-name" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
         </div>
         <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono); white-space:nowrap;">\${getQuickPreviewBadge(item)}</span>
       \`;
@@ -1468,7 +1530,7 @@ const htmlContent = `<!DOCTYPE html>
           </div>
           <div class="db-field-box" style="grid-column: 1 / -1;">
             <span class="db-field-label">สูตรคำนวณดาเมจ (Damage Formula)</span>
-            <input type="text" class="stat-input" id="skill-formula" value="\${dmg.formula || ''}" placeholder="เช่น a.atk * 4 - b.def * 2">
+            <input type="text" class="stat-input" id="skill-formula" value="\${escapeHtml(dmg.formula || '')}" placeholder="เช่น a.atk * 4 - b.def * 2">
           </div>
         </div>
       \`;
@@ -1478,7 +1540,7 @@ const htmlContent = `<!DOCTYPE html>
       <div class="db-item-header">
         <div class="db-item-title-group">
           <div class="db-icon-box">\${getCategoryIcon(cat)}</div>
-          <input type="text" class="db-name-input" id="detail-name" value="\${item.name || ''}" placeholder="ชื่อไอเทม / สกิล">
+          <input type="text" class="db-name-input" id="detail-name" value="\${escapeHtml(item.name || '')}" placeholder="ชื่อไอเทม / สกิล">
           <span style="background:#20283c; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.8rem; font-family:var(--font-mono); color:#79c0ff;">ID #\${item.id}</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
@@ -1494,11 +1556,11 @@ const htmlContent = `<!DOCTYPE html>
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
         <div class="db-field-box">
           <span class="db-field-label">คำอธิบายในเกม (Description)</span>
-          <textarea class="db-textarea" id="detail-desc" style="height:64px;">\${item.description || ''}</textarea>
+          <textarea class="db-textarea" id="detail-desc" style="height:64px;">\${escapeHtml(item.description || '')}</textarea>
         </div>
         <div class="db-field-box">
           <span class="db-field-label">แท็กพิเศษ / Note (เช่น &lt;Weight: 0&gt; หรือ Plugin)</span>
-          <textarea class="db-textarea" id="detail-note" style="height:64px; font-family:var(--font-mono);" placeholder="แท็ก Note ของ RPG Maker...">\${item.note || ''}</textarea>
+          <textarea class="db-textarea" id="detail-note" style="height:64px; font-family:var(--font-mono);" placeholder="แท็ก Note ของ RPG Maker...">\${escapeHtml(item.note || '')}</textarea>
         </div>
       </div>
 
@@ -1822,6 +1884,10 @@ const htmlContent = `<!DOCTYPE html>
   // SAVE EDITOR LOGIC (PRESERVED & INTEGRATED)
   // -------------------------------------------------------------
   async function loadSaveFile(file) {
+    if (file && file.size > 50 * 1024 * 1024) {
+      showToast('ไฟล์มีขนาดเกิน 50MB เพื่อความปลอดภัยระบบจำกัดขนาดไฟล์ไม่เกิน 50MB', 'danger');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = async () => {
       const rawBytes = new Uint8Array(reader.result);
@@ -2020,6 +2086,54 @@ const htmlContent = `<!DOCTYPE html>
       };
     }
 
+    function triggerSuperGodMode() {
+      applyGold(9999999, true);
+
+      // Max all actors
+      const actorsObj = adapt.actors;
+      const actorsData = getJsonExArray(actorsObj ? (actorsObj._data || actorsObj['@data'] || actorsObj) : []);
+      actorsData.forEach(actor => {
+        if (!actor) return;
+        if (actor._level !== undefined) actor._level = 99;
+        if (actor['@level'] !== undefined) actor['@level'] = 99;
+        if (actor._hp !== undefined) actor._hp = 9999;
+        if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
+        if (actor._mp !== undefined) actor._mp = 9999;
+        if (actor['@mp'] !== undefined) actor['@mp'] = 9999;
+        if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
+        const paramPlus = actor._paramPlus || actor['@param_plus'];
+        if (paramPlus) {
+          const p = getJsonExArray(paramPlus);
+          for (let i = 0; i < 8; i++) p[i] = 9999;
+        }
+      });
+
+      // Max items, weapons, armors to 99
+      if (adapt.party) {
+        const items = adapt.party['@items'] || adapt.party._items || adapt.party.items || {};
+        const weapons = adapt.party['@weapons'] || adapt.party._weapons || adapt.party.weapons || {};
+        const armors = adapt.party['@armors'] || adapt.party._armors || adapt.party.armors || {};
+        Object.keys(items).forEach(k => { if (items[k] > 0) items[k] = 99; });
+        Object.keys(weapons).forEach(k => { if (weapons[k] > 0) weapons[k] = 99; });
+        Object.keys(armors).forEach(k => { if (armors[k] > 0) armors[k] = 99; });
+      }
+
+      setupVisualEditor();
+      markSaveModified('SUPER GOD MODE');
+      showToast('🗝️ [SECRET UNLOCKED] Super God Mode: เงินเต็ม / เลือดมานาเต็ม / สเตตัส 9999 / ไอเทม 99 ชิ้น ครบชุด!', 'success');
+    }
+
+    const btnSecretGod = document.getElementById('btn-secret-godmode');
+    if (btnSecretGod) {
+      btnSecretGod.onclick = triggerSuperGodMode;
+    }
+    window.onkeydown = (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'G' || e.key === 'g')) {
+        e.preventDefault();
+        triggerSuperGodMode();
+      }
+    };
+
     // Search and filter inputs bindings
     document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
     document.getElementById('inventory-owned-only').onchange = () => renderInventoryTab(adapt.party);
@@ -2064,7 +2178,7 @@ const htmlContent = `<!DOCTYPE html>
         <div style="background:#1f2430; border-left: 4px solid #f2cc60; padding: 14px 18px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; color: #e6edf3;">
           <b>⚠️ ข้อมูลสำคัญเกี่ยวกับระบบเซฟเกมนี้:</b><br>
           เกมนี้คอมไพล์ด้วย <b>WOLF RPG Editor Pro</b> ซึ่งใช้ระบบเข้ารหัสเซฟระดับไบนารี (128-byte block encryption) และตัวแปรเก็บเป็นตัวเลขอินเด็กซ์ดิบ (ไม่มีชื่อกำกับในไฟล์)<br>
-          <i>*แม้แต่เว็บ SaveEditOnline.com ดั้งเดิม เมื่อพยายามกดบันทึกไฟล์นี้กลับ ก็จะเกิดข้อผิดพลาด 500 (An error occurred while saving the file) เพราะตัวเซฟถูกป้องกันด้วย Checksum ของเอนจิ้น</i>
+          <i>*แม้แต่โปรแกรมแก้ไขเซฟทั่วไป เมื่อพยายามบันทึกไฟล์นี้กลับ ก็จะล้มเหลวเพราะตัวเซฟถูกป้องกันด้วย Checksum เฉพาะของเอนจิ้น</i>
         </div>
 
         <div style="background:#13233a; border: 1px solid #1f6feb; padding: 18px; border-radius: 10px;">
@@ -2242,7 +2356,7 @@ const htmlContent = `<!DOCTYPE html>
       card.className = 'item-card';
       card.innerHTML = \`
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-weight:600; font-size:0.88rem; color:#fff;" title="\${name}">\${name}</span>
+          <span style="font-weight:600; font-size:0.88rem; color:#fff;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
           <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span>
         </div>
         <div style="display:flex; align-items:center; gap:4px;">
@@ -2294,7 +2408,7 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;">\${name}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
         <input type="number" class="stat-input" value="\${count}" style="padding:4px;">
       \`;
       card.querySelector('input').onchange = (e) => {
@@ -2331,7 +2445,7 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;">\${name}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
         <input type="number" class="stat-input" value="\${count}" style="padding:4px;">
       \`;
       card.querySelector('input').onchange = (e) => {
@@ -2397,7 +2511,7 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
       card.innerHTML = \`
-        <span style="color:#fff; font-weight:600;">\${name}</span>
+        <span style="color:#fff; font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
         <label class="toggle-switch"><input type="checkbox" \${val?'checked':''}><span class="slider"></span></label>
       \`;
       card.querySelector('input').onchange = (e) => {

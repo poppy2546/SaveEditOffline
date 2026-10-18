@@ -4,3 +4,7 @@ raw_save.json
 *.bak
 .DS_Store
 Thumbs.db
+PROJECT_CONTEXT_AND_CHAT_HISTORY.md
+*.log
+temp/
+

@@ -43,6 +43,7 @@ class MarshalReader {
   }
 
   read() {
+    this.depth = 0;
     const major = this.readByte();
     const minor = this.readByte();
     if (major !== 4 || minor !== 8) {
@@ -100,77 +101,84 @@ class MarshalReader {
   }
 
   readAny() {
-    const type = String.fromCharCode(this.readByte());
-    switch (type) {
-      case '0': return null;
-      case 'T': return true;
-      case 'F': return false;
-      case 'i': return this.readFixnum();
-      case ':': return this.readSymbol();
-      case ';': {
-        const idx = this.readFixnum();
-        return this.symbols[idx];
-      }
-      case '@': {
-        const idx = this.readFixnum();
-        return this.objects[idx];
-      }
-      case '"': {
-        const len = this.readFixnum();
-        const bytes = this.readBytes(len);
-        let str;
-        try { str = new TextDecoder('utf-8').decode(bytes); }
-        catch(e) { str = String.fromCharCode.apply(null, bytes); }
-        this.objects.push(str);
-        return str;
-      }
-      case 'I': {
-        // Wrapped with instance variables (e.g. String with UTF-8 encoding ivar)
-        const obj = this.readAny();
-        const ivarCount = this.readFixnum();
-        const ivars = {};
-        for (let i = 0; i < ivarCount; i++) {
-          const k = this.readAny();
-          const v = this.readAny();
-          ivars[k] = v;
+    if (++this.depth > 128) {
+      throw new Error('RubyMarshal recursion depth limit exceeded (possible malformed file)');
+    }
+    try {
+      const type = String.fromCharCode(this.readByte());
+      switch (type) {
+        case '0': return null;
+        case 'T': return true;
+        case 'F': return false;
+        case 'i': return this.readFixnum();
+        case ':': return this.readSymbol();
+        case ';': {
+          const idx = this.readFixnum();
+          return this.symbols[idx];
         }
-        if (typeof obj === 'object' && obj !== null) {
-          Object.assign(obj, ivars);
+        case '@': {
+          const idx = this.readFixnum();
+          return this.objects[idx];
         }
-        return obj;
-      }
-      case '[': {
-        const arr = [];
-        this.objects.push(arr);
-        const len = this.readFixnum();
-        for (let i = 0; i < len; i++) {
-          arr.push(this.readAny());
+        case '"': {
+          const len = this.readFixnum();
+          const bytes = this.readBytes(len);
+          let str;
+          try { str = new TextDecoder('utf-8').decode(bytes); }
+          catch(e) { str = String.fromCharCode.apply(null, bytes); }
+          this.objects.push(str);
+          return str;
         }
-        return arr;
-      }
-      case '{': {
-        const hash = {};
-        this.objects.push(hash);
-        const len = this.readFixnum();
-        for (let i = 0; i < len; i++) {
-          const k = this.readAny();
-          const v = this.readAny();
-          hash[k] = v;
+        case 'I': {
+          // Wrapped with instance variables (e.g. String with UTF-8 encoding ivar)
+          const obj = this.readAny();
+          const ivarCount = this.readFixnum();
+          const ivars = {};
+          for (let i = 0; i < ivarCount; i++) {
+            const k = this.readAny();
+            const v = this.readAny();
+            if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+            ivars[k] = v;
+          }
+          if (typeof obj === 'object' && obj !== null) {
+            Object.assign(obj, ivars);
+          }
+          return obj;
         }
-        return hash;
-      }
-      case 'o': {
-        const className = this.readAny();
-        const obj = new RubyObject(className);
-        this.objects.push(obj);
-        const ivarCount = this.readFixnum();
-        for (let i = 0; i < ivarCount; i++) {
-          const k = this.readAny();
-          const v = this.readAny();
-          obj[k] = v;
+        case '[': {
+          const arr = [];
+          this.objects.push(arr);
+          const len = this.readFixnum();
+          for (let i = 0; i < len; i++) {
+            arr.push(this.readAny());
+          }
+          return arr;
         }
-        return obj;
-      }
+        case '{': {
+          const hash = {};
+          this.objects.push(hash);
+          const len = this.readFixnum();
+          for (let i = 0; i < len; i++) {
+            const k = this.readAny();
+            const v = this.readAny();
+            if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+            hash[k] = v;
+          }
+          return hash;
+        }
+        case 'o': {
+          const className = this.readAny();
+          const obj = new RubyObject(className);
+          this.objects.push(obj);
+          const ivarCount = this.readFixnum();
+          for (let i = 0; i < ivarCount; i++) {
+            const k = this.readAny();
+            const v = this.readAny();
+            if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+            obj[k] = v;
+          }
+          return obj;
+        }
       case 'u': {
         const className = this.readAny();
         const len = this.readFixnum();
@@ -190,6 +198,9 @@ class MarshalReader {
       default:
         console.warn('Unhandled Ruby Marshal tag:', type);
         return null;
+      }
+    } finally {
+      this.depth--;
     }
   }
 }

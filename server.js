@@ -13,14 +13,37 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml'
 };
 
+const ROOT_DIR = path.resolve(__dirname);
+
 const server = http.createServer((req, res) => {
-  let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+  let pathname;
+  try {
+    const parsed = new URL(req.url, 'http://localhost');
+    pathname = decodeURIComponent(parsed.pathname);
+  } catch (e) {
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end('400 Bad Request');
+    return;
+  }
+
+  if (pathname === '/') pathname = '/index.html';
+
+  const safeRelPath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
+  const filePath = path.resolve(ROOT_DIR, '.' + safeRelPath);
+
+  // Path traversal guard: must stay inside ROOT_DIR
+  if (!filePath.startsWith(ROOT_DIR + path.sep) && filePath !== ROOT_DIR && filePath !== path.join(ROOT_DIR, 'index.html')) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    res.end('403 Forbidden');
+    return;
+  }
+
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
   fs.readFile(filePath, (err, content) => {
     if (err) {
-      if (err.code === 'ENOENT') {
+      if (err.code === 'ENOENT' || err.code === 'EISDIR') {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('404 Not Found');
       } else {

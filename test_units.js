@@ -256,6 +256,11 @@ it('index.html executes in simulated DOM and wires all buttons & Gold input', as
   assert.strictEqual(typeof elementsById['btn-char-max-stats'].onclick, 'function');
   elementsById['btn-char-max-stats'].click();
 
+  // 6.5. Test Secret Super God Mode button
+  assert.strictEqual(typeof elementsById['btn-secret-godmode'].onclick, 'function', 'btn-secret-godmode must be wired');
+  elementsById['btn-secret-godmode'].click();
+  assert.strictEqual(Number(goldInput.value), 9999999, 'Super God Mode must set Gold to 9,999,999');
+
   // 7. Test Inventory Set All Owned to 99 button
   assert.strictEqual(typeof elementsById['btn-items-set-all-99'].onclick, 'function');
   elementsById['btn-items-set-all-99'].click();
@@ -398,6 +403,28 @@ it('WOLF RPG: Correctly identify .sav and trigger safety guard', () => {
   const fileName = 'SaveData01.sav';
   const isWolf = fileName.toLowerCase().endsWith('.sav') || fileName.toLowerCase().includes('savedata');
   assert.strictEqual(isWolf, true);
+});
+
+// ---------------------------------------------------------
+// 2. Security & Defense Hardening Tests
+// ---------------------------------------------------------
+console.log('\n🛡️ Group 2: Security & Defense Hardening Verification');
+
+it('Security: index.html enforces strict Content Security Policy (CSP)', () => {
+  assert.ok(htmlContent.includes('http-equiv="Content-Security-Policy"'), 'CSP meta tag must be present');
+  assert.ok(htmlContent.includes("connect-src 'none'"), "connect-src 'none' must be enforced");
+});
+
+it('Security: RubyMarshal depth limiter blocks call-stack overflow attacks (>128)', () => {
+  // Construct a nested array 135 levels deep
+  let deepBytes = [0x04, 0x08];
+  for (let i = 0; i < 135; i++) {
+    deepBytes.push(0x5b, 0x01, 0x01); // '[' with 1 element
+  }
+  deepBytes.push(0x30); // nil '0'
+  assert.throws(() => {
+    RubyMarshal.decode(new Uint8Array(deepBytes));
+  }, /depth limit exceeded/i, 'Deep recursion must be blocked by depth limiter');
 });
 
 setTimeout(() => {
