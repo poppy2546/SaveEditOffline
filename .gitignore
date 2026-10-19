@@ -12,3 +12,5 @@ PROJECT_CONTEXT_AND_CHAT_HISTORY.md
 temp/
 .vscode/
 .idea/
+*.lnk
+
