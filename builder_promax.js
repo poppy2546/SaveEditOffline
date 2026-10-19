@@ -12,6 +12,9 @@ const htmlContent = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none';">
 <title>Save &amp; DB Studio — Web RPG Maker Save & DB Utility</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23242933'/%3E%3Cstop%20offset='100%25'%20stop-color='%2314161B'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='gold'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23FFF2D6'/%3E%3Cstop%20offset='40%25'%20stop-color='%23E2B86B'/%3E%3Cstop%20offset='100%25'%20stop-color='%23B88028'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='crystal'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23C2F0BC'/%3E%3Cstop%20offset='60%25'%20stop-color='%2373A86E'/%3E%3Cstop%20offset='100%25'%20stop-color='%233B6338'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='14'%20fill='url(%23bg)'%20stroke='url(%23gold)'%20stroke-width='2.5'/%3E%3Cpath%20d='M16%2013h24l9%209v27a2%202%200%200%201-2%202H18a2%202%200%200%201-2-2V13z'%20fill='%231C2028'%20stroke='%23444B57'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3Cpath%20d='M22%2013h18v12a1%201%200%200%201-1%201H23a1%201%200%200%201-1-1V13z'%20fill='url(%23gold)'/%3E%3Crect%20x='26'%20y='16'%20width='3.5'%20height='6'%20rx='1'%20fill='%2314161B'/%3E%3Cpolygon%20points='32,29%2042,39%2032,49%2022,39'%20fill='url(%23crystal)'%20stroke='%23A2C79D'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3Cpolygon%20points='32,32%2039,39%2032,46%2025,39'%20fill='%23E8FCE4'%20opacity='0.35'/%3E%3Ccircle%20cx='32'%20cy='39'%20r='2.2'%20fill='%23FFFFFF'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#16181D">
 <style>
   /* Color Hunt Palette Adaptation (High Contrast Tactile Studio):
      Primary Curated Palette: Crisp Parchment, Warm Sand & Deep Charcoal
@@ -718,8 +721,32 @@ const htmlContent = `<!DOCTYPE html>
 
 <header>
   <div class="logo-wrap">
-    <div class="logo-icon" aria-hidden="true">
-      <svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+    <div class="logo-icon" aria-hidden="true" style="padding:2px; background:transparent; border:none;">
+      <svg viewBox="0 0 64 64" style="width:100%; height:100%; display:block;">
+        <defs>
+          <linearGradient id="header-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#242933"/>
+            <stop offset="100%" stop-color="#14161B"/>
+          </linearGradient>
+          <linearGradient id="header-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFF2D6"/>
+            <stop offset="40%" stop-color="#E2B86B"/>
+            <stop offset="100%" stop-color="#B88028"/>
+          </linearGradient>
+          <linearGradient id="header-crystal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C2F0BC"/>
+            <stop offset="60%" stop-color="#73A86E"/>
+            <stop offset="100%" stop-color="#3B6338"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#header-bg)" stroke="url(#header-gold)" stroke-width="2.5"/>
+        <path d="M16 13h24l9 9v27a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V13z" fill="#1C2028" stroke="#444B57" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M22 13h18v12a1 1 0 0 1-1 1H23a1 1 0 0 1-1-1V13z" fill="url(#header-gold)"/>
+        <rect x="26" y="16" width="3.5" height="6" rx="1" fill="#14161B"/>
+        <polygon points="32,29 42,39 32,49 22,39" fill="url(#header-crystal)" stroke="#A2C79D" stroke-width="1.5" stroke-linejoin="round"/>
+        <polygon points="32,32 39,39 32,46 25,39" fill="#E8FCE4" opacity="0.35"/>
+        <circle cx="32" cy="39" r="2.2" fill="#FFFFFF"/>
+      </svg>
     </div>
     <div>
       <div style="display:flex; align-items:center;">

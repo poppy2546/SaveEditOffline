@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#242933"/>
+      <stop offset="100%" stop-color="#14161B"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2D6"/>
+      <stop offset="40%" stop-color="#E2B86B"/>
+      <stop offset="100%" stop-color="#B88028"/>
+    </linearGradient>
+    <linearGradient id="crystal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C2F0BC"/>
+      <stop offset="60%" stop-color="#73A86E"/>
+      <stop offset="100%" stop-color="#3B6338"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer Squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)" stroke="url(#gold)" stroke-width="2.5"/>
+  <!-- Floppy Disk / Save Card Body -->
+  <path d="M16 13h24l9 9v27a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V13z" fill="#1C2028" stroke="#444B57" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Top Metal Slider -->
+  <path d="M22 13h18v12a1 1 0 0 1-1 1H23a1 1 0 0 1-1-1V13z" fill="url(#gold)"/>
+  <rect x="26" y="16" width="3.5" height="6" rx="1" fill="#14161B"/>
+  <!-- Center RPG Save Crystal -->
+  <polygon points="32,29 42,39 32,49 22,39" fill="url(#crystal)" stroke="#A2C79D" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="32,32 39,39 32,46 25,39" fill="#E8FCE4" opacity="0.35"/>
+  <circle cx="32" cy="39" r="2.2" fill="#FFFFFF"/>
+</svg>
