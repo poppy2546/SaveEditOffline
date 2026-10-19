@@ -1,17 +1,31 @@
 {
   "name": "saveeditoffline",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Universal RPG Maker Save Editor & JSON Database Modder — 100% Client-side, private, and offline",
+  "main": "builder_promax.js",
   "scripts": {
+    "build": "node builder_promax.js",
+    "start": "node server.js",
     "test": "node tests/run_pyramid.js",
     "test:unit": "node tests/run_pyramid.js --unit",
     "test:integration": "node tests/run_pyramid.js --integration",
     "test:e2e": "node tests/run_pyramid.js --e2e"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/poppy2546/SaveEditOffline.git"
+  },
+  "keywords": [
+    "rpgmaker",
+    "save-editor",
+    "rmmz",
+    "rmmv",
+    "vxace",
+    "database-modder",
+    "offline-tool"
+  ],
+  "author": "poppy2546",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "lz-string": "^1.5.0"

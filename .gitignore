@@ -1,4 +1,7 @@
 node_modules/
+.wrangler/
+.env
+.env.*
 raw_save.json
 *.sav
 *.bak
@@ -7,4 +10,5 @@ Thumbs.db
 PROJECT_CONTEXT_AND_CHAT_HISTORY.md
 *.log
 temp/
-
+.vscode/
+.idea/
