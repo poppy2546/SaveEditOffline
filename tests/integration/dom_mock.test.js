@@ -172,5 +172,15 @@ module.exports = async function runDomMockIntegrationTests(it) {
     const exportedZipped = getLastBlob().parts[0];
     const exportedJson = JSON.parse(pako.inflate(exportedZipped, { to: 'string' }));
     assert.strictEqual(exportedJson.party._gold, 9999999);
+
+    // Verify Clear File in Save Editor
+    assert.strictEqual(typeof elementsById['btn-clear-save'].onclick, 'function');
+    elementsById['btn-clear-save'].click();
+    assert.strictEqual(elementsById['upload-section'].style.display, 'flex');
+    assert.strictEqual(elementsById['save-editor-screen'].style.display, 'none');
+
+    // Verify Clear Database Files buttons exist and are wired
+    assert.strictEqual(typeof elementsById['btn-db-clear-all'].onclick, 'function');
+    assert.strictEqual(typeof elementsById['btn-clear-db-header'].onclick, 'function');
   });
 };

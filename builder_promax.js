@@ -11,30 +11,44 @@ const htmlContent = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none';">
-<title>SaveEdit &amp; Database Studio PRO MAX - Universal RPG Maker Tool</title>
+<title>Save &amp; DB Studio — Web RPG Maker Save & DB Utility</title>
 <style>
+  /* Color Hunt Palette Adaptation (High Contrast Tactile Studio):
+     Primary Curated Palette: Crisp Parchment, Warm Sand & Deep Charcoal
+     Secondary Earth Accents: Sage Green, Ochre Amber & Terracotta */
   :root {
-    --bg-main: #0b0e14;
-    --bg-card: #131720;
-    --bg-card-hover: #19202c;
-    --bg-input: #080b10;
-    --border-color: #262d3d;
-    --border-subtle: #1c2230;
-    --border-focus: #58a6ff;
-    --text-primary: #e6edf3;
-    --text-secondary: #8b949e;
-    --text-muted: #656d76;
-    --accent-green: #238636;
-    --accent-green-hover: #2ea043;
-    --accent-blue: #1f6feb;
-    --accent-blue-hover: #388bfd;
-    --accent-gold: #d29922;
-    --accent-warn: #d29922;
-    --accent-danger: #da3633;
-    --accent-purple: #8957e5;
-    --card-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --bg-main: #16181D;
+    --bg-header: #1C1F26;
+    --bg-card: #22262E;
+    --bg-card-hover: #2C323D;
+    --bg-elevated: #303744;
+    --bg-input: #121418;
+    --border-color: #444B57;
+    --border-subtle: #333944;
+    --border-focus: #F0E6D2;
+    --text-primary: #F7F3EB;
+    --text-secondary: #C8BFB2;
+    --text-muted: #9C9588;
+    --accent-sand: #E6D8C3;
+    --accent-sand-hover: #F7EDE1;
+    --accent-sand-text: #181B20;
+    --accent-sage: #607D5B;
+    --accent-sage-bright: #A2C79D;
+    --accent-sage-bg: #1F2E1E;
+    --accent-amber: #D9A85B;
+    --accent-amber-bg: #302617;
+    --accent-terra: #C9674D;
+    --accent-terra-bg: #331E18;
+    --font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+  }
+
+  ::placeholder {
+    color: var(--text-muted);
+    opacity: 0.85;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,119 +56,235 @@ const htmlContent = `<!DOCTYPE html>
     background-color: var(--bg-main);
     color: var(--text-primary);
     font-family: var(--font-sans);
+    font-size: 14px;
     line-height: 1.5;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    -webkit-font-smoothing: antialiased;
   }
+
+  /* SVG Icons */
+  .ico {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    flex-shrink: 0;
+  }
+  .ico-lg { width: 22px; height: 22px; stroke-width: 1.5; }
+  .ico-xl { width: 32px; height: 32px; stroke-width: 1.4; }
 
   /* Header */
   header {
-    background: #0f131a;
+    background: var(--bg-header);
     border-bottom: 1px solid var(--border-color);
-    padding: 10px 24px;
+    padding: 12px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
     position: sticky;
     top: 0;
     z-index: 100;
+    flex-wrap: wrap;
   }
   .logo-wrap { display: flex; align-items: center; gap: 12px; }
   .logo-icon {
-    width: 32px; height: 32px;
-    background: #18202e;
-    border: 1px solid #323d52;
-    border-radius: 6px;
+    width: 34px; height: 34px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 15px; color: #58a6ff;
-    font-family: var(--font-mono);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    color: var(--accent-sand);
   }
+  .brand-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .badge-promax, .badge-offline {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: var(--radius-sm);
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
+  .badge-promax {
+    background: var(--bg-elevated);
+    color: var(--accent-sand);
+    border: 1px solid var(--border-color);
+  }
+  .badge-offline {
+    background: var(--accent-sage-bg);
+    color: var(--accent-sage-bright);
+    border: 1px solid var(--accent-sage);
+  }
+
+  /* Mode Switcher */
   .mode-switch-bar {
-    display: flex; background: #080b10; border: 1px solid var(--border-color);
-    border-radius: 6px; padding: 3px; gap: 3px;
+    display: flex;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    gap: 3px;
   }
   .mode-btn {
-    padding: 6px 14px; border-radius: 4px; border: none; background: transparent;
-    color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer;
-    transition: all 0.12s ease; display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    display: flex;
+    align-items: center;
+    gap: 7px;
   }
-  .mode-btn:hover { color: #fff; }
-  .mode-btn.active {
-    background: #1f2736; color: #fff; border: 1px solid #36445d;
-  }
-  .mode-btn.active-db {
-    background: #241a34; color: #d2a8ff; border: 1px solid #5c3b88;
+  .mode-btn:hover { color: var(--text-primary); }
+  .mode-btn.active, .mode-btn.active-db {
+    background: var(--bg-card);
+    color: var(--accent-sand);
+    border-color: var(--border-color);
   }
 
   .container {
-    max-width: 1560px; width: 100%; margin: 0 auto;
-    padding: 16px 20px; flex: 1; display: flex; flex-direction: column;
+    max-width: 1480px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Buttons */
   .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 13px; border-radius: 6px; font-size: 0.84rem;
-    font-weight: 600; cursor: pointer; border: 1px solid transparent;
-    transition: all 0.12s ease; user-select: none;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .btn:active { transform: translateY(1px); }
-  .btn-primary { background: var(--accent-green); color: #fff; border-color: #2da44e; }
-  .btn-primary:hover { background: var(--accent-green-hover); }
-  .btn-blue { background: var(--accent-blue); color: #fff; border-color: #388bfd; }
-  .btn-blue:hover { background: var(--accent-blue-hover); }
-  .btn-secondary { background: #19202c; color: var(--text-primary); border-color: var(--border-color); }
-  .btn-secondary:hover { background: #232d3e; border-color: #4b5873; }
-  .btn-gold { background: #2a200a; color: var(--accent-gold); border-color: #6e5012; }
-  .btn-gold:hover { background: #3d2f0e; border-color: #9e751b; }
-  .btn-purple { background: #231633; color: var(--accent-purple); border-color: #583380; }
-  .btn-purple:hover { background: #321f4a; }
-  .btn-danger { background: #2d1316; color: var(--accent-danger); border-color: #5c2025; }
-  .btn-danger:hover { background: #40191e; }
-  .btn-secret {
-    background: #241d08; color: #f2cc60; border: 1px solid #856114;
-    font-family: var(--font-mono); letter-spacing: 0.02em;
-  }
-  .btn-secret:hover {
-    background: #382c0a; border-color: #d29922; color: #fff;
-    box-shadow: 0 0 10px rgba(210, 153, 34, 0.35);
-  }
-  .btn-sm { padding: 4px 10px; font-size: 0.78rem; border-radius: 5px; }
-
-  /* Tabs */
-  .nav-tabs {
-    display: flex; gap: 8px; border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0; overflow-x: auto;
-  }
-  .tab-btn {
-    padding: 10px 18px; border: none; background: transparent;
-    color: var(--text-secondary); font-size: 0.92rem; font-weight: 600;
-    cursor: pointer; display: flex; align-items: center; gap: 8px;
-    border-bottom: 3px solid transparent; transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    user-select: none;
     white-space: nowrap;
   }
-  .tab-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.02); }
+  .btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--text-secondary);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 1px;
+  }
+  /* Warm Sand Primary CTA */
+  .btn-primary, .btn-blue {
+    background: var(--accent-sand);
+    color: var(--accent-sand-text);
+    border-color: var(--accent-sand);
+    font-weight: 700;
+  }
+  .btn-primary:hover, .btn-blue:hover {
+    background: var(--accent-sand-hover);
+    border-color: var(--accent-sand-hover);
+    color: var(--accent-sand-text);
+  }
+  /* Secondary Neutral */
+  .btn-secondary, .btn-purple {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+  }
+  .btn-secondary:hover, .btn-purple:hover {
+    background: #363D49;
+    border-color: var(--text-secondary);
+  }
+  /* Warm Ochre / Gold */
+  .btn-gold, .btn-secret {
+    background: var(--accent-amber-bg);
+    color: #E2B86B;
+    border-color: #6B532B;
+  }
+  .btn-gold:hover, .btn-secret:hover {
+    background: #382E1E;
+    border-color: var(--accent-amber);
+    color: #F2CE8A;
+  }
+  /* Terracotta Danger */
+  .btn-danger {
+    background: var(--accent-terra-bg);
+    color: #E08268;
+    border-color: #6E3829;
+  }
+  .btn-danger:hover {
+    background: #3B241F;
+    border-color: var(--accent-terra);
+  }
+  .btn-sm { padding: 5px 11px; font-size: 0.78rem; border-radius: var(--radius-sm); }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(223, 208, 184, 0.03);
+  }
   .tab-btn.active {
-    color: var(--accent-blue-hover);
-    border-bottom-color: var(--accent-blue);
-    background: rgba(31, 111, 235, 0.08);
-    border-radius: 6px 6px 0 0;
+    color: var(--accent-sand);
+    border-bottom-color: var(--accent-sand);
+    background: rgba(223, 208, 184, 0.05);
   }
   .tab-badge {
-    background: #19202c; color: var(--text-secondary); padding: 1px 7px;
-    border-radius: 8px; font-size: 0.72rem; font-family: var(--font-mono);
-    border: 1px solid var(--border-color);
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    border: 1px solid var(--border-subtle);
   }
-  .tab-btn.active .tab-badge { background: #162638; color: #79c0ff; border-color: #1f6feb; }
-
-  /* Info Green Notice Bar */
-  .info-notice {
-    background: #0d2215; border: 1px solid #238636; border-radius: 8px;
-    padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; font-size: 0.85rem; color: #7ee787;
+  .tab-btn.active .tab-badge {
+    background: var(--bg-elevated);
+    color: var(--accent-sand);
+    border-color: var(--border-color);
   }
 
   /* Section Panels */
@@ -163,256 +293,489 @@ const htmlContent = `<!DOCTYPE html>
 
   /* Card and Stat Inputs */
   .stat-card {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px;
-    transition: border-color 0.15s ease;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.12s ease;
   }
-  .stat-card:hover { border-color: #388bfd; }
-  .stat-card.custom-mod { border-color: #613b8b; background: rgba(188, 140, 255, 0.04); }
-  .stat-title { font-weight: 700; font-size: 0.88rem; color: #79c0ff; font-family: var(--font-mono); }
-  .stat-desc { font-size: 0.75rem; color: var(--text-muted); }
+  .stat-card:hover { border-color: var(--text-secondary); }
+  .stat-title {
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--accent-sand);
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+  .stat-desc { font-size: 0.74rem; color: var(--text-secondary); }
   .stat-input {
-    flex: 1; padding: 8px 10px; background: var(--bg-input);
-    border: 1px solid var(--border-color); border-radius: 6px;
-    color: #fff; font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600;
+    flex: 1;
+    padding: 7px 10px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    font-weight: 500;
   }
-  .stat-input:focus { outline: none; border-color: var(--border-focus); }
+  .stat-input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+  }
 
   /* Item / Weapon / Armor Grid */
   .items-card-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 12px;
   }
   .item-card {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.12s ease;
   }
-  .item-card:hover { background: var(--bg-card-hover); border-color: #388bfd; }
-  .item-card.is-modified { border-color: var(--accent-green); background: rgba(46, 160, 67, 0.05); }
+  .item-card:hover { border-color: var(--text-secondary); }
+  .item-card.is-modified {
+    border-color: var(--accent-sage);
+    background: var(--accent-sage-bg);
+  }
 
   /* Switch Toggle */
   .toggle-switch {
-    position: relative; width: 44px; height: 24px; display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 22px;
+    display: inline-block;
+    flex-shrink: 0;
   }
   .toggle-switch input { opacity: 0; width: 0; height: 0; }
   .slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #2b3347; transition: .2s; border-radius: 24px;
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    transition: 0.15s;
+    border-radius: 22px;
   }
   .slider:before {
-    position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
-    background-color: white; transition: .2s; border-radius: 50%;
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-secondary);
+    transition: 0.15s;
+    border-radius: 50%;
   }
-  input:checked + .slider { background-color: var(--accent-green); }
-  input:checked + .slider:before { transform: translateX(20px); }
+  input:checked + .slider {
+    background-color: var(--accent-sage-bg);
+    border-color: var(--accent-sage-bright);
+  }
+  input:checked + .slider:before {
+    transform: translateX(18px);
+    background-color: var(--accent-sand);
+  }
 
   /* Revert Icon Button */
   .revert-btn {
-    background: transparent; border: none; color: var(--text-secondary);
-    cursor: pointer; font-size: 0.95rem; padding: 2px 4px; border-radius: 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
     display: none;
   }
-  .revert-btn.show { display: inline-block; color: var(--accent-green); }
-  .revert-btn:hover { color: var(--accent-danger); }
+  .revert-btn.show {
+    display: inline-block;
+    color: var(--accent-amber);
+    border-color: var(--border-color);
+  }
+  .revert-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+  }
 
   /* ============================================================== */
   /* DATABASE MODDER STUDIO (MASTER - DETAIL 2-COLUMN LAYOUT)       */
   /* ============================================================== */
   #db-modder-screen {
-    display: none; flex-direction: column; gap: 14px; width: 100%;
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
   }
   .db-toolbar {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 12px; padding: 12px 18px; display: flex; flex-wrap: wrap;
-    align-items: center; justify-content: space-between; gap: 14px;
-    box-shadow: var(--card-shadow);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 12px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
   }
   .db-layout {
-    display: grid; grid-template-columns: 340px 1fr; gap: 16px; min-height: 700px;
+    display: grid;
+    grid-template-columns: 330px 1fr;
+    gap: 16px;
+    min-height: 680px;
   }
-  @media (max-width: 900px) {
+  @media (max-width: 920px) {
     .db-layout { grid-template-columns: 1fr; }
   }
 
   /* Left Master List */
   .db-list-panel {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   .db-search-box {
-    padding: 12px; border-bottom: 1px solid var(--border-color); background: #161b27;
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-header);
   }
   .db-search-input {
-    width: 100%; padding: 8px 12px; background: var(--bg-input);
-    border: 1px solid var(--border-color); border-radius: 6px;
-    color: #fff; font-size: 0.88rem;
+    width: 100%;
+    padding: 7px 11px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.84rem;
+    font-family: var(--font-sans);
   }
-  .db-search-input:focus { outline: none; border-color: var(--accent-blue); }
+  .db-search-input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+  }
 
   .db-items-scroll {
-    overflow-y: auto; flex: 1; max-height: calc(100vh - 260px);
+    overflow-y: auto;
+    flex: 1;
+    max-height: calc(100vh - 280px);
   }
   .db-list-row {
-    padding: 10px 14px; border-bottom: 1px solid #23293a; cursor: pointer;
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    transition: background 0.15s ease;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: background 0.1s ease;
   }
   .db-list-row:hover { background: var(--bg-card-hover); }
   .db-list-row.active {
-    background: #23344e; border-left: 4px solid var(--accent-blue);
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--accent-sand);
+    padding-left: 11px;
   }
-  .db-list-row.is-modified .db-row-name { color: #7ee787; font-weight: 700; }
-  .db-row-id { font-size: 0.75rem; color: var(--text-secondary); font-family: var(--font-mono); }
+  .db-list-row.is-modified .db-row-name {
+    color: var(--accent-sage-bright);
+    font-weight: 700;
+  }
+  .db-row-id {
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    min-width: 30px;
+  }
   .db-row-name {
-    font-size: 0.88rem; font-weight: 600; color: #fff;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 185px;
   }
 
   /* Right Detail Editor */
   .db-detail-panel {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 12px; padding: 22px; display: flex; flex-direction: column;
-    gap: 20px; box-shadow: var(--card-shadow);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
   }
   .db-item-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: 16px; border-bottom: 1px solid var(--border-color); gap: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    gap: 14px;
     flex-wrap: wrap;
   }
   .db-item-title-group { display: flex; align-items: center; gap: 12px; flex: 1; }
   .db-icon-box {
-    width: 48px; height: 48px; border-radius: 10px; background: #262e42;
-    border: 1px solid var(--border-color); display: flex; align-items: center;
-    justify-content: center; font-size: 1.6rem;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-sand);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
   }
   .db-name-input {
-    font-size: 1.25rem; font-weight: 700; color: #fff; background: var(--bg-input);
-    border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px;
-    flex: 1; min-width: 200px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 7px 12px;
+    flex: 1;
+    min-width: 200px;
   }
-  .db-name-input:focus { outline: none; border-color: var(--accent-blue); }
+  .db-name-input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+  }
 
   .db-field-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
   }
   .db-field-box {
-    display: flex; flex-direction: column; gap: 6px;
-    background: #151a26; padding: 12px; border-radius: 8px;
-    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--bg-header);
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
   }
   .db-field-label {
-    font-size: 0.8rem; font-weight: 700; color: #79c0ff;
-    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .db-textarea {
-    width: 100%; height: 75px; background: var(--bg-input);
-    border: 1px solid var(--border-color); border-radius: 6px;
-    color: #fff; font-size: 0.85rem; padding: 8px; resize: vertical;
+    width: 100%;
+    height: 68px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.84rem;
+    font-family: var(--font-sans);
+    padding: 8px 10px;
+    resize: vertical;
+  }
+  .db-textarea:focus {
+    outline: none;
+    border-color: var(--border-focus);
   }
 
-  /* Preset Pills */
+  /* Preset Bar */
   .preset-bar {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    background: #171d2c; padding: 10px 14px; border-radius: 8px;
-    border: 1px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: var(--bg-header);
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
   }
 
   /* DB Drop Banner & Category Slots */
   .db-drop-banner {
-    background: linear-gradient(135deg, rgba(110, 64, 201, 0.14), rgba(31, 111, 235, 0.1));
-    border: 2px dashed #6e40c9; border-radius: 12px; padding: 14px 18px;
-    display: flex; align-items: center; justify-content: space-between; gap: 14px;
-    flex-wrap: wrap; transition: all 0.2s ease; cursor: pointer;
+    background: var(--bg-card);
+    border: 1px dashed var(--text-secondary);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    cursor: pointer;
   }
   .db-drop-banner:hover, .db-drop-banner.drag-over {
-    border-color: #bc8cff; background: rgba(163, 113, 247, 0.18);
+    border-color: var(--accent-sand);
+    background: var(--bg-card-hover);
   }
   .db-slot-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
   }
   @media (max-width: 900px) {
     .db-slot-grid { grid-template-columns: repeat(2, 1fr); }
   }
   .db-cat-btn {
-    background: #151924; border: 1px solid var(--border-color); border-radius: 10px;
-    padding: 10px 14px; display: flex; flex-direction: column; align-items: flex-start;
-    gap: 6px; cursor: pointer; transition: all 0.15s ease; text-align: left; color: #fff;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease;
+    text-align: left;
+    color: var(--text-primary);
   }
-  .db-cat-btn:hover { background: #1e2436; border-color: #58a6ff; }
+  .db-cat-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--text-secondary);
+  }
   .db-cat-btn.active {
-    background: #201a35; border: 2px solid #a371f7;
-    box-shadow: 0 0 14px rgba(163, 113, 247, 0.25);
+    background: var(--bg-elevated);
+    border-color: var(--accent-sand);
   }
-  .db-cat-btn.loaded { border-left: 4px solid #2ea043; }
+  .db-cat-btn.loaded {
+    border-left: 3px solid var(--accent-sage-bright);
+  }
   .db-slot-top {
-    display: flex; align-items: center; justify-content: space-between; width: 100%;
-    font-weight: 700; font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-weight: 600;
+    font-size: 0.86rem;
   }
   .db-slot-sub {
-    display: flex; align-items: center; justify-content: space-between; width: 100%;
-    font-size: 0.75rem; color: var(--text-secondary);
-  }
-  .db-bulk-bar {
-    background: #141824; border: 1px solid var(--border-color); border-radius: 10px;
-    padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; flex-wrap: wrap;
-  }
-  .effect-tag {
-    display: inline-flex; align-items: center; gap: 6px; background: #1e2638;
-    border: 1px solid #35415f; border-radius: 6px; padding: 4px 10px;
-    font-size: 0.78rem; color: #79c0ff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.74rem;
+    color: var(--text-secondary);
   }
 
-  /* Toast & Modals */
+  .meta-pill {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    padding: 3px 9px;
+    border-radius: var(--radius-sm);
+    font-size: 0.74rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+  }
+
+  /* Toast */
   .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: #1f6feb; color: #fff; padding: 12px 20px;
-    border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    font-size: 0.9rem; font-weight: 600; opacity: 0;
-    transform: translateY(10px); transition: all 0.25s ease;
-    z-index: 1100; pointer-events: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--accent-sand);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.84rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 1100;
+    pointer-events: none;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.success { background: #238636; }
-  .toast.warn { background: #9e6a03; }
-  .toast.error { background: #da3633; }
+  .toast.success { border-color: var(--accent-sage-bright); background: var(--accent-sage-bg); color: var(--text-primary); }
+  .toast.warn { border-color: var(--accent-amber); background: var(--accent-amber-bg); }
+  .toast.error, .toast.danger { border-color: var(--accent-terra); background: var(--accent-terra-bg); }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo-wrap">
-    <div class="logo-icon">✎</div>
+    <div class="logo-icon" aria-hidden="true">
+      <svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+    </div>
     <div>
       <div style="display:flex; align-items:center;">
-        <h1 style="font-size:1.15rem; font-weight:800;">Save &amp; DB Studio</h1>
+        <h1 class="brand-title">Save &amp; DB Studio</h1>
         <span class="badge-promax" id="app-badge-mode">SAVE EDITOR</span>
-        <span class="badge-offline">100% OFFLINE</span>
+        <span class="badge-offline">CLIENT-SIDE / 100% PRIVATE</span>
       </div>
-      <div style="font-size:0.75rem; color:var(--text-secondary);">
-        All RPG Maker Saves + Database Modder (Weapons, Armors, Items, Skills)
+      <div style="font-size:0.74rem; color:var(--text-secondary);">
+        Universal RPG Maker Save Editor &amp; JSON Database Inspector
       </div>
     </div>
   </div>
 
   <!-- Primary Mode Switcher -->
-  <div class="mode-switch-bar">
-    <button class="mode-btn active" id="btn-mode-save">💾 Game Save Editor</button>
-    <button class="mode-btn" id="btn-mode-db">🛠️ Game Database Modder</button>
+  <div class="mode-switch-bar" role="tablist" aria-label="Workspace Mode">
+    <button class="mode-btn active" id="btn-mode-save" type="button">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save Editor
+    </button>
+    <button class="mode-btn" id="btn-mode-db" type="button">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Database Modder
+    </button>
   </div>
 
   <!-- Save Editor Header Actions -->
   <div style="display:flex; align-items:center; gap:8px;" id="header-save-actions">
-    <button class="btn btn-secondary btn-sm" id="btn-change-file">📁 Open Save</button>
-    <button class="btn btn-blue btn-sm" id="btn-export-json">Export JSON</button>
-    <button class="btn btn-primary btn-sm" id="btn-review-download">📥 Download Edited Save</button>
+    <button class="btn btn-secondary btn-sm" id="btn-change-file" type="button">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Open Save
+    </button>
+    <button class="btn btn-secondary btn-sm" id="btn-clear-save" type="button" title="Close and clear current save file">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      Clear File
+    </button>
+    <button class="btn btn-secondary btn-sm" id="btn-export-json" type="button">Export JSON</button>
+    <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Save
+    </button>
   </div>
 
   <!-- Database Modder Header Actions -->
   <div style="display:none; align-items:center; gap:8px;" id="header-db-actions">
-    <button class="btn btn-secondary btn-sm" id="btn-open-db-file">📂 Open DB File (.json)</button>
-    <button class="btn btn-primary btn-sm" id="btn-db-download">📥 Download Edited .json</button>
+    <button class="btn btn-secondary btn-sm" id="btn-open-db-file" type="button">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Open JSON File(s)
+    </button>
+    <button class="btn btn-secondary btn-sm" id="btn-clear-db-header" type="button" title="Clear all loaded database files">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      Clear Files
+    </button>
+    <button class="btn btn-primary btn-sm" id="btn-db-download" type="button">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download .json
+    </button>
   </div>
 </header>
 
@@ -421,32 +784,36 @@ const htmlContent = `<!DOCTYPE html>
   <!-- ========================================================= -->
   <!-- 1. WELCOME / DROPZONE SCREEN                             -->
   <!-- ========================================================= -->
-  <div id="upload-section" style="display:flex; flex-direction:column; align-items:center; margin:36px auto; max-width:880px; width:100%; text-align:center;">
-    <div style="width:100%; border:2px dashed var(--accent-blue); border-radius:16px; background:var(--bg-card); padding:50px 30px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:16px;" id="dropzone">
-      <div style="font-size:3.5rem;">🎮</div>
-      <div style="font-size:1.4rem; font-weight:700;">Drop any Save File or Database JSON here</div>
-      <div style="color:var(--text-secondary); font-size:0.9rem; max-width:680px;">
-        Auto-detects: <b>Save Files</b> (<code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rxdata</code>, <code>.lsd</code>) or <b>Database Files</b> (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>)
+  <div id="upload-section" style="display:flex; flex-direction:column; align-items:center; margin:32px auto; max-width:860px; width:100%; text-align:center;">
+    <div style="width:100%; border:1px dashed var(--text-secondary); border-radius:var(--radius-lg); background:var(--bg-card); padding:48px 32px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:14px; transition:border-color 0.15s ease;" id="dropzone">
+      <div style="color:var(--accent-sand);" aria-hidden="true">
+        <svg class="ico ico-xl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div style="font-size:1.2rem; font-weight:600; color:var(--text-primary); letter-spacing:-0.01em;">
+        Drop a Save File or Database JSON to begin
+      </div>
+      <div style="color:var(--text-secondary); font-size:0.85rem; max-width:620px; line-height:1.6;">
+        Supports <b>Save Files</b> (<code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>) and <b>Database JSON</b> (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>)
       </div>
       <input type="file" id="file-input" multiple style="display:none;">
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button class="btn btn-blue" onclick="document.getElementById('file-input').click()">Browse File(s)</button>
-        <button class="btn btn-purple" id="btn-quick-open-db">🛠️ Open Game Database (data/*.json)</button>
+      <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
+        <button class="btn btn-primary" type="button" onclick="document.getElementById('file-input').click()">Select Save File</button>
+        <button class="btn btn-secondary" type="button" id="btn-quick-open-db">Open Database JSON (data/*.json)</button>
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; width:100%; margin-top:32px; text-align:left;">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:10px;">
-        <h4 style="color:#79c0ff; margin-bottom:6px;">🛠️ Database Modder</h4>
-        <p style="color:var(--text-secondary); font-size:0.8rem;">Mod Weapons, Armors, Items, and Skills. Edit damage formulas, 0 MP cost, infinite items, and 9999 stats.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px; width:100%; margin-top:24px; text-align:left;">
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:var(--radius-md);">
+        <div style="font-weight:600; color:var(--accent-sand); margin-bottom:6px; font-size:0.88rem;">Multi-Engine Save Support</div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; line-height:1.5;">Read and write RPG Maker MZ, MV, VX Ace, VX, and XP files directly in your browser without uploading data.</p>
       </div>
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:10px;">
-        <h4 style="color:#7ee787; margin-bottom:6px;">💾 All RPG Maker Saves</h4>
-        <p style="color:var(--text-secondary); font-size:0.8rem;">Native support for MZ, MV, VX Ace, VX, XP, 2000/2003, and Wolf RPG with custom mod variable rendering.</p>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:var(--radius-md);">
+        <div style="font-weight:600; color:var(--accent-sand); margin-bottom:6px; font-size:0.88rem;">Database Batch Modding</div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; line-height:1.5;">Load multiple JSON tables at once. Edit parameters, recovery rates, skill costs, and item consumption rules.</p>
       </div>
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:10px;">
-        <h4 style="color:var(--accent-gold); margin-bottom:6px;">⚡ Direct In-Place Save</h4>
-        <p style="color:var(--text-secondary); font-size:0.8rem;">Save directly to game folder via File System API with automatic .bak backup preservation.</p>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:var(--radius-md);">
+        <div style="font-weight:600; color:var(--accent-sand); margin-bottom:6px; font-size:0.88rem;">Non-Destructive Workflow</div>
+        <p style="color:var(--text-secondary); font-size:0.8rem; line-height:1.5;">Revert individual records or entire tables to their original state at any time before exporting.</p>
       </div>
     </div>
   </div>
@@ -456,61 +823,67 @@ const htmlContent = `<!DOCTYPE html>
   <!-- ========================================================= -->
   <div id="save-editor-screen" style="display:none; flex-direction:column; gap:16px; width:100%;">
     <!-- Top Quick Bar -->
-    <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:12px 18px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <span style="font-weight:700; font-size:1.1rem; color:#fff;" id="label-filename">savegame.rpgsave</span>
-        <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:#388bfd; font-weight:700;" id="label-format">FORMAT</span>
-        <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:var(--text-secondary);" id="label-size">0 KB</span>
-        <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:var(--accent-green-hover);" id="label-changes">0 CHANGES</span>
+    <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:12px 18px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span style="font-weight:600; font-size:0.98rem; color:var(--text-primary); font-family:var(--font-mono);" id="label-filename">savegame.rpgsave</span>
+        <span class="meta-pill" id="label-format">FORMAT</span>
+        <span class="meta-pill" id="label-size">0 KB</span>
+        <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage);" id="label-changes">0 CHANGES</span>
       </div>
 
-      <!-- Quick Gold Edit & Secret God Mode -->
+      <!-- Quick Gold Edit & Max Preset -->
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <div style="background:#141a24; border:1px solid #6e5012; border-radius:8px; padding:6px 14px; display:flex; align-items:center; gap:8px;">
-          <span style="font-weight:700; color:var(--accent-gold); font-size:0.95rem;">💰 Gold:</span>
-          <input type="number" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff; font-family:var(--font-mono); font-size:1rem; font-weight:bold; width:120px; padding:4px 8px;" id="quick-gold-input" value="0">
-          <button class="revert-btn" id="gold-revert-btn" title="Revert Gold">↺</button>
-          <button class="btn btn-secondary btn-sm" id="btn-gold-add-10k">+10K</button>
-          <button class="btn btn-secondary btn-sm" id="btn-gold-add-100k">+100K</button>
-          <button class="btn btn-gold btn-sm" id="btn-gold-max">MAX 9.9M</button>
+        <div style="background:var(--bg-header); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:5px 12px; display:flex; align-items:center; gap:8px;">
+          <span style="font-weight:600; color:var(--accent-sand); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.03em;">Gold</span>
+          <input type="number" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-family:var(--font-mono); font-size:0.9rem; font-weight:600; width:115px; padding:4px 8px;" id="quick-gold-input" value="0" aria-label="Party Gold">
+          <button class="revert-btn" id="gold-revert-btn" title="Revert Gold to original value" type="button">Revert</button>
+          <button class="btn btn-secondary btn-sm" id="btn-gold-add-10k" type="button">+10K</button>
+          <button class="btn btn-secondary btn-sm" id="btn-gold-add-100k" type="button">+100K</button>
+          <button class="btn btn-gold btn-sm" id="btn-gold-max" type="button">Max 9.9M</button>
         </div>
-        <button class="btn btn-secret btn-sm" id="btn-secret-godmode" title="ปุ่มลับ: ปลดล็อกเงินเต็ม 9.9M + เลือดมานาเต็ม + สเตตัส 9999 + ไอเทม/อาวุธ/เกราะ 99 ทุกชิ้น (คีย์ลัด Ctrl+Shift+G)">🗝️ ปุ่มลับ: SUPER GOD MODE</button>
+        <button class="btn btn-secret btn-sm" id="btn-secret-godmode" type="button" title="Max Gold (9.9M), Full HP/MP, All Stats 9999, and 99x Owned Items (Shortcut: Ctrl+Shift+G)">
+          Max All Party &amp; Inventory
+        </button>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
-    <div class="nav-tabs" id="main-nav-tabs">
-      <button class="tab-btn active" data-tab="tab-characters">👤 Characters <span class="tab-badge" id="badge-char-count">0</span></button>
-      <button class="tab-btn" data-tab="tab-inventory">🎒 Inventory <span class="tab-badge" id="badge-item-count">0</span></button>
-      <button class="tab-btn" data-tab="tab-weapons">⚔️ Weapons <span class="tab-badge" id="badge-weapon-count">0</span></button>
-      <button class="tab-btn" data-tab="tab-armors">🛡️ Armors <span class="tab-badge" id="badge-armor-count">0</span></button>
-      <button class="tab-btn" data-tab="tab-variables">🔢 Variables <span class="tab-badge" id="badge-var-count">0</span></button>
-      <button class="tab-btn" data-tab="tab-switches">🔘 Switches <span class="tab-badge" id="badge-switch-count">0</span></button>
-      <button class="tab-btn" data-tab="tab-datafiles">📁 Data Files (.json)</button>
-      <button class="tab-btn" data-tab="tab-raw">🌲 Raw Variable Tree</button>
+    <div class="nav-tabs" id="main-nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-characters" type="button">Characters <span class="tab-badge" id="badge-char-count">0</span></button>
+      <button class="tab-btn" data-tab="tab-inventory" type="button">Inventory <span class="tab-badge" id="badge-item-count">0</span></button>
+      <button class="tab-btn" data-tab="tab-weapons" type="button">Weapons <span class="tab-badge" id="badge-weapon-count">0</span></button>
+      <button class="tab-btn" data-tab="tab-armors" type="button">Armors <span class="tab-badge" id="badge-armor-count">0</span></button>
+      <button class="tab-btn" data-tab="tab-variables" type="button">Variables <span class="tab-badge" id="badge-var-count">0</span></button>
+      <button class="tab-btn" data-tab="tab-switches" type="button">Switches <span class="tab-badge" id="badge-switch-count">0</span></button>
+      <button class="tab-btn" data-tab="tab-datafiles" type="button">Data Files (.json)</button>
+      <button class="tab-btn" data-tab="tab-raw" type="button">Raw Tree</button>
     </div>
 
     <!-- TAB 1: CHARACTERS -->
     <div class="section-panel active" id="tab-characters">
-      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--bg-card); padding:14px 18px; border-radius:10px; border:1px solid var(--border-color);">
-        <label style="font-weight:700; color:var(--text-secondary);">Select Character:</label>
-        <select class="char-select" id="char-dropdown" style="padding:8px 14px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff; font-size:0.95rem; font-weight:600; min-width:260px;"></select>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--bg-card); padding:12px 16px; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+        <label for="char-dropdown" style="font-weight:600; color:var(--text-secondary); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.03em;">Character</label>
+        <select class="char-select" id="char-dropdown" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.88rem; font-weight:500; min-width:250px;"></select>
         <div style="display:flex; gap:8px; margin-left:auto;">
-          <button class="btn btn-secondary btn-sm" id="btn-char-full-heal">💖 Full Restore (HP/MP)</button>
-          <button class="btn btn-gold btn-sm" id="btn-char-max-stats">⚡ Max All Stats (9999)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-char-full-heal" type="button">Full Restore (HP/MP)</button>
+          <button class="btn btn-gold btn-sm" id="btn-char-max-stats" type="button">Max All Stats (9999)</button>
         </div>
       </div>
-      <div class="stats-grid" id="char-stats-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;"></div>
+      <div class="stats-grid" id="char-stats-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;"></div>
     </div>
 
     <!-- TAB 2: INVENTORY -->
     <div class="section-panel" id="tab-inventory">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:12px 18px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
-        <div style="flex:1; min-width:240px;"><input type="text" id="inventory-search" placeholder="Search Item ID, name or value..." style="width:100%; padding:7px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff;"></div>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+        <div style="flex:1; min-width:240px;">
+          <input type="text" id="inventory-search" placeholder="Filter by item ID or name..." style="width:100%; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        </div>
         <div style="display:flex; align-items:center; gap:10px;">
-          <label style="font-size:0.85rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="inventory-owned-only" checked> Owned only (>0)</label>
-          <button class="btn btn-blue btn-sm" id="btn-items-set-all-99">Set All Owned to 99</button>
-          <button class="btn btn-secondary btn-sm" id="btn-add-item-dialog">+ Add Item ID</button>
+          <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="inventory-owned-only" checked> Owned only (&gt;0)
+          </label>
+          <button class="btn btn-secondary btn-sm" id="btn-items-set-all-99" type="button">Set All Owned to 99</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-item-dialog" type="button">+ Add Item ID</button>
         </div>
       </div>
       <div class="items-card-grid" id="inventory-cards-container"></div>
@@ -518,37 +891,41 @@ const htmlContent = `<!DOCTYPE html>
 
     <!-- TAB 3: WEAPONS -->
     <div class="section-panel" id="tab-weapons">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:12px 18px; display:flex; justify-content:space-between; gap:12px;">
-        <input type="text" id="weapons-search" placeholder="Search Weapon ID, name or value..." style="flex:1; padding:7px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff;">
-        <button class="btn btn-secondary btn-sm" id="btn-add-weapon-dialog">+ Add Weapon ID</button>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; gap:12px;">
+        <input type="text" id="weapons-search" placeholder="Filter by weapon ID or name..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <button class="btn btn-primary btn-sm" id="btn-add-weapon-dialog" type="button">+ Add Weapon ID</button>
       </div>
       <div class="items-card-grid" id="weapons-cards-container"></div>
     </div>
 
     <!-- TAB 4: ARMORS -->
     <div class="section-panel" id="tab-armors">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:12px 18px; display:flex; justify-content:space-between; gap:12px;">
-        <input type="text" id="armors-search" placeholder="Search Armor ID, name or value..." style="flex:1; padding:7px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff;">
-        <button class="btn btn-secondary btn-sm" id="btn-add-armor-dialog">+ Add Armor ID</button>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; gap:12px;">
+        <input type="text" id="armors-search" placeholder="Filter by armor ID or name..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <button class="btn btn-primary btn-sm" id="btn-add-armor-dialog" type="button">+ Add Armor ID</button>
       </div>
       <div class="items-card-grid" id="armors-cards-container"></div>
     </div>
 
     <!-- TAB 5: VARIABLES -->
     <div class="section-panel" id="tab-variables">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:12px 18px; display:flex; justify-content:space-between; gap:12px;">
-        <input type="text" id="variables-search" placeholder="Search Variable ID, name or value..." style="flex:1; padding:7px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff;">
-        <label style="font-size:0.85rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="vars-nonzero-only" checked> Non-zero only</label>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <input type="text" id="variables-search" placeholder="Filter by variable ID, name, or value..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="vars-nonzero-only" checked> Non-zero only
+        </label>
       </div>
       <div class="items-card-grid" id="variables-cards-container"></div>
     </div>
 
     <!-- TAB 6: SWITCHES -->
     <div class="section-panel" id="tab-switches">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:12px 18px; display:flex; justify-content:space-between; gap:12px;">
-        <input type="text" id="switches-search" placeholder="Search Switch ID or name..." style="flex:1; padding:7px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff;">
-        <select id="switches-filter" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:6px; color:#fff;">
-          <option value="all">All Switches</option><option value="on">ON only</option><option value="off">OFF only</option>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; gap:12px;">
+        <input type="text" id="switches-search" placeholder="Filter by switch ID or name..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <select id="switches-filter" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+          <option value="all">All Switches</option>
+          <option value="on">ON Only</option>
+          <option value="off">OFF Only</option>
         </select>
       </div>
       <div class="items-card-grid" id="switches-cards-container"></div>
@@ -556,14 +933,16 @@ const htmlContent = `<!DOCTYPE html>
 
     <!-- TAB 7: DATA FILES -->
     <div class="section-panel" id="tab-datafiles">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:24px;">
-        <h3 style="font-size:1.1rem; color:#fff; margin-bottom:8px;">Load Game Data Files (Optional)</h3>
-        <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:16px;">
-          Upload <code>Items.json</code>, <code>Weapons.json</code>, <code>Armors.json</code>, or <code>System.json</code> to replace raw IDs with actual names.
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:24px;">
+        <h3 style="font-size:1rem; color:var(--text-primary); margin-bottom:6px; font-weight:600;">Load Game Reference Data (Optional)</h3>
+        <p style="color:var(--text-secondary); font-size:0.84rem; margin-bottom:16px;">
+          Drop <code>Items.json</code>, <code>Weapons.json</code>, <code>Armors.json</code>, or <code>System.json</code> to resolve raw IDs into readable names across all tabs.
         </p>
-        <div style="border:2px dashed var(--border-color); border-radius:10px; padding:30px; text-align:center; cursor:pointer;" id="data-dropzone">
-          <div style="font-size:2rem; margin-bottom:8px;">📂</div>
-          <div style="font-weight:600; color:#fff;">Drop data JSON files here or click to browse</div>
+        <div style="border:1px dashed var(--text-secondary); border-radius:var(--radius-md); padding:32px; text-align:center; cursor:pointer; background:var(--bg-header);" id="data-dropzone">
+          <div style="color:var(--accent-sand); margin-bottom:8px;" aria-hidden="true">
+            <svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div style="font-weight:600; color:var(--text-primary); font-size:0.88rem;">Drop JSON reference files here or click to browse</div>
           <input type="file" id="data-file-input" multiple accept=".json" style="display:none;">
         </div>
       </div>
@@ -571,15 +950,15 @@ const htmlContent = `<!DOCTYPE html>
 
     <!-- TAB 8: RAW TREE -->
     <div class="section-panel" id="tab-raw">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; overflow:hidden;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
           <thead>
-            <tr style="background:#151926; text-align:left; color:var(--text-secondary);">
-              <th style="padding:10px 14px; width:35%;">Variable / Path</th>
+            <tr style="background:var(--bg-header); text-align:left; color:var(--text-secondary); border-bottom:1px solid var(--border-color);">
+              <th style="padding:10px 14px; width:35%;">Property Path</th>
               <th style="padding:10px 14px; width:10%;">Type</th>
               <th style="padding:10px 14px; width:25%;">Original</th>
-              <th style="padding:10px 14px; width:25%;">Value</th>
-              <th style="padding:10px 14px; width:5%;">Revert</th>
+              <th style="padding:10px 14px; width:25%;">Current Value</th>
+              <th style="padding:10px 14px; width:5%;">Reset</th>
             </tr>
           </thead>
           <tbody id="raw-tbody"></tbody>
@@ -592,66 +971,69 @@ const htmlContent = `<!DOCTYPE html>
   <!-- 3. GAME DATABASE MODDER STUDIO                            -->
   <!-- ========================================================= -->
   <div id="db-modder-screen">
-    <!-- Top Multi-File Drop Guide & 4 Category Slots -->
+    <!-- Top Multi-File Drop Guide -->
     <div class="db-drop-banner" id="db-drop-banner">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div style="font-size:2rem;">📂</div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="color:var(--accent-sand); display:flex; align-items:center;" aria-hidden="true">
+          <svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </div>
         <div>
-          <div style="font-weight:800; font-size:0.98rem; color:#fff;">ลากไฟล์ Database (.json) มาวางที่นี่ได้พร้อมกันหลายไฟล์!</div>
-          <div style="font-size:0.8rem; color:var(--text-secondary);">
-            หาไฟล์ได้จากโฟลเดอร์เกม <code>data/</code> หรือ <code>www/data/</code> (เช่น <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>) ลากมาวางรวดเดียวได้เลย
+          <div style="font-weight:600; font-size:0.92rem; color:var(--text-primary);">Drop Database JSON files here (Multi-file supported)</div>
+          <div style="font-size:0.78rem; color:var(--text-secondary);">
+            Locate files in your game's <code>data/</code> or <code>www/data/</code> folder (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>) and drop them together.
           </div>
         </div>
       </div>
       <input type="file" id="db-multi-file-input" multiple accept=".json" style="display:none;">
       <div style="display:flex; gap:8px;">
-        <button class="btn btn-purple btn-sm" id="btn-db-browse-multi">📂 เลือกไฟล์ .json (เลือกหลายไฟล์ได้)</button>
+        <button class="btn btn-secondary btn-sm" id="btn-db-browse-multi" type="button">Select JSON Files</button>
+        <button class="btn btn-secondary btn-sm" id="btn-db-clear-all" type="button" title="Clear all loaded database files">Clear All Files</button>
       </div>
     </div>
 
     <!-- 4 Category Status Cards -->
     <div class="db-slot-grid">
-      <button class="db-cat-btn active" data-cat="weapons" id="slot-btn-weapons">
+      <button class="db-cat-btn active" data-cat="weapons" id="slot-btn-weapons" type="button">
         <div class="db-slot-top">
-          <span>⚔️ อาวุธ (Weapons)</span>
-          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Weapons.json</span>
+          <span>Weapons</span>
+          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Weapons.json</span>
         </div>
         <div class="db-slot-sub">
-          <span id="db-slot-status-weapons" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
-          <span id="db-slot-mod-weapons" style="color:#7ee787; font-weight:700;"></span>
+          <span id="db-slot-status-weapons">Not loaded</span>
+          <span id="db-slot-mod-weapons" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
         </div>
       </button>
 
-      <button class="db-cat-btn" data-cat="armors" id="slot-btn-armors">
+      <button class="db-cat-btn" data-cat="armors" id="slot-btn-armors" type="button">
         <div class="db-slot-top">
-          <span>🛡️ เครื่องป้องกัน (Armors)</span>
-          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Armors.json</span>
+          <span>Armors</span>
+          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Armors.json</span>
         </div>
         <div class="db-slot-sub">
-          <span id="db-slot-status-armors" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
-          <span id="db-slot-mod-armors" style="color:#7ee787; font-weight:700;"></span>
+          <span id="db-slot-status-armors">Not loaded</span>
+          <span id="db-slot-mod-armors" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
         </div>
       </button>
 
-      <button class="db-cat-btn" data-cat="items" id="slot-btn-items">
+      <button class="db-cat-btn" data-cat="items" id="slot-btn-items" type="button">
         <div class="db-slot-top">
-          <span>🎒 ไอเทม (Items)</span>
-          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Items.json</span>
+          <span>Items</span>
+          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Items.json</span>
         </div>
         <div class="db-slot-sub">
-          <span id="db-slot-status-items" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
-          <span id="db-slot-mod-items" style="color:#7ee787; font-weight:700;"></span>
+          <span id="db-slot-status-items">Not loaded</span>
+          <span id="db-slot-mod-items" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
         </div>
       </button>
 
-      <button class="db-cat-btn" data-cat="skills" id="slot-btn-skills">
+      <button class="db-cat-btn" data-cat="skills" id="slot-btn-skills" type="button">
         <div class="db-slot-top">
-          <span>⚡ สกิล (Skills)</span>
-          <span style="font-size:0.75rem; font-family:var(--font-mono); color:#8b949e;">Skills.json</span>
+          <span>Skills</span>
+          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Skills.json</span>
         </div>
         <div class="db-slot-sub">
-          <span id="db-slot-status-skills" style="color:#8b949e;">⚪ ยังไม่โหลด (คลิก/ลากไฟล์)</span>
-          <span id="db-slot-mod-skills" style="color:#7ee787; font-weight:700;"></span>
+          <span id="db-slot-status-skills">Not loaded</span>
+          <span id="db-slot-mod-skills" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
         </div>
       </button>
     </div>
@@ -659,10 +1041,10 @@ const htmlContent = `<!DOCTYPE html>
     <!-- Active Category Toolbar & Bulk Actions -->
     <div class="db-toolbar">
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <span style="font-size:1.1rem; font-weight:800; color:#bc8cff;" id="db-label-type">⚔️ WEAPONS DATABASE</span>
-        <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:#7ee787;" id="db-label-filename">Weapons.json</span>
-        <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:var(--text-secondary);" id="db-label-count">0 ITEMS</span>
-        <span style="background:#141722; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.78rem; color:#7ee787; display:none;" id="db-label-modified">0 MODIFIED</span>
+        <span style="font-size:0.92rem; font-weight:700; color:var(--accent-sand); letter-spacing:0.03em; text-transform:uppercase;" id="db-label-type">WEAPONS DATABASE</span>
+        <span class="meta-pill" style="color:var(--text-primary);" id="db-label-filename">Weapons.json</span>
+        <span class="meta-pill" id="db-label-count">0 ITEMS</span>
+        <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage); display:none;" id="db-label-modified">0 MODIFIED</span>
       </div>
 
       <!-- Bulk Quick-Mod Actions for Current File -->
@@ -676,12 +1058,12 @@ const htmlContent = `<!DOCTYPE html>
       <!-- Left List Panel -->
       <div class="db-list-panel">
         <div class="db-search-box" style="display:flex; flex-direction:column; gap:8px;">
-          <input type="text" class="db-search-input" id="db-search-input" placeholder="🔍 ค้นหาชื่อ, ID (เช่น 2), หรือคำอธิบาย...">
-          <div style="display:flex; align-items:center; justify-content:space-between; font-size:0.78rem; color:var(--text-secondary);">
+          <input type="text" class="db-search-input" id="db-search-input" placeholder="Search by ID, name, or description...">
+          <div style="display:flex; align-items:center; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary);">
             <label style="cursor:pointer; display:flex; align-items:center; gap:6px;">
-              <input type="checkbox" id="db-filter-modified"> ✏️ แสดงเฉพาะที่แก้ไขแล้ว
+              <input type="checkbox" id="db-filter-modified"> Modified only
             </label>
-            <span id="db-list-showing-label">แสดง 0 รายการ</span>
+            <span id="db-list-showing-label" style="font-family:var(--font-mono);">0 entries</span>
           </div>
         </div>
         <div class="db-items-scroll" id="db-items-list-container">
@@ -691,10 +1073,9 @@ const htmlContent = `<!DOCTYPE html>
 
       <!-- Right Detail Panel -->
       <div class="db-detail-panel" id="db-detail-container">
-        <div style="text-align:center; padding:60px 20px; color:var(--text-muted);">
-          <div style="font-size:3rem; margin-bottom:10px;">📂</div>
-          <div style="font-size:1.1rem; font-weight:600; color:#fff;">ลากไฟล์ .json จากโฟลเดอร์ data/ มาวางเพื่อเริ่มแก้ไข</div>
-          <div style="font-size:0.85rem; margin-top:6px;">รองรับการลากวางหลายไฟล์พร้อมกัน (Weapons.json, Armors.json, Items.json, Skills.json)</div>
+        <div style="text-align:center; padding:64px 20px; color:var(--text-secondary);">
+          <div style="font-size:1rem; font-weight:600; color:var(--text-primary);">No Database Loaded</div>
+          <div style="font-size:0.82rem; margin-top:6px;">Drop <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, or <code>Skills.json</code> from your game's <code>data/</code> directory.</div>
         </div>
       </div>
     </div>
@@ -703,24 +1084,24 @@ const htmlContent = `<!DOCTYPE html>
 </div>
 
 <!-- DIFF MODAL -->
-<div class="modal-overlay" id="diff-modal" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:1000;">
-  <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px; max-width:900px; width:90%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden;">
-    <div style="padding:16px 20px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-weight:700; color:#fff;">🔍 Review Changes Before Saving</span>
-      <button class="btn btn-secondary btn-sm" id="btn-close-modal">&times;</button>
+<div class="modal-overlay" id="diff-modal" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,17,21,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
+  <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); max-width:860px; width:90%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden;">
+    <div style="padding:14px 20px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-weight:600; color:var(--text-primary);">Review Changes Before Saving</span>
+      <button class="btn btn-secondary btn-sm" id="btn-close-modal" type="button">&times;</button>
     </div>
     <div style="padding:18px 20px; overflow-y:auto; flex:1;" id="diff-content"></div>
-    <div style="padding:14px 20px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; background:#141824;">
-      <button class="btn btn-secondary" id="btn-modal-bak">🛡️ Download Backup (.bak)</button>
+    <div style="padding:12px 20px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; background:var(--bg-header);">
+      <button class="btn btn-secondary" id="btn-modal-bak" type="button">Download Backup (.bak)</button>
       <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" id="btn-modal-cancel">Keep Editing</button>
-        <button class="btn btn-primary" id="btn-modal-download">💾 Download Edited File</button>
+        <button class="btn btn-secondary" id="btn-modal-cancel" type="button">Keep Editing</button>
+        <button class="btn btn-primary" id="btn-modal-download" type="button">Download Edited File</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast">Notification</div>
+<div class="toast" id="toast" role="status" aria-live="polite">Notification</div>
 
 <!-- Embedded Libraries -->
 <script>${pakoCode}</script>
@@ -748,9 +1129,9 @@ const htmlContent = `<!DOCTYPE html>
 
   // Active Database State
   let currentDb = {
-    category: 'weapons', // 'weapons', 'armors', 'items', 'skills'
+    category: 'weapons',
     fileName: 'Weapons.json',
-    fileHandle: null,    // File System Access API handle
+    fileHandle: null,
     items: [],
     origItemsJson: '[]',
     selectedId: null,
@@ -865,11 +1246,11 @@ const htmlContent = `<!DOCTYPE html>
   const btnDbBrowseMulti = document.getElementById('btn-db-browse-multi');
 
   dropzone.onclick = (e) => { if (e.target.tagName !== 'BUTTON') fileInput.click(); };
-  dropzone.ondragover = (e) => { e.preventDefault(); dropzone.style.borderColor = '#388bfd'; };
-  dropzone.ondragleave = () => { dropzone.style.borderColor = 'var(--border-color)'; };
+  dropzone.ondragover = (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-sand)'; };
+  dropzone.ondragleave = () => { dropzone.style.borderColor = 'var(--text-secondary)'; };
   dropzone.ondrop = (e) => {
     e.preventDefault();
-    dropzone.style.borderColor = 'var(--border-color)';
+    dropzone.style.borderColor = 'var(--text-secondary)';
     if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleIncomingFiles(e.dataTransfer.files);
     }
@@ -927,14 +1308,12 @@ const htmlContent = `<!DOCTYPE html>
     const files = Array.from(fileList || []);
     if (files.length === 0) return;
 
-    // Separate database JSON files from save files
     const jsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.json') && (isDatabaseJsonFilename(f.name) || currentAppMode === 'database' || files.length > 1));
     if (jsonFiles.length > 0) {
       jsonFiles.forEach((f, idx) => loadDatabaseFile(f, null, idx === 0));
       return;
     }
 
-    // Otherwise load first file as save file
     loadSaveFile(files[0]);
   }
 
@@ -942,12 +1321,11 @@ const htmlContent = `<!DOCTYPE html>
   // DATABASE MODDER LOGIC
   // -------------------------------------------------------------
   function detectDbCategory(fileName, jsonArr) {
-    const baseName = fileName.replace(/\.json$/i, '').toLowerCase();
+    const baseName = fileName.replace(/\\.json$/i, '').toLowerCase();
     if (baseName.includes('weapon')) return 'weapons';
     if (baseName.includes('armor')) return 'armors';
     if (baseName.includes('item')) return 'items';
     if (baseName.includes('skill')) return 'skills';
-    // Fallback heuristic based on RPG Maker object keys
     const sample = (jsonArr || []).find(x => x && typeof x === 'object' && x.id);
     if (sample) {
       if ('wtypeId' in sample) return 'weapons';
@@ -960,29 +1338,26 @@ const htmlContent = `<!DOCTYPE html>
 
   function loadDatabaseFile(file, handle = null, autoSwitch = true) {
     if (file && file.size > 50 * 1024 * 1024) {
-      showToast('ไฟล์มีขนาดเกิน 50MB เพื่อความปลอดภัยระบบจำกัดขนาดไฟล์ไม่เกิน 50MB', 'danger');
+      showToast('File exceeds the 50MB safety limit.', 'danger');
       return;
     }
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const json = JSON.parse(reader.result);
-        const lower = file.name.toLowerCase();
 
-        // Support System.json for variable/switch names if dropped together
         if (!Array.isArray(json) && json && typeof json === 'object') {
           if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
           if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
-          showToast(\`โหลดชื่อ Variables/Switches จาก \${file.name} แล้ว!\`, 'success');
+          showToast(\`Loaded Variable/Switch names from \${file.name}\`, 'success');
           return;
         }
 
-        if (!Array.isArray(json)) throw new Error('ไฟล์ Database (.json) ต้องเป็น JSON Array ของ RPG Maker');
+        if (!Array.isArray(json)) throw new Error('Database file (.json) must be a valid RPG Maker JSON array.');
 
         const cat = detectDbCategory(file.name, json);
         const validItems = json.filter(x => x && x.id);
 
-        // Also sync names into Save Editor's gameData dictionary
         if (gameData[cat]) {
           validItems.forEach(x => { if (x.id && x.name) gameData[cat][x.id] = x.name; });
         }
@@ -1005,7 +1380,7 @@ const htmlContent = `<!DOCTYPE html>
         updateDbSlotBadges();
         renderDbBulkActions();
         renderDbMasterList();
-        showToast(\`โหลด \${file.name} (\${validItems.length} รายการ) สำเร็จ!\`, 'success');
+        showToast(\`Loaded \${file.name} (\${validItems.length} entries)\`, 'success');
       } catch(e) {
         alert('Error parsing database JSON:\\n' + e.message);
       }
@@ -1034,6 +1409,39 @@ const htmlContent = `<!DOCTYPE html>
     }
   }
 
+  function clearDatabaseCategory(cat) {
+    if (!cat) cat = currentDb.category;
+    if (!dbStore[cat] && (!currentDb.items || currentDb.items.length === 0)) return;
+    dbStore[cat] = null;
+    if (gameData && gameData[cat]) gameData[cat] = {};
+    syncCurrentDbFromStore(cat);
+    updateDbCategoryButtons(cat);
+    updateDbSlotBadges();
+    renderDbBulkActions();
+    renderDbMasterList();
+    if (dbMultiFileInput) dbMultiFileInput.value = '';
+    showToast(\`Cleared \${cat.charAt(0).toUpperCase() + cat.slice(1)} database file.\`, 'info');
+  }
+
+  function clearAllDatabaseFiles() {
+    const loaded = ['weapons', 'armors', 'items', 'skills'].some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
+    if (!loaded) {
+      showToast('No database files are currently loaded.', 'info');
+      return;
+    }
+    ['weapons', 'armors', 'items', 'skills'].forEach(c => {
+      dbStore[c] = null;
+      if (gameData && gameData[c]) gameData[c] = {};
+    });
+    syncCurrentDbFromStore(currentDb.category);
+    updateDbCategoryButtons(currentDb.category);
+    updateDbSlotBadges();
+    renderDbBulkActions();
+    renderDbMasterList();
+    if (dbMultiFileInput) dbMultiFileInput.value = '';
+    showToast('All database files cleared.', 'info');
+  }
+
   function updateDbSlotBadges() {
     ['weapons', 'armors', 'items', 'skills'].forEach(cat => {
       const slotBtn = document.getElementById('slot-btn-' + cat);
@@ -1045,13 +1453,13 @@ const htmlContent = `<!DOCTYPE html>
       if (store && store.items && store.items.length > 0) {
         const count = store.items.filter(x => x && x.id).length;
         slotBtn.classList.add('loaded');
-        statusEl.innerHTML = \`🟢 โหลดแล้ว <b>\${count}</b> ชิ้น\`;
-        statusEl.style.color = '#7ee787';
-        modEl.textContent = store.modifiedIds.size > 0 ? \`✏️ แก้ \${store.modifiedIds.size}\` : '';
+        statusEl.innerHTML = \`Loaded: <b>\${count}</b> entries\`;
+        statusEl.style.color = 'var(--accent-sage-bright)';
+        modEl.textContent = store.modifiedIds.size > 0 ? \`\${store.modifiedIds.size} edited\` : '';
       } else {
         slotBtn.classList.remove('loaded');
-        statusEl.textContent = '⚪ ยังไม่โหลด (คลิก/ลากวาง)';
-        statusEl.style.color = '#8b949e';
+        statusEl.textContent = 'Not loaded (click or drop)';
+        statusEl.style.color = 'var(--text-secondary)';
         modEl.textContent = '';
       }
     });
@@ -1060,7 +1468,7 @@ const htmlContent = `<!DOCTYPE html>
     if (modBadge) {
       const modCount = currentDb.modifiedIds ? currentDb.modifiedIds.size : 0;
       modBadge.style.display = modCount > 0 ? 'inline-block' : 'none';
-      modBadge.textContent = \`✏️ แก้ไขแล้ว \${modCount} รายการ\`;
+      modBadge.textContent = \`\${modCount} MODIFIED\`;
     }
   }
 
@@ -1070,10 +1478,10 @@ const htmlContent = `<!DOCTYPE html>
     });
     document.getElementById('db-label-filename').textContent = currentDb.fileName;
     const catTitles = {
-      weapons: '⚔️ WEAPONS DATABASE (คลังอาวุธ)',
-      armors: '🛡️ ARMORS DATABASE (คลังเครื่องป้องกัน)',
-      items: '🎒 ITEMS DATABASE (คลังไอเทม)',
-      skills: '⚡ SKILLS DATABASE (คลังสกิล)'
+      weapons: 'WEAPONS DATABASE',
+      armors: 'ARMORS DATABASE',
+      items: 'ITEMS DATABASE',
+      skills: 'SKILLS DATABASE'
     };
     document.getElementById('db-label-type').textContent = catTitles[cat] || 'DATABASE MODDER';
   }
@@ -1099,26 +1507,27 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     const cat = currentDb.category;
-    let buttonsHtml = \`<span style="font-size:0.78rem; color:var(--text-secondary); font-weight:700;">⚡ แก้ทั้งไฟล์:</span>\`;
+    let buttonsHtml = \`<span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase; letter-spacing:0.03em;">Batch Actions:</span>\`;
     if (cat === 'weapons' || cat === 'armors') {
       buttonsHtml += \`
-        <button class="btn btn-gold btn-sm" id="btn-bulk-god-all">\${cat==='weapons'?'⚔️ อาวุธทุกชิ้น ATK+9999':'🛡️ เกราะทุกชิ้น DEF+9999'}</button>
-        <button class="btn btn-secondary btn-sm" id="btn-bulk-free-all">🪙 ราคา 0 ทั้งไฟล์</button>
+        <button class="btn btn-gold btn-sm" id="btn-bulk-god-all" type="button">\${cat==='weapons'?'All ATK/MAT 9999':'All DEF/MDF 9999'}</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-free-all" type="button">All Price 0</button>
       \`;
     } else if (cat === 'items') {
       buttonsHtml += \`
-        <button class="btn btn-blue btn-sm" id="btn-bulk-infinite-all">♾️ ใช้ไม่หมดทั้งไฟล์</button>
-        <button class="btn btn-secondary btn-sm" id="btn-bulk-free-all">🪙 ราคา 0 ทั้งไฟล์</button>
-        <button class="btn btn-secondary btn-sm" id="btn-bulk-zero-weight-all">⚖️ ลบน้ำหนัก [0W] ทั้งไฟล์</button>
+        <button class="btn btn-primary btn-sm" id="btn-bulk-infinite-all" type="button">All Non-Consumable</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-free-all" type="button">All Price 0</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-zero-weight-all" type="button">All Zero Weight [0W]</button>
       \`;
     } else if (cat === 'skills') {
       buttonsHtml += \`
-        <button class="btn btn-blue btn-sm" id="btn-bulk-free-mp-all">⚡ สกิล 0 MP/TP ทั้งไฟล์</button>
+        <button class="btn btn-primary btn-sm" id="btn-bulk-free-mp-all" type="button">All 0 MP/TP Cost</button>
       \`;
     }
     buttonsHtml += \`
-      <button class="btn btn-secret btn-sm" id="btn-secret-db-god" title="ปุ่มลับ: ปรับสเตตัสเทพและราคา 0 ทั้งหมวด">🗝️ ปุ่มลับ: Turbo God Mod</button>
-      <button class="btn btn-secondary btn-sm" id="btn-bulk-revert-all" title="คืนค่าเดิมทั้งไฟล์">↺ คืนค่าทั้งไฟล์</button>
+      <button class="btn btn-secret btn-sm" id="btn-secret-db-god" type="button" title="Apply max parameters and zero cost across this entire table">Max Table Preset</button>
+      <button class="btn btn-secondary btn-sm" id="btn-bulk-revert-all" type="button" title="Restore all entries in this file to original values">Revert File</button>
+      <button class="btn btn-secondary btn-sm" id="btn-bulk-clear-file" type="button" title="Clear this database file">Clear File</button>
     \`;
     bulkContainer.innerHTML = buttonsHtml;
 
@@ -1145,7 +1554,7 @@ const htmlContent = `<!DOCTYPE html>
           }
           currentDb.modifiedIds.add(it.id);
         });
-        finishBulkAction('🗝️ [SECRET ACTIVATED] Turbo God Mod ปรับสเตตัสเทพและราคา 0 ทั้งหมวดแล้ว!');
+        finishBulkAction('Applied Max Table Preset to all entries.');
       };
     }
 
@@ -1153,7 +1562,7 @@ const htmlContent = `<!DOCTYPE html>
     if (btnBulkFree) {
       btnBulkFree.onclick = () => {
         currentDb.items.filter(x => x && x.id).forEach(it => { if (it.price !== undefined) { it.price = 0; currentDb.modifiedIds.add(it.id); } });
-        finishBulkAction('ปรับราคาทุกชิ้นในไฟล์เป็น 0 G แล้ว!');
+        finishBulkAction('Set price to 0 for all entries.');
       };
     }
     const btnBulkGod = document.getElementById('btn-bulk-god-all');
@@ -1165,7 +1574,7 @@ const htmlContent = `<!DOCTYPE html>
           else { it.params[3] = 9999; it.params[5] = 9999; }
           currentDb.modifiedIds.add(it.id);
         });
-        finishBulkAction('ปรับสเตตัส 9999 ทั้งไฟล์แล้ว!');
+        finishBulkAction('Set primary combat stats to 9999 for all entries.');
       };
     }
     const btnBulkInf = document.getElementById('btn-bulk-infinite-all');
@@ -1174,7 +1583,7 @@ const htmlContent = `<!DOCTYPE html>
         currentDb.items.filter(x => x && x.id).forEach(it => {
           if (it.consumable) { it.consumable = false; currentDb.modifiedIds.add(it.id); }
         });
-        finishBulkAction('ปรับไอเทมทุกชิ้นให้ใช้ไม่หมด (Infinite) แล้ว!');
+        finishBulkAction('Set all items to non-consumable (infinite use).');
       };
     }
     const btnBulkWeight = document.getElementById('btn-bulk-zero-weight-all');
@@ -1183,7 +1592,7 @@ const htmlContent = `<!DOCTYPE html>
         currentDb.items.filter(x => x && x.id).forEach(it => {
           if (zeroItemWeight(it)) currentDb.modifiedIds.add(it.id);
         });
-        finishBulkAction('ปรับน้ำหนัก [Weight: 0W] ทุกชิ้นแล้ว!');
+        finishBulkAction('Set weight tags to 0W across all items.');
       };
     }
     const btnBulkMp = document.getElementById('btn-bulk-free-mp-all');
@@ -1194,7 +1603,7 @@ const htmlContent = `<!DOCTYPE html>
           it.tpCost = 0;
           currentDb.modifiedIds.add(it.id);
         });
-        finishBulkAction('ปรับสกิลทุกอันให้ใช้ 0 MP / 0 TP แล้ว!');
+        finishBulkAction('Set MP and TP cost to 0 for all skills.');
       };
     }
     const btnBulkRev = document.getElementById('btn-bulk-revert-all');
@@ -1209,19 +1618,23 @@ const htmlContent = `<!DOCTYPE html>
         updateDbSlotBadges();
         renderDbBulkActions();
         renderDbMasterList();
-        showToast('คืนค่าเดิมทั้งไฟล์เรียบร้อย!', 'info');
+        showToast('Reverted all entries in file to original state.', 'info');
       };
+    }
+    const btnBulkClear = document.getElementById('btn-bulk-clear-file');
+    if (btnBulkClear) {
+      btnBulkClear.onclick = () => clearDatabaseCategory(cat);
     }
   }
 
   function zeroItemWeight(item) {
     let changed = false;
-    if (typeof item.description === 'string' && /weight\s*:\s*\d+/i.test(item.description)) {
-      item.description = item.description.replace(/(weight\s*:\s*)\d+(\s*w?)/gi, '$10$2');
+    if (typeof item.description === 'string' && /weight\\s*:\\s*\\d+/i.test(item.description)) {
+      item.description = item.description.replace(/(weight\\s*:\\s*)\\d+(\\s*w?)/gi, '$10$2');
       changed = true;
     }
-    if (typeof item.note === 'string' && /weight\s*:\s*\d+/i.test(item.note)) {
-      item.note = item.note.replace(/(weight\s*:\s*)\d+(\s*w?)/gi, '$10$2');
+    if (typeof item.note === 'string' && /weight\\s*:\\s*\\d+/i.test(item.note)) {
+      item.note = item.note.replace(/(weight\\s*:\\s*)\\d+(\\s*w?)/gi, '$10$2');
       changed = true;
     }
     return changed;
@@ -1246,27 +1659,24 @@ const htmlContent = `<!DOCTYPE html>
     const validItems = currentDb.items.filter(x => x && x.id);
     document.getElementById('db-label-count').textContent = \`\${validItems.length} ITEMS\`;
 
-    // If current category file is not loaded yet, show a clear, friendly drop prompt
     if (validItems.length === 0) {
-      if (showingLabel) showingLabel.textContent = 'ยังไม่ได้โหลดไฟล์';
+      if (showingLabel) showingLabel.textContent = 'Not loaded';
       container.innerHTML = \`
         <div style="padding:36px 20px; text-align:center; color:var(--text-secondary);">
-          <div style="font-size:2.4rem; margin-bottom:8px;">📥</div>
-          <div style="font-weight:700; color:#fff; margin-bottom:6px;">ยังไม่ได้โหลดไฟล์ \${currentDb.fileName}</div>
-          <div style="font-size:0.8rem; margin-bottom:14px;">ลากไฟล์ <b>\${currentDb.fileName}</b> จากโฟลเดอร์ <code>data/</code> มาวาง หรือกดปุ่มด้านล่าง</div>
-          <button class="btn btn-purple btn-sm" id="btn-empty-load-cat">📂 เลือกไฟล์ \${currentDb.fileName}</button>
+          <div style="font-weight:600; color:var(--text-primary); margin-bottom:6px; font-size:0.88rem;">\${currentDb.fileName} is not loaded</div>
+          <div style="font-size:0.78rem; margin-bottom:14px; line-height:1.5;">Drop <b>\${currentDb.fileName}</b> from your game's <code>data/</code> folder or select it below.</div>
+          <button class="btn btn-secondary btn-sm" id="btn-empty-load-cat" type="button">Select \${currentDb.fileName}</button>
         </div>
       \`;
       if (detailContainer) {
         detailContainer.innerHTML = \`
-          <div style="text-align:center; padding:60px 20px; color:var(--text-muted); border:2px dashed #353f58; border-radius:12px; margin:auto 0;">
-            <div style="font-size:3.2rem; margin-bottom:12px;">📂</div>
-            <div style="font-size:1.15rem; font-weight:700; color:#fff;">หมวด \${currentDb.fileName} ยังไม่ได้โหลดไฟล์</div>
-            <div style="font-size:0.88rem; margin-top:6px; color:var(--text-secondary);">
-              คุณสามารถลากไฟล์ <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code><br>
-              จากโฟลเดอร์ <code>data/</code> ของเกมมาวางพร้อมกันทีเดียวได้เลย!
+          <div style="text-align:center; padding:64px 24px; color:var(--text-secondary); border:1px dashed var(--border-color); border-radius:var(--radius-md); margin:auto 0;">
+            <div style="font-size:1.05rem; font-weight:600; color:var(--text-primary);">No \${currentDb.fileName} File Loaded</div>
+            <div style="font-size:0.84rem; margin-top:6px; color:var(--text-secondary); line-height:1.6;">
+              Drop <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, and <code>Skills.json</code><br>
+              from your game's <code>data/</code> folder all at once.
             </div>
-            <button class="btn btn-purple" style="margin-top:16px;" id="btn-detail-empty-browse">📂 เลือกไฟล์ .json จากเครื่อง</button>
+            <button class="btn btn-primary" style="margin-top:16px;" id="btn-detail-empty-browse" type="button">Browse JSON File(s)</button>
           </div>
         \`;
         const b2 = document.getElementById('btn-detail-empty-browse');
@@ -1283,7 +1693,7 @@ const htmlContent = `<!DOCTYPE html>
 
     let shownCount = 0;
     validItems.forEach(item => {
-      const name = item.name || '(ไม่มีชื่อ / Unnamed)';
+      const name = item.name || '(Unnamed)';
       const idStr = String(item.id);
       const desc = item.description || '';
       if (onlyMod && !currentDb.modifiedIds.has(item.id)) return;
@@ -1297,7 +1707,7 @@ const htmlContent = `<!DOCTYPE html>
           <span class="db-row-id">#\${item.id}</span>
           <span class="db-row-name" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
         </div>
-        <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono); white-space:nowrap;">\${getQuickPreviewBadge(item)}</span>
+        <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono); white-space:nowrap;">\${getQuickPreviewBadge(item)}</span>
       \`;
 
       row.onclick = () => {
@@ -1311,7 +1721,7 @@ const htmlContent = `<!DOCTYPE html>
       container.appendChild(row);
     });
 
-    if (showingLabel) showingLabel.textContent = \`แสดง \${shownCount} / \${validItems.length} รายการ\`;
+    if (showingLabel) showingLabel.textContent = \`Showing \${shownCount} / \${validItems.length}\`;
 
     const selectedObj = validItems.find(x => x.id === currentDb.selectedId) || validItems[0];
     if (selectedObj) {
@@ -1331,7 +1741,7 @@ const htmlContent = `<!DOCTYPE html>
       return \`\${item.mpCost || 0} MP\`;
     }
     if (currentDb.category === 'items') {
-      const inf = item.consumable === false ? '♾️ ' : '';
+      const inf = item.consumable === false ? 'INF · ' : '';
       return inf + (item.price !== undefined ? \`\${item.price} G\` : '');
     }
     return '';
@@ -1375,8 +1785,8 @@ const htmlContent = `<!DOCTYPE html>
 
     if (cat === 'weapons' || cat === 'armors') {
       const paramLabels = [
-        'MHP (เลือดสูงสุด)', 'MMP (มานาสูงสุด)', 'ATK (พลังโจมตี)', 'DEF (พลังป้องกัน)',
-        'MAT (โจมตีเวท)', 'MDF (ป้องกันเวท)', 'AGI (ความเร็ว)', 'LUK (โชค)'
+        'MHP (Max HP)', 'MMP (Max MP)', 'ATK (Attack)', 'DEF (Defense)',
+        'MAT (Magic Attack)', 'MDF (Magic Defense)', 'AGI (Agility)', 'LUK (Luck)'
       ];
       const p = item.params || [0,0,0,0,0,0,0,0];
       let paramInputs = '';
@@ -1391,13 +1801,13 @@ const htmlContent = `<!DOCTYPE html>
 
       specificHtml = \`
         <div class="preset-bar">
-          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ ปุ่มลัดชิ้นนี้:</span>
-          <button class="btn btn-gold btn-sm" id="btn-db-god-weapon">\${cat==='weapons'?'⚔️ อาวุธเทพ (ATK/MAT 9999)':'🛡️ เกราะอมตะ (DEF 9999 / MHP 99999)'}</button>
-          <button class="btn btn-secondary btn-sm" id="btn-db-free-price">🪙 ราคา 0 G</button>
-          <button class="btn btn-secondary btn-sm" id="btn-db-zero-weight">⚖️ ลบน้ำหนัก [0W]</button>
+          <span style="font-weight:600; color:var(--text-secondary); font-size:0.76rem; text-transform:uppercase; letter-spacing:0.03em;">Quick Presets:</span>
+          <button class="btn btn-gold btn-sm" id="btn-db-god-weapon" type="button">\${cat==='weapons'?'Max Weapon (ATK/MAT 9999)':'Max Armor (DEF 9999 / MHP 99999)'}</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-free-price" type="button">Price 0 G</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-zero-weight" type="button">Zero Weight [0W]</button>
         </div>
 
-        <div style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:4px;">ค่าพลังสเตตัส (Combat Stats):</div>
+        <div style="font-size:0.78rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.04em; margin-top:4px;">Equipment Parameters</div>
         <div class="db-field-grid">\${paramInputs}</div>
       \`;
     } else if (cat === 'items') {
@@ -1410,80 +1820,80 @@ const htmlContent = `<!DOCTYPE html>
 
       specificHtml = \`
         <div class="preset-bar">
-          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ ปุ่มลัดชิ้นนี้:</span>
-          <button class="btn btn-blue btn-sm" id="btn-db-make-infinite">♾️ ใช้ไม่หมด (Infinite)</button>
-          <button class="btn btn-secondary btn-sm" id="btn-db-free-price">🪙 ราคา 0 G</button>
-          <button class="btn btn-gold btn-sm" id="btn-db-full-heal-item">💖 ฟื้นฟู HP/MP 100%</button>
-          <button class="btn btn-purple btn-sm" id="btn-db-max-tp-item">🔥 เพิ่ม TP/AP +100</button>
-          <button class="btn btn-secondary btn-sm" id="btn-db-zero-weight">⚖️ ลบน้ำหนัก [0W]</button>
+          <span style="font-weight:600; color:var(--text-secondary); font-size:0.76rem; text-transform:uppercase; letter-spacing:0.03em;">Quick Presets:</span>
+          <button class="btn btn-primary btn-sm" id="btn-db-make-infinite" type="button">Non-Consumable (Infinite)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-free-price" type="button">Price 0 G</button>
+          <button class="btn btn-gold btn-sm" id="btn-db-full-heal-item" type="button">Full HP/MP Recovery (100%)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-max-tp-item" type="button">+100 TP/AP Gain</button>
+          <button class="btn btn-secondary btn-sm" id="btn-db-zero-weight" type="button">Zero Weight [0W]</button>
         </div>
 
         <div class="db-field-grid">
           <div class="db-field-box">
-            <span class="db-field-label">ใช้แล้วหมดไป (Consumable)</span>
-            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+            <span class="db-field-label">Consumable</span>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:4px;">
               <label class="toggle-switch">
                 <input type="checkbox" id="item-consumable" \${item.consumable?'checked':''}>
                 <span class="slider"></span>
               </label>
-              <span style="font-size:0.8rem; color:\${item.consumable ? 'var(--text-muted)' : '#7ee787; font-weight:700'};">
-                \${item.consumable ? 'เปิดอยู่ (ใช้แล้วลดลง)' : '♾️ ปิดอยู่ (ใช้ได้ไม่จำกัด!)'}
+              <span style="font-size:0.8rem; color:\${item.consumable ? 'var(--text-secondary)' : 'var(--accent-sage-bright); font-weight:600'};">
+                \${item.consumable ? 'Yes (Depletes on use)' : 'No (Infinite use)'}
               </span>
             </div>
           </div>
 
           <div class="db-field-box">
-            <span class="db-field-label">เป้าหมาย (Target Scope)</span>
-            <select id="item-scope" class="stat-input" style="font-size:0.85rem; padding:6px;">
-              <option value="1" \${item.scope===1?'selected':''}>ศัตรู 1 ตัว (One Enemy)</option>
-              <option value="2" \${item.scope===2?'selected':''}>ศัตรูทั้งหมด (All Enemies)</option>
-              <option value="7" \${item.scope===7?'selected':''}>เพื่อนร่วมทีม 1 คน (One Ally)</option>
-              <option value="8" \${item.scope===8?'selected':''}>ทั้งปาร์ตี้ (All Allies)</option>
-              <option value="9" \${item.scope===9?'selected':''}>ชุบชีวิตเพื่อน 1 คน (Dead Ally)</option>
-              <option value="11" \${item.scope===11?'selected':''}>ตัวเอง (The User)</option>
-              <option value="0" \${item.scope===0?'selected':''}>ไม่ระบุ (None)</option>
+            <span class="db-field-label">Target Scope</span>
+            <select id="item-scope" class="stat-input" style="font-size:0.84rem; padding:6px;">
+              <option value="1" \${item.scope===1?'selected':''}>One Enemy</option>
+              <option value="2" \${item.scope===2?'selected':''}>All Enemies</option>
+              <option value="7" \${item.scope===7?'selected':''}>One Ally</option>
+              <option value="8" \${item.scope===8?'selected':''}>All Allies (Party)</option>
+              <option value="9" \${item.scope===9?'selected':''}>One Dead Ally (Revive)</option>
+              <option value="11" \${item.scope===11?'selected':''}>The User</option>
+              <option value="0" \${item.scope===0?'selected':''}>None</option>
             </select>
           </div>
 
           <div class="db-field-box">
-            <span class="db-field-label">จำนวนครั้งที่ออกผล (Repeats)</span>
+            <span class="db-field-label">Repeats</span>
             <input type="number" class="stat-input" id="item-repeats" value="\${item.repeats || 1}" min="1" max="99">
           </div>
 
           <div class="db-field-box">
-            <span class="db-field-label">ได้รับ TP/AP ทันที (TP Gain)</span>
+            <span class="db-field-label">TP Gain on Use</span>
             <input type="number" class="stat-input" id="item-tp-gain" value="\${item.tpGain || 0}">
           </div>
         </div>
 
-        <div style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:4px;">💖 ผลลัพธ์การฟื้นฟู (Item Recovery Effects):</div>
+        <div style="font-size:0.78rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.04em; margin-top:4px;">Recovery &amp; Formula Effects</div>
         <div class="db-field-grid">
           <div class="db-field-box">
-            <span class="db-field-label">ฟื้นฟู HP (%) + ค่าคงที่</span>
+            <span class="db-field-label">HP Recovery (%) + Flat</span>
             <div style="display:flex; gap:6px; align-items:center;">
-              <input type="number" class="stat-input" id="item-eff-hp-pct" value="\${hpPct}" placeholder="%" title="เปอร์เซ็นต์ HP" style="width:50%;">
-              <span style="color:var(--text-secondary); font-size:0.8rem;">% +</span>
-              <input type="number" class="stat-input" id="item-eff-hp-flat" value="\${hpFlat}" placeholder="หน่วย" title="ค่าคงที่ HP" style="width:50%;">
+              <input type="number" class="stat-input" id="item-eff-hp-pct" value="\${hpPct}" placeholder="%" title="HP Recovery Percentage" style="width:50%;">
+              <span style="color:var(--text-secondary); font-size:0.78rem;">% +</span>
+              <input type="number" class="stat-input" id="item-eff-hp-flat" value="\${hpFlat}" placeholder="Flat" title="Flat HP Recovery" style="width:50%;">
             </div>
           </div>
 
           <div class="db-field-box">
-            <span class="db-field-label">ฟื้นฟู MP (%) + ค่าคงที่</span>
+            <span class="db-field-label">MP Recovery (%) + Flat</span>
             <div style="display:flex; gap:6px; align-items:center;">
-              <input type="number" class="stat-input" id="item-eff-mp-pct" value="\${mpPct}" placeholder="%" title="เปอร์เซ็นต์ MP" style="width:50%;">
-              <span style="color:var(--text-secondary); font-size:0.8rem;">% +</span>
-              <input type="number" class="stat-input" id="item-eff-mp-flat" value="\${mpFlat}" placeholder="หน่วย" title="ค่าคงที่ MP" style="width:50%;">
+              <input type="number" class="stat-input" id="item-eff-mp-pct" value="\${mpPct}" placeholder="%" title="MP Recovery Percentage" style="width:50%;">
+              <span style="color:var(--text-secondary); font-size:0.78rem;">% +</span>
+              <input type="number" class="stat-input" id="item-eff-mp-flat" value="\${mpFlat}" placeholder="Flat" title="Flat MP Recovery" style="width:50%;">
             </div>
           </div>
 
           <div class="db-field-box">
-            <span class="db-field-label">เพิ่มค่า TP/AP จากเอฟเฟกต์</span>
+            <span class="db-field-label">Effect TP Gain</span>
             <input type="number" class="stat-input" id="item-eff-tp" value="\${tpEff}">
           </div>
 
           <div class="db-field-box">
-            <span class="db-field-label">สูตรดาเมจ / ฟื้นฟู (Damage Formula)</span>
-            <input type="text" class="stat-input" id="item-formula" value="\${dmg.formula || '0'}" placeholder="เช่น 200 + b.mhp * 0.2">
+            <span class="db-field-label">Damage / Recovery Formula</span>
+            <input type="text" class="stat-input" id="item-formula" value="\${dmg.formula || '0'}" placeholder="e.g. 200 + b.mhp * 0.2">
           </div>
         </div>
       \`;
@@ -1491,46 +1901,46 @@ const htmlContent = `<!DOCTYPE html>
       const dmg = item.damage || {};
       specificHtml = \`
         <div class="preset-bar">
-          <span style="font-weight:700; color:var(--text-secondary); font-size:0.85rem;">⚡ ปุ่มลัดสกิลนี้:</span>
-          <button class="btn btn-blue btn-sm" id="btn-db-free-mp">⚡ ใช้ 0 MP / 0 TP</button>
-          <button class="btn btn-danger btn-sm" id="btn-db-instakill">💥 ดาเมจ 99,999 (วันฮิตคิล)</button>
+          <span style="font-weight:600; color:var(--text-secondary); font-size:0.76rem; text-transform:uppercase; letter-spacing:0.03em;">Quick Presets:</span>
+          <button class="btn btn-primary btn-sm" id="btn-db-free-mp" type="button">0 MP / 0 TP Cost</button>
+          <button class="btn btn-gold btn-sm" id="btn-db-instakill" type="button">99,999 Damage Formula</button>
         </div>
 
         <div class="db-field-grid">
           <div class="db-field-box">
-            <span class="db-field-label">ใช้ MP (MP Cost)</span>
+            <span class="db-field-label">MP Cost</span>
             <input type="number" class="stat-input" id="skill-mp-cost" value="\${item.mpCost || 0}">
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">ใช้ TP/AP (TP Cost)</span>
+            <span class="db-field-label">TP Cost</span>
             <input type="number" class="stat-input" id="skill-tp-cost" value="\${item.tpCost || 0}">
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">ติดคริติคอลได้? (Critical)</span>
+            <span class="db-field-label">Allow Critical Hits</span>
             <label class="toggle-switch" style="margin-top:4px;">
               <input type="checkbox" id="skill-critical" \${dmg.critical?'checked':''}>
               <span class="slider"></span>
             </label>
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">ประเภทการโจมตี (Hit Type)</span>
-            <select id="skill-hit-type" class="stat-input" style="font-size:0.85rem; padding:6px;">
-              <option value="0" \${item.hitType===0?'selected':''}>โดนแน่นอน 100% (Certain Hit)</option>
-              <option value="1" \${item.hitType===1?'selected':''}>กายภาพ (Physical Attack)</option>
-              <option value="2" \${item.hitType===2?'selected':''}>เวทมนตร์ (Magical Attack)</option>
+            <span class="db-field-label">Hit Type</span>
+            <select id="skill-hit-type" class="stat-input" style="font-size:0.84rem; padding:6px;">
+              <option value="0" \${item.hitType===0?'selected':''}>Certain Hit (100%)</option>
+              <option value="1" \${item.hitType===1?'selected':''}>Physical Attack</option>
+              <option value="2" \${item.hitType===2?'selected':''}>Magical Attack</option>
             </select>
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">จำนวนครั้งที่โจมตี (Repeats)</span>
+            <span class="db-field-label">Repeats</span>
             <input type="number" class="stat-input" id="skill-repeats" value="\${item.repeats || 1}" min="1" max="99">
           </div>
           <div class="db-field-box">
-            <span class="db-field-label">ได้รับ TP เมื่อใช้ (TP Gain)</span>
+            <span class="db-field-label">TP Gain</span>
             <input type="number" class="stat-input" id="skill-tp-gain" value="\${item.tpGain || 0}">
           </div>
           <div class="db-field-box" style="grid-column: 1 / -1;">
-            <span class="db-field-label">สูตรคำนวณดาเมจ (Damage Formula)</span>
-            <input type="text" class="stat-input" id="skill-formula" value="\${escapeHtml(dmg.formula || '')}" placeholder="เช่น a.atk * 4 - b.def * 2">
+            <span class="db-field-label">Damage Formula</span>
+            <input type="text" class="stat-input" id="skill-formula" value="\${escapeHtml(dmg.formula || '')}" placeholder="e.g. a.atk * 4 - b.def * 2">
           </div>
         </div>
       \`;
@@ -1540,14 +1950,14 @@ const htmlContent = `<!DOCTYPE html>
       <div class="db-item-header">
         <div class="db-item-title-group">
           <div class="db-icon-box">\${getCategoryIcon(cat)}</div>
-          <input type="text" class="db-name-input" id="detail-name" value="\${escapeHtml(item.name || '')}" placeholder="ชื่อไอเทม / สกิล">
-          <span style="background:#20283c; border:1px solid var(--border-color); padding:3px 10px; border-radius:6px; font-size:0.8rem; font-family:var(--font-mono); color:#79c0ff;">ID #\${item.id}</span>
+          <input type="text" class="db-name-input" id="detail-name" value="\${escapeHtml(item.name || '')}" placeholder="Entry Name">
+          <span class="meta-pill" style="color:var(--accent-sand);">ID #\${item.id}</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
           \${item.price !== undefined ? \`
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:0.85rem; color:var(--accent-gold); font-weight:700;">💰 ราคา (Price):</span>
-              <input type="number" class="stat-input" id="detail-price" value="\${item.price}" style="width:110px; padding:4px 8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:0.78rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Price</span>
+              <input type="number" class="stat-input" id="detail-price" value="\${item.price}" style="width:110px; padding:5px 8px;">
             </div>
           \` : ''}
         </div>
@@ -1555,22 +1965,22 @@ const htmlContent = `<!DOCTYPE html>
 
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
         <div class="db-field-box">
-          <span class="db-field-label">คำอธิบายในเกม (Description)</span>
-          <textarea class="db-textarea" id="detail-desc" style="height:64px;">\${escapeHtml(item.description || '')}</textarea>
+          <span class="db-field-label">Description</span>
+          <textarea class="db-textarea" id="detail-desc">\${escapeHtml(item.description || '')}</textarea>
         </div>
         <div class="db-field-box">
-          <span class="db-field-label">แท็กพิเศษ / Note (เช่น &lt;Weight: 0&gt; หรือ Plugin)</span>
-          <textarea class="db-textarea" id="detail-note" style="height:64px; font-family:var(--font-mono);" placeholder="แท็ก Note ของ RPG Maker...">\${escapeHtml(item.note || '')}</textarea>
+          <span class="db-field-label">Note Tags (e.g. &lt;Weight: 0&gt;)</span>
+          <textarea class="db-textarea" id="detail-note" style="font-family:var(--font-mono);" placeholder="RPG Maker Note tags...">\${escapeHtml(item.note || '')}</textarea>
         </div>
       </div>
 
       \${specificHtml}
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:16px; border-top:1px solid var(--border-color); flex-wrap:wrap; gap:10px;">
-        <button class="btn btn-secondary btn-sm" id="btn-db-revert-item">↺ คืนค่าเดิมชิ้นนี้ (Revert #\${item.id})</button>
+        <button class="btn btn-secondary btn-sm" id="btn-db-revert-item" type="button">Revert Entry (#\${item.id})</button>
         <div style="display:flex; gap:8px;">
-          <button class="btn btn-blue btn-sm" id="btn-detail-save-disk">💾 บันทึกทับไฟล์เดิม (Save to Disk)</button>
-          <button class="btn btn-primary btn-sm" id="btn-detail-download">📥 ดาวน์โหลด \${currentDb.fileName}</button>
+          <button class="btn btn-secondary btn-sm" id="btn-detail-save-disk" type="button">Save to Disk</button>
+          <button class="btn btn-primary btn-sm" id="btn-detail-download" type="button">Download \${currentDb.fileName}</button>
         </div>
       </div>
     \`;
@@ -1579,11 +1989,11 @@ const htmlContent = `<!DOCTYPE html>
   }
 
   function getCategoryIcon(cat) {
-    if (cat === 'weapons') return '⚔️';
-    if (cat === 'armors') return '🛡️';
-    if (cat === 'items') return '🎒';
-    if (cat === 'skills') return '⚡';
-    return '📦';
+    if (cat === 'weapons') return 'WPN';
+    if (cat === 'armors') return 'ARM';
+    if (cat === 'items') return 'ITM';
+    if (cat === 'skills') return 'SKL';
+    return 'DB';
   }
 
   function markModified(item) {
@@ -1597,7 +2007,6 @@ const htmlContent = `<!DOCTYPE html>
   }
 
   function bindDetailEvents(item) {
-    // Name, Desc, Note, Price
     const nameEl = document.getElementById('detail-name');
     if (nameEl) nameEl.onchange = () => { item.name = nameEl.value; markModified(item); renderDbMasterList(); };
     const descEl = document.getElementById('detail-desc');
@@ -1607,7 +2016,6 @@ const htmlContent = `<!DOCTYPE html>
     const priceEl = document.getElementById('detail-price');
     if (priceEl) priceEl.onchange = () => { item.price = parseInt(priceEl.value) || 0; markModified(item); renderDbMasterList(); };
 
-    // Stats for weapons & armors
     document.querySelectorAll('.db-stat-input').forEach(inp => {
       inp.onchange = () => {
         const idx = parseInt(inp.getAttribute('data-idx'));
@@ -1618,22 +2026,21 @@ const htmlContent = `<!DOCTYPE html>
       };
     });
 
-    // Preset buttons
     const btnGod = document.getElementById('btn-db-god-weapon');
     if (btnGod) {
       btnGod.onclick = () => {
         if (!item.params) item.params = [0,0,0,0,0,0,0,0];
         if (currentDb.category === 'weapons') {
-          item.params[2] = 9999; // ATK
-          item.params[4] = 9999; // MAT
+          item.params[2] = 9999;
+          item.params[4] = 9999;
         } else {
-          item.params[3] = 9999; // DEF
-          item.params[0] = 99999; // MHP
+          item.params[3] = 9999;
+          item.params[0] = 99999;
         }
         markModified(item);
         renderDbMasterList();
         renderDbDetail(item);
-        showToast('ปรับค่าพลัง 9999 เรียบร้อย!', 'success');
+        showToast('Parameters set to 9999.', 'success');
       };
     }
 
@@ -1644,7 +2051,7 @@ const htmlContent = `<!DOCTYPE html>
         markModified(item);
         renderDbMasterList();
         renderDbDetail(item);
-        showToast('ปรับราคาเป็น 0 G แล้ว!', 'success');
+        showToast('Price set to 0 G.', 'success');
       };
     }
 
@@ -1654,11 +2061,10 @@ const htmlContent = `<!DOCTYPE html>
         zeroItemWeight(item);
         markModified(item);
         renderDbDetail(item);
-        showToast('ปรับน้ำหนักเป็น 0W แล้ว!', 'success');
+        showToast('Weight set to 0W.', 'success');
       };
     }
 
-    // Items events
     const chkCons = document.getElementById('item-consumable');
     if (chkCons) chkCons.onchange = () => { item.consumable = chkCons.checked; markModified(item); renderDbMasterList(); renderDbDetail(item); };
     const selScope = document.getElementById('item-scope');
@@ -1674,7 +2080,6 @@ const htmlContent = `<!DOCTYPE html>
       markModified(item);
     };
 
-    // Item Recovery Effects inputs
     const effHpPct = document.getElementById('item-eff-hp-pct');
     const effHpFlat = document.getElementById('item-eff-hp-flat');
     if (effHpPct || effHpFlat) {
@@ -1710,7 +2115,7 @@ const htmlContent = `<!DOCTYPE html>
         markModified(item);
         renderDbMasterList();
         renderDbDetail(item);
-        showToast('ปรับเป็นไอเทมใช้ไม่หมด (Infinite) แล้ว!', 'success');
+        showToast('Item set to non-consumable (infinite).', 'success');
       };
     }
 
@@ -1722,7 +2127,7 @@ const htmlContent = `<!DOCTYPE html>
         if (!item.scope || item.scope === 0) item.scope = 7;
         markModified(item);
         renderDbDetail(item);
-        showToast('เพิ่มเอฟเฟกต์ฟื้นฟู HP/MP 100% แล้ว!', 'success');
+        showToast('Added 100% HP/MP recovery effect.', 'success');
       };
     }
 
@@ -1733,11 +2138,10 @@ const htmlContent = `<!DOCTYPE html>
         setEffectValue(item, 13, 100, 0);
         markModified(item);
         renderDbDetail(item);
-        showToast('ปรับเพิ่ม TP/AP +100 แล้ว!', 'success');
+        showToast('TP/AP gain set to +100.', 'success');
       };
     }
 
-    // Skills events
     const mpCost = document.getElementById('skill-mp-cost');
     if (mpCost) mpCost.onchange = () => { item.mpCost = parseInt(mpCost.value) || 0; markModified(item); renderDbMasterList(); };
     const tpCost = document.getElementById('skill-tp-cost');
@@ -1769,7 +2173,7 @@ const htmlContent = `<!DOCTYPE html>
         markModified(item);
         renderDbMasterList();
         renderDbDetail(item);
-        showToast('ปรับใช้ 0 MP & 0 TP แล้ว!', 'success');
+        showToast('Skill cost set to 0 MP / 0 TP.', 'success');
       };
     }
 
@@ -1782,11 +2186,10 @@ const htmlContent = `<!DOCTYPE html>
         item.damage.critical = true;
         markModified(item);
         renderDbDetail(item);
-        showToast('ปรับสูตรดาเมจ 99,999 แล้ว!', 'success');
+        showToast('Damage formula set to 99,999.', 'success');
       };
     }
 
-    // Revert Single Item button
     const btnRevertItem = document.getElementById('btn-db-revert-item');
     if (btnRevertItem) {
       btnRevertItem.onclick = () => {
@@ -1800,22 +2203,20 @@ const htmlContent = `<!DOCTYPE html>
           updateDbSlotBadges();
           renderDbMasterList();
           renderDbDetail(currentDb.items[idx]);
-          showToast(\`คืนค่าเดิมของ #\${item.id} เรียบร้อย!\`, 'info');
+          showToast(\`Reverted entry #\${item.id} to original values.\`, 'info');
         }
       };
     }
 
-    // Save buttons
     const btnDetDl = document.getElementById('btn-detail-download');
     if (btnDetDl) btnDetDl.onclick = downloadDatabaseFile;
     const btnDetSave = document.getElementById('btn-detail-save-disk');
     if (btnDetSave) btnDetSave.onclick = saveDatabaseToDisk;
   }
 
-  // File System Access API & Download
   async function saveDatabaseToDisk() {
     if (!currentDb.items || currentDb.items.length === 0) {
-      showToast('ยังไม่มีข้อมูลไฟล์ให้บันทึก', 'warn');
+      showToast('No database loaded to save.', 'warn');
       return;
     }
     const jsonStr = JSON.stringify(currentDb.items, null, 2);
@@ -1828,19 +2229,18 @@ const htmlContent = `<!DOCTYPE html>
         const writable = await handle.createWritable();
         await writable.write(jsonStr);
         await writable.close();
-        showToast(\`บันทึกทับไฟล์ \${currentDb.fileName} สำเร็จ!\`, 'success');
+        showToast(\`Saved \${currentDb.fileName} to disk.\`, 'success');
         return;
       }
     } catch(e) {
       if (e.name !== 'AbortError') console.warn(e);
     }
-    // Fallback to regular download
     downloadDatabaseFile();
   }
 
   function downloadDatabaseFile() {
     if (!currentDb.items || currentDb.items.length === 0) {
-      showToast('ยังไม่ได้โหลดไฟล์ Database (.json)', 'warn');
+      showToast('No database file loaded.', 'warn');
       return;
     }
     const jsonStr = JSON.stringify(currentDb.items, null, 2);
@@ -1853,13 +2253,12 @@ const htmlContent = `<!DOCTYPE html>
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(\`ดาวน์โหลด \${currentDb.fileName} แล้ว!\`, 'success');
+    showToast(\`Downloaded \${currentDb.fileName}.\`, 'success');
   }
 
   const btnDbDl = document.getElementById('btn-db-download');
   if (btnDbDl) btnDbDl.onclick = downloadDatabaseFile;
 
-  // Open DB file(s) directly via Picker (supports selecting multiple .json files at once!)
   document.getElementById('btn-open-db-file').onclick = async () => {
     try {
       if (window.showOpenFilePicker) {
@@ -1881,11 +2280,11 @@ const htmlContent = `<!DOCTYPE html>
   };
 
   // -------------------------------------------------------------
-  // SAVE EDITOR LOGIC (PRESERVED & INTEGRATED)
+  // SAVE EDITOR LOGIC
   // -------------------------------------------------------------
   async function loadSaveFile(file) {
     if (file && file.size > 50 * 1024 * 1024) {
-      showToast('ไฟล์มีขนาดเกิน 50MB เพื่อความปลอดภัยระบบจำกัดขนาดไฟล์ไม่เกิน 50MB', 'danger');
+      showToast('File exceeds the 50MB safety limit.', 'danger');
       return;
     }
     const reader = new FileReader();
@@ -1909,7 +2308,7 @@ const htmlContent = `<!DOCTYPE html>
         resetSaveModified();
         setupVisualEditor();
         renderRawTable();
-        showToast(\`Loaded \${file.name} successfully!\`, 'success');
+        showToast(\`Loaded \${file.name}\`, 'success');
       } catch(err) {
         alert('Error parsing save file:\\n' + err.message);
       }
@@ -1917,12 +2316,10 @@ const htmlContent = `<!DOCTYPE html>
     reader.readAsArrayBuffer(file);
   }
 
-  // Universal Save Parser Pipeline
   async function parseSaveData(rawBytes, fileName) {
     const textDecoder = new TextDecoder('utf-8', { fatal: false });
     const text = textDecoder.decode(rawBytes).trim();
 
-    // Ruby Marshal 4.8
     if (rawBytes.length >= 2 && rawBytes[0] === 0x04 && rawBytes[1] === 0x08) {
       try {
         const decoded = RubyMarshal.decode(rawBytes);
@@ -1934,7 +2331,6 @@ const htmlContent = `<!DOCTYPE html>
       } catch(e) {}
     }
 
-    // RPG Maker MZ
     if (typeof pako !== 'undefined') {
       try {
         const unzipped = pako.inflate(text, { to: 'string' });
@@ -1950,7 +2346,6 @@ const htmlContent = `<!DOCTYPE html>
       } catch (e) {}
     }
 
-    // RPG Maker MV
     if (fileName.endsWith('.rpgsave') || /^[A-Za-z0-9+/=]+$/.test(text)) {
       try {
         const decompressed = LZString.decompressFromBase64(text);
@@ -1960,12 +2355,10 @@ const htmlContent = `<!DOCTYPE html>
       } catch (e) {}
     }
 
-    // JSON / Gzip / Deflate
     if ((text.startsWith('{') && text.endsWith('}')) || (text.startsWith('[') && text.endsWith(']'))) {
       return { format: 'json', formatLabel: 'JSON File', root: JSON.parse(text), engine: 'generic' };
     }
 
-    // WOLF RPG Editor (.sav)
     if (fileName.toLowerCase().endsWith('.sav') || fileName.toLowerCase().includes('savedata') || fileName.toLowerCase() === 'system.sav') {
       return {
         format: 'wolf_rpg',
@@ -1980,7 +2373,7 @@ const htmlContent = `<!DOCTYPE html>
       };
     }
 
-    throw new Error('Unrecognized save file format. Supported: RPG Maker (MZ, MV, VX Ace, VX, XP, 2000/2003), WOLF RPG (.sav), JSON, XML, INI.');
+    throw new Error('Unrecognized save file format. Supported: RPG Maker (MZ, MV, VX Ace, VX, XP), WOLF RPG (.sav), JSON.');
   }
 
   function getGameAdapters(root, engine) {
@@ -2032,7 +2425,6 @@ const htmlContent = `<!DOCTYPE html>
 
     const adapt = getGameAdapters(root, currentFile.engine);
 
-    // Gold setup & event bindings
     let goldParty = adapt.party;
     let goldKey = null;
     if (goldParty) {
@@ -2069,27 +2461,26 @@ const htmlContent = `<!DOCTYPE html>
     goldInput.onchange = () => applyGold(goldInput.value, true);
     document.getElementById('btn-gold-add-10k').onclick = () => {
       applyGold((parseInt(goldInput.value, 10) || 0) + 10000, true);
-      showToast('💰 +10,000 Gold added!', 'success');
+      showToast('+10,000 Gold added.', 'success');
     };
     document.getElementById('btn-gold-add-100k').onclick = () => {
       applyGold((parseInt(goldInput.value, 10) || 0) + 100000, true);
-      showToast('💰 +100,000 Gold added!', 'success');
+      showToast('+100,000 Gold added.', 'success');
     };
     document.getElementById('btn-gold-max').onclick = () => {
       applyGold(9999999, true);
-      showToast('💰 Gold maxed to 9,999,999!', 'success');
+      showToast('Gold set to 9,999,999.', 'success');
     };
     if (revBtn) {
       revBtn.onclick = () => {
         applyGold(originalGold, true);
-        showToast('↺ Gold reverted to ' + originalGold, 'info');
+        showToast('Gold reverted to ' + originalGold, 'info');
       };
     }
 
     function triggerSuperGodMode() {
       applyGold(9999999, true);
 
-      // Max all actors
       const actorsObj = adapt.actors;
       const actorsData = getJsonExArray(actorsObj ? (actorsObj._data || actorsObj['@data'] || actorsObj) : []);
       actorsData.forEach(actor => {
@@ -2108,7 +2499,6 @@ const htmlContent = `<!DOCTYPE html>
         }
       });
 
-      // Max items, weapons, armors to 99
       if (adapt.party) {
         const items = adapt.party['@items'] || adapt.party._items || adapt.party.items || {};
         const weapons = adapt.party['@weapons'] || adapt.party._weapons || adapt.party.weapons || {};
@@ -2119,8 +2509,8 @@ const htmlContent = `<!DOCTYPE html>
       }
 
       setupVisualEditor();
-      markSaveModified('SUPER GOD MODE');
-      showToast('🗝️ [SECRET UNLOCKED] Super God Mode: เงินเต็ม / เลือดมานาเต็ม / สเตตัส 9999 / ไอเทม 99 ชิ้น ครบชุด!', 'success');
+      markSaveModified('MAX ALL');
+      showToast('Applied Max Party & Inventory preset (9.9M Gold, 9999 Stats, 99x Items).', 'success');
     }
 
     const btnSecretGod = document.getElementById('btn-secret-godmode');
@@ -2134,7 +2524,6 @@ const htmlContent = `<!DOCTYPE html>
       }
     };
 
-    // Search and filter inputs bindings
     document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
     document.getElementById('inventory-owned-only').onchange = () => renderInventoryTab(adapt.party);
     document.getElementById('weapons-search').oninput = () => renderWeaponsTab(adapt.party);
@@ -2166,29 +2555,25 @@ const htmlContent = `<!DOCTYPE html>
 
     const container = document.getElementById('char-stats-container');
     container.innerHTML = \`
-      <div style="grid-column: 1 / -1; background: #161b27; border: 1px solid #388bfd; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:2.2rem;">🐺</span>
-          <div>
-            <h3 style="color:#79c0ff; margin:0 0 4px 0;">ตรวจพบไฟล์เซฟ WOLF RPG Editor (Woditor)</h3>
-            <div style="color:var(--text-secondary); font-size:0.85rem;">ไฟล์: <b>\${currentFile.name}</b> (\${formatBytes(currentFile.size)}) | เอนจิ้น: WOLF RPG Editor Pro 3.50+</div>
-          </div>
+      <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <h3 style="color:var(--accent-sand); margin:0 0 4px 0;">WOLF RPG Editor Save Detected</h3>
+          <div style="color:var(--text-secondary); font-size:0.84rem;">File: <b>\${currentFile.name}</b> (\${formatBytes(currentFile.size)}) | Engine: WOLF RPG Editor Pro 3.50+</div>
         </div>
 
-        <div style="background:#1f2430; border-left: 4px solid #f2cc60; padding: 14px 18px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; color: #e6edf3;">
-          <b>⚠️ ข้อมูลสำคัญเกี่ยวกับระบบเซฟเกมนี้:</b><br>
-          เกมนี้คอมไพล์ด้วย <b>WOLF RPG Editor Pro</b> ซึ่งใช้ระบบเข้ารหัสเซฟระดับไบนารี (128-byte block encryption) และตัวแปรเก็บเป็นตัวเลขอินเด็กซ์ดิบ (ไม่มีชื่อกำกับในไฟล์)<br>
-          <i>*แม้แต่โปรแกรมแก้ไขเซฟทั่วไป เมื่อพยายามบันทึกไฟล์นี้กลับ ก็จะล้มเหลวเพราะตัวเซฟถูกป้องกันด้วย Checksum เฉพาะของเอนจิ้น</i>
+        <div style="background:var(--accent-amber-bg); border-left: 3px solid var(--accent-amber); padding: 14px 18px; border-radius: var(--radius-sm); font-size: 0.86rem; line-height: 1.5; color: var(--text-primary);">
+          <b>Important Notice:</b><br>
+          WOLF RPG Editor Pro uses proprietary 128-byte block encryption with strict binary checksums. Direct file modification without the game's internal key will corrupt the save file.
         </div>
 
-        <div style="background:#13233a; border: 1px solid #1f6feb; padding: 18px; border-radius: 10px;">
-          <h4 style="color:#58a6ff; margin:0 0 10px 0;">🎮 วิธีโกงเงินและสเตตัสสำหรับเกมนี้ที่ได้ผล 100% (ง่ายและปลอดภัยที่สุด):</h4>
-          <ol style="margin:0; padding-left:22px; color:#c9d1d9; font-size:0.9rem; display:flex; flex-direction:column; gap:8px;">
-            <li>เปิดเกม <b>GamePro.exe</b> ตามปกติ</li>
-            <li>เปิดโปรแกรม <b>Cheat Engine</b> แล้วกดปุ่มไอคอนคอมพิวเตอร์ เลือก Process <code>GamePro.exe</code></li>
-            <li>เนื่องจากตัวเกมเป็น <b>32-bit x86</b> ให้ตั้ง Value Type เป็น <b>4 Bytes</b> กรอกจำนวนเงิน หรือค่า HP ในเกม แล้วกด <i>First Scan</i></li>
-            <li>กลับเข้าไปในเกม ใช้เงินหรือโดนดาเมจ 1 ครั้ง แล้วกรอกเลขใหม่ใน Cheat Engine กด <i>Next Scan</i></li>
-            <li>ดับเบิ้ลคลิกแอดเดรสที่เหลือลงมา แล้วเปลี่ยนค่าเป็น <b>999,999</b> ได้ทันที เซฟไม่พัง 100%!</li>
+        <div style="background:var(--bg-header); border: 1px solid var(--border-color); padding: 18px; border-radius: var(--radius-md);">
+          <h4 style="color:var(--accent-sand); margin:0 0 10px 0;">Recommended Memory Editing Procedure:</h4>
+          <ol style="margin:0; padding-left:20px; color:var(--text-primary); font-size:0.86rem; display:flex; flex-direction:column; gap:6px;">
+            <li>Launch <b>GamePro.exe</b> normally.</li>
+            <li>Attach <b>Cheat Engine</b> to the <code>GamePro.exe</code> process.</li>
+            <li>Set Value Type to <b>4 Bytes</b>, enter your current Gold or HP value, and click <i>First Scan</i>.</li>
+            <li>Change the value in-game (spend gold or take damage), enter the updated number, and click <i>Next Scan</i>.</li>
+            <li>Modify the matched address to <b>999,999</b> and save inside the game normally.</li>
           </ol>
         </div>
       </div>
@@ -2216,9 +2601,9 @@ const htmlContent = `<!DOCTYPE html>
     validActors.forEach(item => {
       const opt = document.createElement('option');
       opt.value = item.index;
-      const name = item.actor._name || item.actor['@name'] || \`Hero #\${item.index}\`;
+      const name = item.actor._name || item.actor['@name'] || \`Actor #\${item.index}\`;
       const lvl = item.actor._level || item.actor['@level'] || 1;
-      opt.textContent = \`Character #\${item.index} — \${name} (Lv.\${lvl})\`;
+      opt.textContent = \`#\${item.index} — \${name} (Lv. \${lvl})\`;
       charDropdown.appendChild(opt);
     });
 
@@ -2230,7 +2615,6 @@ const htmlContent = `<!DOCTYPE html>
     };
     renderCharacterStats(actorsData[activeCharacterIndex]);
 
-    // Quick Action: Full Restore (HP/MP)
     document.getElementById('btn-char-full-heal').onclick = () => {
       const actor = actorsData[activeCharacterIndex];
       if (!actor) return;
@@ -2241,10 +2625,9 @@ const htmlContent = `<!DOCTYPE html>
       if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
       renderCharacterStats(actor);
       markSaveModified('Full Heal');
-      showToast('💖 Full restore applied (HP & MP maxed)!', 'success');
+      showToast('Full HP/MP restore applied.', 'success');
     };
 
-    // Quick Action: Max All Stats (9999)
     document.getElementById('btn-char-max-stats').onclick = () => {
       const actor = actorsData[activeCharacterIndex];
       if (!actor) return;
@@ -2262,7 +2645,7 @@ const htmlContent = `<!DOCTYPE html>
       }
       renderCharacterStats(actor);
       markSaveModified('Max Stats');
-      showToast('⚡ All stats & bonuses maxed to 9999!', 'success');
+      showToast('All character stats and bonuses set to 9999.', 'success');
     };
   }
 
@@ -2293,13 +2676,13 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     const lvlKey = actor['@level'] !== undefined ? '@level' : '_level';
-    makeCard('LEVEL', 'Level', actor[lvlKey] || 1, (v) => actor[lvlKey] = v);
+    makeCard('LEVEL', 'Character Level', actor[lvlKey] || 1, (v) => actor[lvlKey] = v);
 
     const hpKey = actor['@hp'] !== undefined ? '@hp' : '_hp';
-    makeCard('MyHP', 'Current HP', actor[hpKey] || 100, (v) => actor[hpKey] = v);
+    makeCard('HP', 'Current HP', actor[hpKey] || 100, (v) => actor[hpKey] = v);
 
     const mpKey = actor['@mp'] !== undefined ? '@mp' : (actor['@sp'] !== undefined ? '@sp' : '_mp');
-    makeCard('MyMP', 'Current MP / SP', actor[mpKey] || 50, (v) => actor[mpKey] = v);
+    makeCard('MP / SP', 'Current MP / SP', actor[mpKey] || 50, (v) => actor[mpKey] = v);
 
     const paramPlus = actor._paramPlus || actor['@param_plus'];
     if (paramPlus) {
@@ -2317,7 +2700,6 @@ const htmlContent = `<!DOCTYPE html>
     const itemIds = Object.keys(itemsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-item-count').textContent = itemIds.length;
 
-    // Quick Action: Set All Owned to 99
     document.getElementById('btn-items-set-all-99').onclick = () => {
       let count = 0;
       itemIds.forEach(id => {
@@ -2328,10 +2710,9 @@ const htmlContent = `<!DOCTYPE html>
       });
       renderInventoryTab(partyObj);
       markSaveModified('Items 99');
-      showToast('Set ' + count + ' owned items to 99!', 'success');
+      showToast('Set ' + count + ' owned items to 99.', 'success');
     };
 
-    // Quick Action: Add Item ID
     document.getElementById('btn-add-item-dialog').onclick = () => {
       const id = prompt('Enter Item ID to add:');
       if (!id || isNaN(id)) return;
@@ -2340,7 +2721,7 @@ const htmlContent = `<!DOCTYPE html>
       itemsObj[id] = val;
       renderInventoryTab(partyObj);
       markSaveModified('Add Item #' + id);
-      showToast('Added Item #' + id + ' (x' + val + ')', 'success');
+      showToast('Added Item #' + id + ' (x' + val + ').', 'success');
     };
 
     const q = document.getElementById('inventory-search').value.trim().toLowerCase();
@@ -2356,14 +2737,14 @@ const htmlContent = `<!DOCTYPE html>
       card.className = 'item-card';
       card.innerHTML = \`
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-weight:600; font-size:0.88rem; color:#fff;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
-          <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span>
+          <span style="font-weight:600; font-size:0.86rem; color:var(--text-primary);" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
+          <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span>
         </div>
         <div style="display:flex; align-items:center; gap:4px;">
-          <button class="btn btn-secondary btn-sm btn-sub">-</button>
+          <button class="btn btn-secondary btn-sm btn-sub" type="button">-</button>
           <input type="number" class="stat-input" value="\${count}" style="text-align:center; padding:4px;">
-          <button class="btn btn-secondary btn-sm btn-add">+</button>
-          <button class="btn btn-secondary btn-sm btn-99">99</button>
+          <button class="btn btn-secondary btn-sm btn-add" type="button">+</button>
+          <button class="btn btn-secondary btn-sm btn-99" type="button">99</button>
         </div>
       \`;
 
@@ -2396,7 +2777,7 @@ const htmlContent = `<!DOCTYPE html>
       weaponsObj[id] = 1;
       renderWeaponsTab(partyObj);
       markSaveModified('Add Weapon #' + id);
-      showToast('Added Weapon #' + id, 'success');
+      showToast('Added Weapon #' + id + '.', 'success');
     };
 
     const q = document.getElementById('weapons-search').value.trim().toLowerCase();
@@ -2408,8 +2789,8 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
-        <input type="number" class="stat-input" value="\${count}" style="padding:4px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span></div>
+        <input type="number" class="stat-input" value="\${count}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
         weaponsObj[id] = parseInt(e.target.value) || 0;
@@ -2433,7 +2814,7 @@ const htmlContent = `<!DOCTYPE html>
       armorsObj[id] = 1;
       renderArmorsTab(partyObj);
       markSaveModified('Add Armor #' + id);
-      showToast('Added Armor #' + id, 'success');
+      showToast('Added Armor #' + id + '.', 'success');
     };
 
     const q = document.getElementById('armors-search').value.trim().toLowerCase();
@@ -2445,8 +2826,8 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.75rem; color:var(--text-secondary);">#\${id}</span></div>
-        <input type="number" class="stat-input" value="\${count}" style="padding:4px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span></div>
+        <input type="number" class="stat-input" value="\${count}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
         armorsObj[id] = parseInt(e.target.value) || 0;
@@ -2469,14 +2850,15 @@ const htmlContent = `<!DOCTYPE html>
       const val = varsArr[id];
       if (val === undefined || val === null) continue;
       if (nonZeroOnly && (val === 0 || val === '0')) continue;
-      if (q && !String(id).includes(q) && !String(val).toLowerCase().includes(q)) continue;
+      const vName = (gameData && gameData.variables && gameData.variables[id]) || \`Variable #\${id}\`;
+      if (q && !String(id).includes(q) && !String(val).toLowerCase().includes(q) && !vName.toLowerCase().includes(q)) continue;
       count++;
 
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:#fff; font-weight:600;">Variable #\${id}</span></div>
-        <input type="text" class="stat-input" value="\${val}" style="padding:4px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(vName)}">\${escapeHtml(vName)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span></div>
+        <input type="text" class="stat-input" value="\${val}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
         let n = e.target.value;
@@ -2509,9 +2891,9 @@ const htmlContent = `<!DOCTYPE html>
       if (q && !String(id).includes(q) && !name.toLowerCase().includes(q)) continue;
 
       const card = document.createElement('div');
-      card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
+      card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
       card.innerHTML = \`
-        <span style="color:#fff; font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
+        <span style="color:var(--text-primary); font-weight:500; font-size:0.84rem;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
         <label class="toggle-switch"><input type="checkbox" \${val?'checked':''}><span class="slider"></span></label>
       \`;
       card.querySelector('input').onchange = (e) => {
@@ -2540,13 +2922,13 @@ const htmlContent = `<!DOCTYPE html>
     tbody.innerHTML = '';
     flatEntries.slice(0, 50).forEach(entry => {
       const tr = document.createElement('tr');
-      tr.style.borderBottom = '1px solid #232a3d';
+      tr.style.borderBottom = '1px solid var(--border-subtle)';
       tr.innerHTML = \`
-        <td style="padding:8px 14px; font-family:var(--font-mono); color:#79c0ff;">\${entry.path}</td>
-        <td style="padding:8px 14px;"><span class="meta-tag">\${entry.type}</span></td>
+        <td style="padding:8px 14px; font-family:var(--font-mono); color:var(--accent-sand);">\${entry.path}</td>
+        <td style="padding:8px 14px;"><span class="meta-pill">\${entry.type}</span></td>
         <td style="padding:8px 14px; color:var(--text-secondary); font-family:var(--font-mono);">\${String(entry.origVal)}</td>
         <td style="padding:8px 14px;"><input type="text" class="stat-input raw-val-input" value="\${entry.currentVal}" style="padding:4px 8px;"></td>
-        <td style="padding:8px 14px;"><button class="btn btn-secondary btn-sm raw-rev-btn">↺</button></td>
+        <td style="padding:8px 14px;"><button class="btn btn-secondary btn-sm raw-rev-btn" type="button">Reset</button></td>
       \`;
       const inp = tr.querySelector('.raw-val-input');
       const rev = tr.querySelector('.raw-rev-btn');
@@ -2618,7 +3000,7 @@ const htmlContent = `<!DOCTYPE html>
   // Save Export
   async function downloadEditedSave() {
     if (currentFile.engine === 'wolf') {
-      showToast('WOLF RPG Pro มีระบบเข้ารหัสเฉพาะของเอนจิ้น — โปรดแก้ไขผ่าน Cheat Engine ตามคู่มือบนหน้าจอ', 'warn');
+      showToast('WOLF RPG Pro uses proprietary encryption — please use Cheat Engine as described.', 'warn');
       return;
     }
     let blob;
@@ -2641,7 +3023,7 @@ const htmlContent = `<!DOCTYPE html>
     a.download = currentFile.name || 'savegame.rpgsave';
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Download started!', 'success');
+    showToast('Download started.', 'success');
   }
 
   function downloadBackupRaw() {
@@ -2653,7 +3035,7 @@ const htmlContent = `<!DOCTYPE html>
     a.download = (currentFile.name || 'save') + '.bak';
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Original backup (.bak) downloaded!', 'success');
+    showToast('Original backup (.bak) downloaded.', 'success');
   }
 
   const btnRevDl = document.getElementById('btn-review-download');
@@ -2678,11 +3060,32 @@ const htmlContent = `<!DOCTYPE html>
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = (currentFile.name ? currentFile.name.replace(/\.[^/.]+$/, '') : 'save') + '_decrypted.json';
+      a.download = (currentFile.name ? currentFile.name.replace(/\\.[^/.]+$/, '') : 'save') + '_decrypted.json';
       a.click();
       URL.revokeObjectURL(url);
-      showToast('Decrypted JSON exported!', 'success');
+      showToast('Decrypted JSON exported.', 'success');
     };
+  }
+
+  function clearSaveFile() {
+    if (!currentFile || (!currentFile.name && !currentFile.parsedRoot)) {
+      showToast('No save file currently open.', 'info');
+      return;
+    }
+    currentFile = {
+      name: null, size: 0, rawBytes: null,
+      format: null, formatLabel: null,
+      parsedRoot: null, engine: null
+    };
+    flatEntries = [];
+    resetSaveModified();
+    if (fileInput) fileInput.value = '';
+    labelFilename.textContent = 'None';
+    labelFormat.textContent = 'None';
+    labelSize.textContent = '0 B';
+    uploadSection.style.display = 'flex';
+    saveEditorScreen.style.display = 'none';
+    showToast('Save file cleared.', 'info');
   }
 
   const btnChangeFile = document.getElementById('btn-change-file');
@@ -2690,6 +3093,21 @@ const htmlContent = `<!DOCTYPE html>
     btnChangeFile.onclick = () => {
       fileInput.click();
     };
+  }
+
+  const btnClearSave = document.getElementById('btn-clear-save');
+  if (btnClearSave) {
+    btnClearSave.onclick = clearSaveFile;
+  }
+
+  const btnDbClearAll = document.getElementById('btn-db-clear-all');
+  if (btnDbClearAll) {
+    btnDbClearAll.onclick = clearAllDatabaseFiles;
+  }
+
+  const btnClearDbHeader = document.getElementById('btn-clear-db-header');
+  if (btnClearDbHeader) {
+    btnClearDbHeader.onclick = clearAllDatabaseFiles;
   }
 
   // Tab switching in Save Editor
@@ -2707,4 +3125,4 @@ const htmlContent = `<!DOCTYPE html>
 `;
 
 fs.writeFileSync(path.join(__dirname, 'index.html'), htmlContent);
-console.log('Save & DB Studio PRO MAX built successfully!');
+console.log('Save & DB Studio built successfully!');
