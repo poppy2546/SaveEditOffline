@@ -78,7 +78,7 @@ module.exports = async function runE2ESmokeTests(it) {
       assert.strictEqual(res.statusCode, 200);
       assert.ok(res.headers['content-type'].includes('text/html'));
       assert.ok(res.body.includes('http-equiv="Content-Security-Policy"'), 'Must deliver CSP');
-      assert.ok(res.body.includes('Save &amp; DB Studio') || res.body.includes('Save & DB Studio'), 'Must contain title');
+      assert.ok(res.body.includes('Universal RPG Maker Save Editor'), 'Must contain title');
     });
 
     await it('E2E HTTP: Delivers core runtime assets (ruby_marshal.js & pako.min.js)', async () => {
