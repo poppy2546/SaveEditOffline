@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://universal-rpg-save-editor.pages.dev/sitemap.xml

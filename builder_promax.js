@@ -15,6 +15,14 @@ const htmlContent = `<!DOCTYPE html>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23242933'/%3E%3Cstop%20offset='100%25'%20stop-color='%2314161B'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='gold'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23FFF2D6'/%3E%3Cstop%20offset='40%25'%20stop-color='%23E2B86B'/%3E%3Cstop%20offset='100%25'%20stop-color='%23B88028'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='crystal'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23C2F0BC'/%3E%3Cstop%20offset='60%25'%20stop-color='%2373A86E'/%3E%3Cstop%20offset='100%25'%20stop-color='%233B6338'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='14'%20fill='url(%23bg)'%20stroke='url(%23gold)'%20stroke-width='2.5'/%3E%3Cpath%20d='M16%2013h24l9%209v27a2%202%200%200%201-2%202H18a2%202%200%200%201-2-2V13z'%20fill='%231C2028'%20stroke='%23444B57'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3Cpath%20d='M22%2013h18v12a1%201%200%200%201-1%201H23a1%201%200%200%201-1-1V13z'%20fill='url(%23gold)'/%3E%3Crect%20x='26'%20y='16'%20width='3.5'%20height='6'%20rx='1'%20fill='%2314161B'/%3E%3Cpolygon%20points='32,29%2042,39%2032,49%2022,39'%20fill='url(%23crystal)'%20stroke='%23A2C79D'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3Cpolygon%20points='32,32%2039,39%2032,46%2025,39'%20fill='%23E8FCE4'%20opacity='0.35'/%3E%3Ccircle%20cx='32'%20cy='39'%20r='2.2'%20fill='%23FFFFFF'/%3E%3C/svg%3E">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="theme-color" content="#16181D">
+<meta name="description" content="Universal RPG Maker Save Editor &amp; Database Modder — Free, 100% private, client-side web utility for RPG Maker MZ, MV, VX Ace, XP, and WOLF RPG save files and JSON databases.">
+<meta name="keywords" content="RPG Maker save editor, rmmzsave editor, rpgsave editor, rvdata2 editor, RPG Maker database modder, RPG save editor online">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://universal-rpg-save-editor.pages.dev/">
+<meta property="og:title" content="Universal RPG Maker Save Editor">
+<meta property="og:description" content="Universal RPG Maker Save Editor &amp; Database Modder — 100% Client-side and private.">
+<meta property="og:url" content="https://universal-rpg-save-editor.pages.dev/">
+<meta property="og:type" content="website">
 <style>
   /* Color Hunt Palette Adaptation (High Contrast Tactile Studio):
      Primary Curated Palette: Crisp Parchment, Warm Sand & Deep Charcoal
