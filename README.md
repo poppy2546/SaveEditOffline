@@ -59,7 +59,7 @@ Open [https://universal-rpg-save-editor.pages.dev/](https://universal-rpg-save-e
    git clone https://github.com/poppy2546/SaveEditOffline.git
    cd SaveEditOffline
    ```
-2. Double-click `open.bat` (or open `index.html` in your browser).
+2. Double-click `open.exe` (or open `index.html` in your browser).
 
 ### Option C: Run Local HTTP Server
 ```bash
