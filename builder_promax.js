@@ -1031,7 +1031,7 @@ const htmlContent = `<!DOCTYPE html>
       <button class="db-cat-btn active" data-cat="weapons" id="slot-btn-weapons" type="button">
         <div class="db-slot-top">
           <span>Weapons</span>
-          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Weapons.json</span>
+          <span id="db-slot-file-weapons" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Weapons.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-weapons">Not loaded</span>
@@ -1042,7 +1042,7 @@ const htmlContent = `<!DOCTYPE html>
       <button class="db-cat-btn" data-cat="armors" id="slot-btn-armors" type="button">
         <div class="db-slot-top">
           <span>Armors</span>
-          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Armors.json</span>
+          <span id="db-slot-file-armors" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Armors.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-armors">Not loaded</span>
@@ -1053,7 +1053,7 @@ const htmlContent = `<!DOCTYPE html>
       <button class="db-cat-btn" data-cat="items" id="slot-btn-items" type="button">
         <div class="db-slot-top">
           <span>Items</span>
-          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Items.json</span>
+          <span id="db-slot-file-items" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Items.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-items">Not loaded</span>
@@ -1064,7 +1064,7 @@ const htmlContent = `<!DOCTYPE html>
       <button class="db-cat-btn" data-cat="skills" id="slot-btn-skills" type="button">
         <div class="db-slot-top">
           <span>Skills</span>
-          <span style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Skills.json</span>
+          <span id="db-slot-file-skills" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Skills.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-skills">Not loaded</span>
@@ -1332,7 +1332,7 @@ const htmlContent = `<!DOCTYPE html>
 
   function isDatabaseJsonFilename(name) {
     const n = name.toLowerCase();
-    return n === 'weapons.json' || n === 'armors.json' || n === 'items.json' || n === 'skills.json' || n === 'enemies.json' || n === 'system.json' || n === 'actors.json';
+    return n === 'weapons.json' || n === 'armors.json' || n === 'items.json' || n === 'skills.json' || n === 'system.json';
   }
 
   function handleIncomingFile(file) {
@@ -1343,7 +1343,7 @@ const htmlContent = `<!DOCTYPE html>
     const files = Array.from(fileList || []);
     if (files.length === 0) return;
 
-    const jsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.json') && (isDatabaseJsonFilename(f.name) || currentAppMode === 'database' || files.length > 1));
+    const jsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.json'));
     if (jsonFiles.length > 0) {
       jsonFiles.forEach((f, idx) => loadDatabaseFile(f, null, idx === 0));
       return;
@@ -1356,19 +1356,76 @@ const htmlContent = `<!DOCTYPE html>
   // DATABASE MODDER LOGIC
   // -------------------------------------------------------------
   function detectDbCategory(fileName, jsonArr) {
-    const baseName = fileName.replace(/\\.json$/i, '').toLowerCase();
+    if (!Array.isArray(jsonArr)) return null;
+    const sample = jsonArr.find(x => x && typeof x === 'object' && x.id);
+    if (sample) {
+      // Reject non-item/equip/skill RPG Maker tables (e.g. Classes.json has 2D params, Actors/Enemies/States/etc.)
+      if (Array.isArray(sample.params) && Array.isArray(sample.params[0])) return null;
+      if ('expParams' in sample || 'learnings' in sample || 'classId' in sample || 'equips' in sample ||
+          'initialLevel' in sample || 'dropItems' in sample || 'actions' in sample || 'battlerName' in sample ||
+          'restriction' in sample || 'autoRemovalTiming' in sample || 'members' in sample || 'pages' in sample ||
+          'tilesetNames' in sample || 'parentId' in sample || 'list' in sample || 'frames' in sample ||
+          'timings' in sample || 'effectName' in sample) {
+        return null;
+      }
+      if ('wtypeId' in sample) return 'weapons';
+      if ('atypeId' in sample || 'etypeId' in sample) return 'armors';
+      if ('stypeId' in sample || 'mpCost' in sample || 'tpCost' in sample) return 'skills';
+      if ('itypeId' in sample || 'consumable' in sample) return 'items';
+    }
+    const baseName = String(fileName || '').replace(/\\.json$/i, '').toLowerCase();
     if (baseName.includes('weapon')) return 'weapons';
     if (baseName.includes('armor')) return 'armors';
     if (baseName.includes('item')) return 'items';
     if (baseName.includes('skill')) return 'skills';
-    const sample = (jsonArr || []).find(x => x && typeof x === 'object' && x.id);
-    if (sample) {
-      if ('wtypeId' in sample) return 'weapons';
-      if ('atypeId' in sample || 'etypeId' in sample) return 'armors';
-      if ('stypeId' in sample || 'mpCost' in sample) return 'skills';
-      if ('itypeId' in sample || 'consumable' in sample) return 'items';
+    return null;
+  }
+
+  function applyDatabaseJson(fileName, json, handle = null, autoSwitch = true) {
+    if (!Array.isArray(json) && json && typeof json === 'object') {
+      if (Array.isArray(json.variables) || Array.isArray(json.switches)) {
+        if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
+        if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+        showToast(\`Loaded Variable/Switch names from \${fileName}\`, 'success');
+        return true;
+      }
+      showToast(\`Skipped \${fileName}: Only Weapons, Armors, Items, Skills, or System.json are supported.\`, 'warn');
+      return false;
     }
-    return currentDb.category || 'items';
+
+    if (!Array.isArray(json)) throw new Error('Database file (.json) must be a valid RPG Maker JSON array.');
+
+    const cat = detectDbCategory(fileName, json);
+    if (!cat) {
+      showToast(\`Skipped \${fileName}: Unsupported database file (use Weapons, Armors, Items, or Skills).\`, 'warn');
+      return false;
+    }
+    const validItems = json.filter(x => x && x.id);
+
+    if (gameData[cat]) {
+      validItems.forEach(x => { if (x.id && x.name) gameData[cat][x.id] = x.name; });
+    }
+
+    dbStore[cat] = {
+      category: cat,
+      fileName: fileName,
+      fileHandle: handle,
+      items: json,
+      origItemsJson: JSON.stringify(json),
+      selectedId: validItems.length > 0 ? validItems[0].id : null,
+      modifiedIds: new Set()
+    };
+
+    if (autoSwitch || !dbStore[currentDb.category] || currentDb.category === cat) {
+      syncCurrentDbFromStore(cat);
+    }
+    switchAppMode('database');
+    updateDbCategoryButtons(currentDb.category);
+    updateDbSlotBadges();
+    renderDbBulkActions();
+    renderDbMasterList();
+    showToast(\`Loaded \${fileName} (\${validItems.length} entries)\`, 'success');
+    return true;
   }
 
   function loadDatabaseFile(file, handle = null, autoSwitch = true) {
@@ -1380,42 +1437,15 @@ const htmlContent = `<!DOCTYPE html>
     reader.onload = () => {
       try {
         const json = JSON.parse(reader.result);
-
-        if (!Array.isArray(json) && json && typeof json === 'object') {
-          if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
-          if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
-          showToast(\`Loaded Variable/Switch names from \${file.name}\`, 'success');
+        const isSaveJson = json && typeof json === 'object' && (
+          (!Array.isArray(json) && (json.party || json.actors)) ||
+          (Array.isArray(json) && json.some(x => x && (x.__ruby_class__ || x['@gold'] !== undefined || x['@data'] !== undefined)))
+        );
+        if (isSaveJson && currentAppMode === 'save' && !handle) {
+          loadSaveFile(file);
           return;
         }
-
-        if (!Array.isArray(json)) throw new Error('Database file (.json) must be a valid RPG Maker JSON array.');
-
-        const cat = detectDbCategory(file.name, json);
-        const validItems = json.filter(x => x && x.id);
-
-        if (gameData[cat]) {
-          validItems.forEach(x => { if (x.id && x.name) gameData[cat][x.id] = x.name; });
-        }
-
-        dbStore[cat] = {
-          category: cat,
-          fileName: file.name,
-          fileHandle: handle,
-          items: json,
-          origItemsJson: JSON.stringify(json),
-          selectedId: validItems.length > 0 ? validItems[0].id : null,
-          modifiedIds: new Set()
-        };
-
-        if (autoSwitch || !dbStore[currentDb.category]) {
-          syncCurrentDbFromStore(cat);
-        }
-        switchAppMode('database');
-        updateDbCategoryButtons(currentDb.category);
-        updateDbSlotBadges();
-        renderDbBulkActions();
-        renderDbMasterList();
-        showToast(\`Loaded \${file.name} (\${validItems.length} entries)\`, 'success');
+        applyDatabaseJson(file.name, json, handle, autoSwitch);
       } catch(e) {
         alert('Error parsing database JSON:\\n' + e.message);
       }
@@ -1478,10 +1508,12 @@ const htmlContent = `<!DOCTYPE html>
   }
 
   function updateDbSlotBadges() {
+    const defaultNames = { weapons: 'Weapons.json', armors: 'Armors.json', items: 'Items.json', skills: 'Skills.json' };
     ['weapons', 'armors', 'items', 'skills'].forEach(cat => {
       const slotBtn = document.getElementById('slot-btn-' + cat);
       const statusEl = document.getElementById('db-slot-status-' + cat);
       const modEl = document.getElementById('db-slot-mod-' + cat);
+      const fileEl = document.getElementById('db-slot-file-' + cat);
       const store = dbStore[cat];
       if (!slotBtn || !statusEl || !modEl) return;
 
@@ -1491,11 +1523,13 @@ const htmlContent = `<!DOCTYPE html>
         statusEl.innerHTML = \`Loaded: <b>\${count}</b> entries\`;
         statusEl.style.color = 'var(--accent-sage-bright)';
         modEl.textContent = store.modifiedIds.size > 0 ? \`\${store.modifiedIds.size} edited\` : '';
+        if (fileEl) fileEl.textContent = store.fileName || defaultNames[cat];
       } else {
         slotBtn.classList.remove('loaded');
         statusEl.textContent = 'Not loaded (click or drop)';
         statusEl.style.color = 'var(--text-secondary)';
         modEl.textContent = '';
+        if (fileEl) fileEl.textContent = defaultNames[cat];
       }
     });
 
@@ -1696,17 +1730,18 @@ const htmlContent = `<!DOCTYPE html>
 
     if (validItems.length === 0) {
       if (showingLabel) showingLabel.textContent = 'Not loaded';
+      const safeDbFileName = escapeHtml(currentDb.fileName);
       container.innerHTML = \`
         <div style="padding:36px 20px; text-align:center; color:var(--text-secondary);">
-          <div style="font-weight:600; color:var(--text-primary); margin-bottom:6px; font-size:0.88rem;">\${currentDb.fileName} is not loaded</div>
-          <div style="font-size:0.78rem; margin-bottom:14px; line-height:1.5;">Drop <b>\${currentDb.fileName}</b> from your game's <code>data/</code> folder or select it below.</div>
-          <button class="btn btn-secondary btn-sm" id="btn-empty-load-cat" type="button">Select \${currentDb.fileName}</button>
+          <div style="font-weight:600; color:var(--text-primary); margin-bottom:6px; font-size:0.88rem;">\${safeDbFileName} is not loaded</div>
+          <div style="font-size:0.78rem; margin-bottom:14px; line-height:1.5;">Drop <b>\${safeDbFileName}</b> from your game's <code>data/</code> folder or select it below.</div>
+          <button class="btn btn-secondary btn-sm" id="btn-empty-load-cat" type="button">Select \${safeDbFileName}</button>
         </div>
       \`;
       if (detailContainer) {
         detailContainer.innerHTML = \`
           <div style="text-align:center; padding:64px 24px; color:var(--text-secondary); border:1px dashed var(--border-color); border-radius:var(--radius-md); margin:auto 0;">
-            <div style="font-size:1.05rem; font-weight:600; color:var(--text-primary);">No \${currentDb.fileName} File Loaded</div>
+            <div style="font-size:1.05rem; font-weight:600; color:var(--text-primary);">No \${safeDbFileName} File Loaded</div>
             <div style="font-size:0.84rem; margin-top:6px; color:var(--text-secondary); line-height:1.6;">
               Drop <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, and <code>Skills.json</code><br>
               from your game's <code>data/</code> folder all at once.
@@ -1928,7 +1963,7 @@ const htmlContent = `<!DOCTYPE html>
 
           <div class="db-field-box">
             <span class="db-field-label">Damage / Recovery Formula</span>
-            <input type="text" class="stat-input" id="item-formula" value="\${dmg.formula || '0'}" placeholder="e.g. 200 + b.mhp * 0.2">
+            <input type="text" class="stat-input" id="item-formula" value="\${escapeHtml(dmg.formula || '0')}" placeholder="e.g. 200 + b.mhp * 0.2">
           </div>
         </div>
       \`;
@@ -1986,13 +2021,13 @@ const htmlContent = `<!DOCTYPE html>
         <div class="db-item-title-group">
           <div class="db-icon-box">\${getCategoryIcon(cat)}</div>
           <input type="text" class="db-name-input" id="detail-name" value="\${escapeHtml(item.name || '')}" placeholder="Entry Name">
-          <span class="meta-pill" style="color:var(--accent-sand);">ID #\${item.id}</span>
+          <span class="meta-pill" style="color:var(--accent-sand);">ID #\${escapeHtml(item.id)}</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
           \${item.price !== undefined ? \`
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:0.78rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Price</span>
-              <input type="number" class="stat-input" id="detail-price" value="\${item.price}" style="width:110px; padding:5px 8px;">
+              <input type="number" class="stat-input" id="detail-price" value="\${escapeHtml(item.price)}" style="width:110px; padding:5px 8px;">
             </div>
           \` : ''}
         </div>
@@ -2012,10 +2047,10 @@ const htmlContent = `<!DOCTYPE html>
       \${specificHtml}
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:16px; border-top:1px solid var(--border-color); flex-wrap:wrap; gap:10px;">
-        <button class="btn btn-secondary btn-sm" id="btn-db-revert-item" type="button">Revert Entry (#\${item.id})</button>
+        <button class="btn btn-secondary btn-sm" id="btn-db-revert-item" type="button">Revert Entry (#\${escapeHtml(item.id)})</button>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-secondary btn-sm" id="btn-detail-save-disk" type="button">Save to Disk</button>
-          <button class="btn btn-primary btn-sm" id="btn-detail-download" type="button">Download \${currentDb.fileName}</button>
+          <button class="btn btn-primary btn-sm" id="btn-detail-download" type="button">Download \${escapeHtml(currentDb.fileName)}</button>
         </div>
       </div>
     \`;
@@ -2327,6 +2362,16 @@ const htmlContent = `<!DOCTYPE html>
       const rawBytes = new Uint8Array(reader.result);
       try {
         const parsed = await parseSaveData(rawBytes, file.name);
+        if (parsed.format === 'json' && parsed.root) {
+          const r = parsed.root;
+          const isRubyJson = Array.isArray(r) && r.some(x => x && (x.__ruby_class__ || x['@gold'] !== undefined || x['@data'] !== undefined));
+          const isDbArray = Array.isArray(r) && !isRubyJson && r.some(x => x && typeof x === 'object' && typeof x.id === 'number');
+          const isSystemJson = !Array.isArray(r) && typeof r === 'object' && (Array.isArray(r.variables) || Array.isArray(r.switches)) && !r.party && !r.actors;
+          if (isDbArray || isSystemJson) {
+            applyDatabaseJson(file.name, r, null, true);
+            return;
+          }
+        }
         currentFile = {
           name: file.name, size: rawBytes.byteLength, rawBytes: rawBytes,
           format: parsed.format, formatLabel: parsed.formatLabel,
@@ -2580,7 +2625,8 @@ const htmlContent = `<!DOCTYPE html>
 
   function renderWolfRpgTab() {
     const charDropdown = document.getElementById('char-dropdown');
-    charDropdown.innerHTML = '<option>WOLF RPG Editor: ' + (currentFile.name || 'SaveData.sav') + '</option>';
+    const safeWolfName = escapeHtml(currentFile.name || 'SaveData.sav');
+    charDropdown.innerHTML = '<option>WOLF RPG Editor: ' + safeWolfName + '</option>';
     document.getElementById('badge-char-count').textContent = 'WOLF';
     document.getElementById('badge-item-count').textContent = '0';
     document.getElementById('badge-weapon-count').textContent = '0';
@@ -2593,7 +2639,7 @@ const htmlContent = `<!DOCTYPE html>
       <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; gap: 16px;">
         <div>
           <h3 style="color:var(--accent-sand); margin:0 0 4px 0;">WOLF RPG Editor Save Detected</h3>
-          <div style="color:var(--text-secondary); font-size:0.84rem;">File: <b>\${currentFile.name}</b> (\${formatBytes(currentFile.size)}) | Engine: WOLF RPG Editor Pro 3.50+</div>
+          <div style="color:var(--text-secondary); font-size:0.84rem;">File: <b>\${safeWolfName}</b> (\${formatBytes(currentFile.size)}) | Engine: WOLF RPG Editor Pro 3.50+</div>
         </div>
 
         <div style="background:var(--accent-amber-bg); border-left: 3px solid var(--accent-amber); padding: 14px 18px; border-radius: var(--radius-sm); font-size: 0.86rem; line-height: 1.5; color: var(--text-primary);">
@@ -2684,6 +2730,46 @@ const htmlContent = `<!DOCTYPE html>
     };
   }
 
+  function getActorExp(actor) {
+    if (!actor) return 0;
+    const raw = actor['@exp'] !== undefined ? actor['@exp'] : actor._exp;
+    if (typeof raw === 'number') return raw;
+    if (raw && typeof raw === 'object') {
+      const classId = actor._classId || actor['@class_id'] || 1;
+      if (Array.isArray(raw['@a']) && raw['@a'][classId] !== undefined) return Number(raw['@a'][classId]) || 0;
+      if (raw[classId] !== undefined) return Number(raw[classId]) || 0;
+      const keys = Object.keys(raw).filter(k => !k.startsWith('@') && raw[k] !== null && raw[k] !== undefined);
+      if (keys.length > 0) return Number(raw[keys[0]]) || 0;
+    }
+    return 0;
+  }
+
+  function setActorExp(actor, val) {
+    if (!actor) return;
+    const num = Math.max(0, parseInt(val, 10) || 0);
+    const classId = actor._classId || actor['@class_id'] || 1;
+    if (actor['@exp'] !== undefined) {
+      if (typeof actor['@exp'] === 'number') {
+        actor['@exp'] = num;
+      } else if (actor['@exp'] && typeof actor['@exp'] === 'object') {
+        actor['@exp'][classId] = num;
+        Object.keys(actor['@exp']).filter(k => !k.startsWith('@')).forEach(k => { actor['@exp'][k] = num; });
+      }
+      return;
+    }
+    if (typeof actor._exp === 'number') {
+      actor._exp = num;
+    } else {
+      if (!actor._exp || typeof actor._exp !== 'object') actor._exp = {};
+      if (Array.isArray(actor._exp['@a'])) {
+        actor._exp['@a'][classId] = num;
+      } else {
+        actor._exp[classId] = num;
+        Object.keys(actor._exp).filter(k => !k.startsWith('@')).forEach(k => { actor._exp[k] = num; });
+      }
+    }
+  }
+
   function renderCharacterStats(actor) {
     const container = document.getElementById('char-stats-container');
     container.innerHTML = '';
@@ -2694,10 +2780,10 @@ const htmlContent = `<!DOCTYPE html>
       card.className = 'stat-card';
       card.innerHTML = \`
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span class="stat-title">\${title}</span>
-          <span class="stat-desc">\${label}</span>
+          <span class="stat-title">\${escapeHtml(title)}</span>
+          <span class="stat-desc">\${escapeHtml(label)}</span>
         </div>
-        <input type="text" class="stat-input" value="\${val}">
+        <input type="text" class="stat-input" value="\${escapeHtml(val)}">
       \`;
       const input = card.querySelector('input');
       input.onchange = () => {
@@ -2708,10 +2794,22 @@ const htmlContent = `<!DOCTYPE html>
         markSaveModified('Stat ' + title);
       };
       container.appendChild(card);
+      return input;
     }
 
     const lvlKey = actor['@level'] !== undefined ? '@level' : '_level';
-    makeCard('LEVEL', 'Character Level', actor[lvlKey] || 1, (v) => actor[lvlKey] = v);
+    let expInput = null;
+    makeCard('LEVEL', 'Character Level', actor[lvlKey] || 1, (v) => {
+      const prevLvl = Number(actor[lvlKey]) || 1;
+      const nextLvl = Math.max(1, parseInt(v, 10) || 1);
+      actor[lvlKey] = nextLvl;
+      if (nextLvl < prevLvl || nextLvl === 1) {
+        setActorExp(actor, 0);
+        if (expInput) expInput.value = 0;
+      }
+    });
+
+    expInput = makeCard('EXP', 'Total Experience', getActorExp(actor), (v) => setActorExp(actor, v));
 
     const hpKey = actor['@hp'] !== undefined ? '@hp' : '_hp';
     makeCard('HP', 'Current HP', actor[hpKey] || 100, (v) => actor[hpKey] = v);
@@ -2773,11 +2871,11 @@ const htmlContent = `<!DOCTYPE html>
       card.innerHTML = \`
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-weight:600; font-size:0.86rem; color:var(--text-primary);" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
-          <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span>
+          <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span>
         </div>
         <div style="display:flex; align-items:center; gap:4px;">
           <button class="btn btn-secondary btn-sm btn-sub" type="button">-</button>
-          <input type="number" class="stat-input" value="\${count}" style="text-align:center; padding:4px;">
+          <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="text-align:center; padding:4px;">
           <button class="btn btn-secondary btn-sm btn-add" type="button">+</button>
           <button class="btn btn-secondary btn-sm btn-99" type="button">99</button>
         </div>
@@ -2824,8 +2922,8 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span></div>
-        <input type="number" class="stat-input" value="\${count}" style="padding:5px 8px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
+        <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
         weaponsObj[id] = parseInt(e.target.value) || 0;
@@ -2861,8 +2959,8 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span></div>
-        <input type="number" class="stat-input" value="\${count}" style="padding:5px 8px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
+        <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
         armorsObj[id] = parseInt(e.target.value) || 0;
@@ -2892,8 +2990,8 @@ const htmlContent = `<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(vName)}">\${escapeHtml(vName)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${id}</span></div>
-        <input type="text" class="stat-input" value="\${val}" style="padding:5px 8px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(vName)}">\${escapeHtml(vName)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
+        <input type="text" class="stat-input" value="\${escapeHtml(val)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
         let n = e.target.value;
@@ -2944,10 +3042,14 @@ const htmlContent = `<!DOCTYPE html>
     let cur = obj;
     for (let i = 0; i < tokens.length - 1; i++) {
       if (!cur) return;
-      cur = cur[tokens[i]];
+      const k = tokens[i];
+      if (k === '__proto__' || k === 'constructor' || k === 'prototype') return;
+      cur = cur[k];
     }
     if (cur && tokens.length > 0) {
-      cur[tokens[tokens.length - 1]] = val;
+      const lastKey = tokens[tokens.length - 1];
+      if (lastKey === '__proto__' || lastKey === 'constructor' || lastKey === 'prototype') return;
+      cur[lastKey] = val;
     }
   }
 
@@ -2959,10 +3061,10 @@ const htmlContent = `<!DOCTYPE html>
       const tr = document.createElement('tr');
       tr.style.borderBottom = '1px solid var(--border-subtle)';
       tr.innerHTML = \`
-        <td style="padding:8px 14px; font-family:var(--font-mono); color:var(--accent-sand);">\${entry.path}</td>
-        <td style="padding:8px 14px;"><span class="meta-pill">\${entry.type}</span></td>
-        <td style="padding:8px 14px; color:var(--text-secondary); font-family:var(--font-mono);">\${String(entry.origVal)}</td>
-        <td style="padding:8px 14px;"><input type="text" class="stat-input raw-val-input" value="\${entry.currentVal}" style="padding:4px 8px;"></td>
+        <td style="padding:8px 14px; font-family:var(--font-mono); color:var(--accent-sand);">\${escapeHtml(entry.path)}</td>
+        <td style="padding:8px 14px;"><span class="meta-pill">\${escapeHtml(entry.type)}</span></td>
+        <td style="padding:8px 14px; color:var(--text-secondary); font-family:var(--font-mono);">\${escapeHtml(String(entry.origVal))}</td>
+        <td style="padding:8px 14px;"><input type="text" class="stat-input raw-val-input" value="\${escapeHtml(entry.currentVal)}" style="padding:4px 8px;"></td>
         <td style="padding:8px 14px;"><button class="btn btn-secondary btn-sm raw-rev-btn" type="button">Reset</button></td>
       \`;
       const inp = tr.querySelector('.raw-val-input');
@@ -2984,14 +3086,17 @@ const htmlContent = `<!DOCTYPE html>
     });
   }
 
-  function flattenObject(obj, prefix = '', tokens = []) {
+  function flattenObject(obj, prefix = '', tokens = [], visited = new WeakSet(), depth = 0) {
     let result = [];
-    if (!obj || typeof obj !== 'object') return result;
+    if (!obj || typeof obj !== 'object' || depth > 64) return result;
+    if (visited.has(obj)) return result;
+    visited.add(obj);
     for (const [key, val] of Object.entries(obj)) {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
       const curTokens = [...tokens, key];
       const curPath = prefix ? (Array.isArray(obj) ? \`\${prefix}[\${key}]\` : \`\${prefix}.\${key}\`) : key;
       if (val !== null && typeof val === 'object' && !(val instanceof Uint8Array)) {
-        result = result.concat(flattenObject(val, curPath, curTokens));
+        result = result.concat(flattenObject(val, curPath, curTokens, visited, depth + 1));
       } else {
         result.push({ path: curPath, pathTokens: curTokens, type: typeof val, origVal: val, currentVal: val, isModified: false });
       }
@@ -3004,19 +3109,28 @@ const htmlContent = `<!DOCTYPE html>
   const dataFileInput = document.getElementById('data-file-input');
   function handleDataFiles(files) {
     Array.from(files).forEach(file => {
+      if (file && file.size > 50 * 1024 * 1024) {
+        showToast('File exceeds the 50MB safety limit.', 'danger');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         try {
           const json = JSON.parse(reader.result);
-          const lower = file.name.toLowerCase();
           if (Array.isArray(json)) {
-            const target = lower.includes('item') ? gameData.items : (lower.includes('weapon') ? gameData.weapons : (lower.includes('armor') ? gameData.armors : null));
-            if (target) {
-              json.forEach(x => { if (x && x.id && x.name) target[x.id] = x.name; });
+            const cat = detectDbCategory(file.name, json);
+            const target = cat && gameData[cat] ? gameData[cat] : null;
+            if (!target) {
+              showToast(\`Skipped \${file.name}: Unsupported reference data file.\`, 'warn');
+              return;
             }
-          } else if (json && typeof json === 'object') {
+            json.forEach(x => { if (x && x.id && x.name) target[x.id] = x.name; });
+          } else if (json && typeof json === 'object' && (Array.isArray(json.variables) || Array.isArray(json.switches))) {
             if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
             if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+          } else {
+            showToast(\`Skipped \${file.name}: Unsupported reference data file.\`, 'warn');
+            return;
           }
           setupVisualEditor();
           showToast(\`Loaded names from \${file.name}\`, 'success');

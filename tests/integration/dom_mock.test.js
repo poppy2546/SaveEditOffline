@@ -27,9 +27,11 @@ function createDomSandbox() {
       value: '',
       checked: false,
       textContent: '',
+      children,
       get innerHTML() { return _innerHTML; },
       set innerHTML(val) {
         _innerHTML = String(val || '');
+        if (_innerHTML === '') children.length = 0;
         for (const m of _innerHTML.matchAll(/id=["']([^"']+)["']/g)) {
           const dynId = m[1];
           if (!elementsById[dynId]) elementsById[dynId] = makeElement(dynId);
@@ -147,7 +149,7 @@ module.exports = async function runDomMockIntegrationTests(it) {
 
     const sampleSave = {
       party: { _gold: 8200, _items: { 1: 5 } },
-      actors: { _data: [null, { _name: 'Hero', _level: 1, _hp: 500, _mp: 50, _paramPlus: [0,0,0,0,0,0,0,0] }] },
+      actors: { _data: [null, { _name: 'Hero', _classId: 1, _level: 20, _exp: { 1: 52899 }, _hp: 500, _mp: 50, _paramPlus: [0,0,0,0,0,0,0,0] }] },
       variables: { _data: [0, 10] },
       switches: { _data: [false, true] }
     };
@@ -158,6 +160,17 @@ module.exports = async function runDomMockIntegrationTests(it) {
     });
 
     await new Promise(r => setImmediate(r));
+
+    // Verify LEVEL & EXP cards and auto-sync when lowering level
+    const statCards = elementsById['char-stats-container'].children;
+    const lvlInput = statCards[0].querySelector('input');
+    const expInput = statCards[1].querySelector('input');
+    lvlInput.value = '1';
+    lvlInput.onchange();
+    assert.strictEqual(Number(expInput.value), 0);
+
+    expInput.value = '1500';
+    expInput.onchange();
 
     const goldInput = elementsById['quick-gold-input'];
     assert.strictEqual(Number(goldInput.value), 8200);
@@ -172,6 +185,8 @@ module.exports = async function runDomMockIntegrationTests(it) {
     const exportedZipped = getLastBlob().parts[0];
     const exportedJson = JSON.parse(pako.inflate(exportedZipped, { to: 'string' }));
     assert.strictEqual(exportedJson.party._gold, 9999999);
+    assert.strictEqual(exportedJson.actors._data[1]._level, 1);
+    assert.strictEqual(exportedJson.actors._data[1]._exp[1], 1500);
 
     // Verify Clear File in Save Editor
     assert.strictEqual(typeof elementsById['btn-clear-save'].onclick, 'function');
@@ -182,5 +197,22 @@ module.exports = async function runDomMockIntegrationTests(it) {
     // Verify Clear Database Files buttons exist and are wired
     assert.strictEqual(typeof elementsById['btn-db-clear-all'].onclick, 'function');
     assert.strictEqual(typeof elementsById['btn-clear-db-header'].onclick, 'function');
+
+    // Verify unsupported DB file (e.g. Classes.json) is rejected and does NOT overwrite Weapons
+    const classesJson = JSON.stringify([null, { id: 1, name: 'NEET', expParams: [30,20,30,30], learnings: [], params: [[1,16],[1,10],[1,16]] }]);
+    elementsById['db-multi-file-input'].onchange({
+      target: { files: [{ name: 'Classes.json', _text: classesJson }] }
+    });
+    assert.ok(elementsById['toast'].textContent.includes('Skipped Classes.json'));
+    assert.notStrictEqual(elementsById['db-label-filename'].textContent, 'Classes.json');
+
+    // Verify renamed valid DB file (e.g. my_custom_file.json with wtypeId) is detected by content
+    const renamedWeaponsJson = JSON.stringify([null, { id: 1, name: 'Excalibur', wtypeId: 2, params: [0,0,500,0,0,0,0,0], price: 1000 }]);
+    elementsById['db-multi-file-input'].onchange({
+      target: { files: [{ name: 'my_custom_file.json', _text: renamedWeaponsJson }] }
+    });
+    assert.strictEqual(elementsById['db-label-type'].textContent, 'WEAPONS DATABASE');
+    assert.strictEqual(elementsById['db-label-filename'].textContent, 'my_custom_file.json');
+    assert.strictEqual(elementsById['db-slot-file-weapons'].textContent, 'my_custom_file.json');
   });
 };

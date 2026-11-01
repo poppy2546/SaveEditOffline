@@ -58,10 +58,20 @@ class MarshalReader {
   }
 
   readBytes(len) {
-    if (this.pos + len > this.buf.length) throw new Error('Unexpected EOF in Ruby Marshal bytes');
+    if (len < 0 || len > this.buf.length - this.pos) {
+      throw new Error('Invalid or out-of-bounds length in Ruby Marshal bytes');
+    }
     const slice = this.buf.subarray(this.pos, this.pos + len);
     this.pos += len;
     return slice;
+  }
+
+  readCount() {
+    const count = this.readFixnum();
+    if (count < 0 || count > this.buf.length - this.pos) {
+      throw new Error('Invalid collection length in Ruby Marshal');
+    }
+    return count;
   }
 
   readFixnum() {
@@ -114,10 +124,12 @@ class MarshalReader {
         case ':': return this.readSymbol();
         case ';': {
           const idx = this.readFixnum();
+          if (idx < 0 || idx >= this.symbols.length) throw new Error('Invalid symbol link index');
           return this.symbols[idx];
         }
         case '@': {
           const idx = this.readFixnum();
+          if (idx < 0 || idx >= this.objects.length) throw new Error('Invalid object link index');
           return this.objects[idx];
         }
         case '"': {
@@ -125,14 +137,17 @@ class MarshalReader {
           const bytes = this.readBytes(len);
           let str;
           try { str = new TextDecoder('utf-8').decode(bytes); }
-          catch(e) { str = String.fromCharCode.apply(null, bytes); }
+          catch(e) {
+            str = '';
+            for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
+          }
           this.objects.push(str);
           return str;
         }
         case 'I': {
           // Wrapped with instance variables (e.g. String with UTF-8 encoding ivar)
           const obj = this.readAny();
-          const ivarCount = this.readFixnum();
+          const ivarCount = this.readCount();
           const ivars = {};
           for (let i = 0; i < ivarCount; i++) {
             const k = this.readAny();
@@ -148,7 +163,7 @@ class MarshalReader {
         case '[': {
           const arr = [];
           this.objects.push(arr);
-          const len = this.readFixnum();
+          const len = this.readCount();
           for (let i = 0; i < len; i++) {
             arr.push(this.readAny());
           }
@@ -157,7 +172,7 @@ class MarshalReader {
         case '{': {
           const hash = {};
           this.objects.push(hash);
-          const len = this.readFixnum();
+          const len = this.readCount();
           for (let i = 0; i < len; i++) {
             const k = this.readAny();
             const v = this.readAny();
@@ -170,7 +185,7 @@ class MarshalReader {
           const className = this.readAny();
           const obj = new RubyObject(className);
           this.objects.push(obj);
-          const ivarCount = this.readFixnum();
+          const ivarCount = this.readCount();
           for (let i = 0; i < ivarCount; i++) {
             const k = this.readAny();
             const v = this.readAny();

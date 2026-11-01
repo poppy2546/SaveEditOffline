@@ -32,4 +32,18 @@ module.exports = function runRubyMarshalUnitTests(it) {
       RubyMarshal.decode(new Uint8Array(deepBytes));
     }, /depth limit exceeded/i);
   });
+
+  it('RubyMarshal: Rejects negative or out-of-bounds lengths to prevent DoS', () => {
+    // String '"' (0x22) with negative fixnum -1 (0xfa)
+    const negLenBytes = new Uint8Array([0x04, 0x08, 0x22, 0xfa]);
+    assert.throws(() => {
+      RubyMarshal.decode(negLenBytes);
+    }, /invalid or out-of-bounds length/i);
+
+    // Array '[' (0x5b) with huge count 100000 (0x03, 0xa0, 0x86, 0x01) on tiny buffer
+    const hugeArrBytes = new Uint8Array([0x04, 0x08, 0x5b, 0x03, 0xa0, 0x86, 0x01]);
+    assert.throws(() => {
+      RubyMarshal.decode(hugeArrBytes);
+    }, /invalid collection length/i);
+  });
 };
