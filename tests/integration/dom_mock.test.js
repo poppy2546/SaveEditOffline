@@ -74,7 +74,7 @@ function createDomSandbox() {
     const id = m[1];
     elementsById[id] = makeElement(id);
   }
-  ['weapons', 'armors', 'items', 'skills'].forEach(cat => {
+  ['weapons', 'armors', 'items', 'skills', 'enemies', 'classes', 'actors'].forEach(cat => {
     const btn = elementsById[`slot-btn-${cat}`] || makeElement(`slot-btn-${cat}`, 'BUTTON');
     btn.setAttribute('data-cat', cat);
     elementsById[`slot-btn-${cat}`] = btn;
@@ -147,11 +147,16 @@ module.exports = async function runDomMockIntegrationTests(it) {
     elementsById['btn-change-file'].click();
     assert.strictEqual(elementsById['file-input'].clicked, true);
 
+    const varArr = new Array(605).fill(0);
+    varArr[1] = 10;
+    varArr[600] = 777;
     const sampleSave = {
       party: { _gold: 8200, _items: { 1: 5 } },
-      actors: { _data: [null, { _name: 'Hero', _classId: 1, _level: 20, _exp: { 1: 52899 }, _hp: 500, _mp: 50, _paramPlus: [0,0,0,0,0,0,0,0] }] },
-      variables: { _data: [0, 10] },
-      switches: { _data: [false, true] }
+      actors: { _data: [null, { _name: 'Hero', _classId: 1, _level: 20, _exp: { 1: 52899 }, _hp: 500, _mp: 50, _states: [4, 5], _skills: [1, 2], _paramPlus: [0,0,0,0,0,0,0,0] }] },
+      variables: { _data: varArr },
+      switches: { _data: [false, true] },
+      system: { _saveEnabled: false, _encounterEnabled: true },
+      player: { _moveSpeed: 4, _through: false }
     };
     const fileBuffer = Buffer.from(pako.deflate(JSON.stringify(sampleSave), { to: 'string', level: 1 }), 'utf8');
 
@@ -161,10 +166,43 @@ module.exports = async function runDomMockIntegrationTests(it) {
 
     await new Promise(r => setImmediate(r));
 
-    // Verify LEVEL & EXP cards and auto-sync when lowering level
+    // Phase 1: Verify Cure States, QoL Bar, and Variables > 500 search
+    elementsById['btn-char-cure-states'].click();
+    const qolCards = elementsById['qol-system-bar'].children;
+    const moveSpdIn = qolCards[0].querySelector('input');
+    moveSpdIn.value = '6';
+    moveSpdIn.onchange({ target: moveSpdIn });
+    const noclipIn = qolCards[1].querySelector('input');
+    noclipIn.checked = true;
+    noclipIn.onchange({ target: noclipIn });
+    const allowSaveIn = qolCards[2].querySelector('input');
+    allowSaveIn.checked = true;
+    allowSaveIn.onchange({ target: allowSaveIn });
+
+    elementsById['variables-search'].value = '600';
+    elementsById['variables-search'].oninput();
+    assert.strictEqual(elementsById['variables-cards-container'].children.length, 1);
+
+    // Phase 2: Load Items.json with a normal item (itypeId: 1) and a Key Item (itypeId: 2) and test Safe Unlock All
+    const itemsDbJson = JSON.stringify([
+      null,
+      { id: 1, name: 'Potion', itypeId: 1, price: 50 },
+      { id: 2, name: 'Hi-Potion', itypeId: 1, price: 200 },
+      { id: 3, name: 'Dungeon Key', itypeId: 2, price: 0 }
+    ]);
+    elementsById['db-multi-file-input'].onchange({
+      target: { files: [{ name: 'Items.json', _text: itemsDbJson }] }
+    });
+    elementsById['btn-items-unlock-safe'].click();
+
+    // Verify LEVEL, EXP, and NAME cards and auto-sync when lowering level
     const statCards = elementsById['char-stats-container'].children;
+    // Card 0 is LEVEL, Card 1 is EXP, Card 4 is NAME
     const lvlInput = statCards[0].querySelector('input');
     const expInput = statCards[1].querySelector('input');
+    const nameInput = statCards[4].querySelector('input');
+    nameInput.value = 'Iris';
+    nameInput.onchange();
     lvlInput.value = '1';
     lvlInput.onchange();
     assert.strictEqual(Number(expInput.value), 0);
@@ -185,8 +223,16 @@ module.exports = async function runDomMockIntegrationTests(it) {
     const exportedZipped = getLastBlob().parts[0];
     const exportedJson = JSON.parse(pako.inflate(exportedZipped, { to: 'string' }));
     assert.strictEqual(exportedJson.party._gold, 9999999);
+    assert.strictEqual(exportedJson.actors._data[1]._name, 'Iris');
     assert.strictEqual(exportedJson.actors._data[1]._level, 1);
     assert.strictEqual(exportedJson.actors._data[1]._exp[1], 1500);
+    assert.deepStrictEqual(exportedJson.actors._data[1]._states, []);
+    assert.strictEqual(exportedJson.player._through, true);
+    assert.strictEqual(exportedJson.player._moveSpeed, 6);
+    assert.strictEqual(exportedJson.system._saveEnabled, true);
+    // Safe Unlock All should add Hi-Potion (id 2) but NOT Dungeon Key (id 3, Key Item)
+    assert.strictEqual(exportedJson.party._items[2], 99);
+    assert.strictEqual(exportedJson.party._items[3], undefined);
 
     // Verify Clear File in Save Editor
     assert.strictEqual(typeof elementsById['btn-clear-save'].onclick, 'function');
@@ -198,13 +244,38 @@ module.exports = async function runDomMockIntegrationTests(it) {
     assert.strictEqual(typeof elementsById['btn-db-clear-all'].onclick, 'function');
     assert.strictEqual(typeof elementsById['btn-clear-db-header'].onclick, 'function');
 
-    // Verify unsupported DB file (e.g. Classes.json) is rejected and does NOT overwrite Weapons
-    const classesJson = JSON.stringify([null, { id: 1, name: 'NEET', expParams: [30,20,30,30], learnings: [], params: [[1,16],[1,10],[1,16]] }]);
+    // Phase 3: Verify Classes.json, Enemies.json, Actors.json load into their dedicated slots and never overwrite Weapons
+    const classesJson = JSON.stringify([null, { id: 1, name: 'NEET', expParams: [30,20,30,30], learnings: [{ level: 15, skillId: 5 }], params: [[1,16],[1,10],[1,16]] }]);
     elementsById['db-multi-file-input'].onchange({
       target: { files: [{ name: 'Classes.json', _text: classesJson }] }
     });
-    assert.ok(elementsById['toast'].textContent.includes('Skipped Classes.json'));
-    assert.notStrictEqual(elementsById['db-label-filename'].textContent, 'Classes.json');
+    assert.strictEqual(elementsById['db-label-type'].textContent, 'CLASSES DATABASE');
+    assert.strictEqual(elementsById['db-slot-file-classes'].textContent, 'Classes.json');
+    assert.notStrictEqual(elementsById['db-slot-file-weapons'].textContent, 'Classes.json');
+    elementsById['btn-bulk-class-fast-exp'].click();
+    elementsById['btn-bulk-class-lv1-skills'].click();
+
+    const enemiesJson = JSON.stringify([null, { id: 1, name: 'Slime', exp: 10, gold: 5, params: [100,0,10,10,10,10,10,10], dropItems: [{ kind: 1, dataId: 1, denominator: 10 }] }]);
+    elementsById['db-multi-file-input'].onchange({
+      target: { files: [{ name: 'Enemies.json', _text: enemiesJson }] }
+    });
+    assert.strictEqual(elementsById['db-label-type'].textContent, 'ENEMIES DATABASE');
+    elementsById['btn-bulk-enemy-drops'].click();
+    elementsById['btn-bulk-enemy-rewards'].click();
+
+    const actorsJson = JSON.stringify([null, { id: 1, name: 'Iris', initialLevel: 1, maxLevel: 99, classId: 1 }]);
+    elementsById['db-multi-file-input'].onchange({
+      target: { files: [{ name: 'Actors.json', _text: actorsJson }] }
+    });
+    assert.strictEqual(elementsById['db-label-type'].textContent, 'ACTORS DATABASE');
+    elementsById['btn-bulk-actor-maxlv'].click();
+
+    // Verify unsupported DB file (e.g. MapInfos.json) is safely skipped
+    const mapInfosJson = JSON.stringify([null, { id: 1, name: 'Town', parentId: 0, order: 1 }]);
+    elementsById['db-multi-file-input'].onchange({
+      target: { files: [{ name: 'MapInfos.json', _text: mapInfosJson }] }
+    });
+    assert.ok(elementsById['toast'].textContent.includes('Skipped MapInfos.json'));
 
     // Verify renamed valid DB file (e.g. my_custom_file.json with wtypeId) is detected by content
     const renamedWeaponsJson = JSON.stringify([null, { id: 1, name: 'Excalibur', wtypeId: 2, params: [0,0,500,0,0,0,0,0], price: 1000 }]);

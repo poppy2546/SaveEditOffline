@@ -892,26 +892,31 @@
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--bg-card); padding:12px 16px; border-radius:var(--radius-md); border:1px solid var(--border-color);">
         <label for="char-dropdown" style="font-weight:600; color:var(--text-secondary); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.03em;">Character</label>
         <select class="char-select" id="char-dropdown" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.88rem; font-weight:500; min-width:250px;"></select>
-        <div style="display:flex; gap:8px; margin-left:auto;">
+        <div style="display:flex; gap:8px; margin-left:auto; flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" id="btn-char-cure-states" type="button" title="Clear poison, death, and negative status effects">Cure States</button>
           <button class="btn btn-secondary btn-sm" id="btn-char-full-heal" type="button">Full Restore (HP/MP)</button>
           <button class="btn btn-gold btn-sm" id="btn-char-max-stats" type="button">Max All Stats (9999)</button>
         </div>
       </div>
+      <div id="qol-system-bar" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px;"></div>
       <div class="stats-grid" id="char-stats-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;"></div>
+      <div id="char-skills-panel" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:14px 16px;"></div>
     </div>
 
     <!-- TAB 2: INVENTORY -->
     <div class="section-panel" id="tab-inventory">
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
-        <div style="flex:1; min-width:240px;">
+        <div style="flex:1; min-width:220px;">
           <input type="text" id="inventory-search" placeholder="Filter by item ID or name..." style="width:100%; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         </div>
-        <div style="display:flex; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
             <input type="checkbox" id="inventory-owned-only" checked> Owned only (&gt;0)
           </label>
+          <select id="inventory-picker-select" style="display:none; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-items-set-all-99" type="button">Set All Owned to 99</button>
-          <button class="btn btn-primary btn-sm" id="btn-add-item-dialog" type="button">+ Add Item ID</button>
+          <button class="btn btn-gold btn-sm" id="btn-items-unlock-safe" type="button" title="Unlock all regular items from Items.json while skipping Key Items (itypeId=2) to protect story quests">Safe Unlock All (No Key Items)</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-item-dialog" type="button">+ Add Item</button>
         </div>
       </div>
       <div class="items-card-grid" id="inventory-cards-container"></div>
@@ -919,41 +924,58 @@
 
     <!-- TAB 3: WEAPONS -->
     <div class="section-panel" id="tab-weapons">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; gap:12px;">
-        <input type="text" id="weapons-search" placeholder="Filter by weapon ID or name..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
-        <button class="btn btn-primary btn-sm" id="btn-add-weapon-dialog" type="button">+ Add Weapon ID</button>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
+        <input type="text" id="weapons-search" placeholder="Filter by weapon ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <select id="weapons-picker-select" style="display:none; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <button class="btn btn-secondary btn-sm" id="btn-weapons-set-all-99" type="button">Set Owned to 99</button>
+          <button class="btn btn-gold btn-sm" id="btn-weapons-unlock-all" type="button">Unlock All DB Weapons</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-weapon-dialog" type="button">+ Add Weapon</button>
+        </div>
       </div>
       <div class="items-card-grid" id="weapons-cards-container"></div>
     </div>
 
     <!-- TAB 4: ARMORS -->
     <div class="section-panel" id="tab-armors">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; gap:12px;">
-        <input type="text" id="armors-search" placeholder="Filter by armor ID or name..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
-        <button class="btn btn-primary btn-sm" id="btn-add-armor-dialog" type="button">+ Add Armor ID</button>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
+        <input type="text" id="armors-search" placeholder="Filter by armor ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <select id="armors-picker-select" style="display:none; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <button class="btn btn-secondary btn-sm" id="btn-armors-set-all-99" type="button">Set Owned to 99</button>
+          <button class="btn btn-gold btn-sm" id="btn-armors-unlock-all" type="button">Unlock All DB Armors</button>
+          <button class="btn btn-primary btn-sm" id="btn-add-armor-dialog" type="button">+ Add Armor</button>
+        </div>
       </div>
       <div class="items-card-grid" id="armors-cards-container"></div>
     </div>
 
     <!-- TAB 5: VARIABLES -->
     <div class="section-panel" id="tab-variables">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
-        <input type="text" id="variables-search" placeholder="Filter by variable ID, name, or value..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
-        <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <input type="checkbox" id="vars-nonzero-only" checked> Non-zero only
-        </label>
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+        <input type="text" id="variables-search" placeholder="Filter by variable ID (#1-9999), name, or value..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="vars-nonzero-only" checked> Non-zero only
+          </label>
+          <input type="file" id="compare-save-input" style="display:none;">
+          <button class="btn btn-secondary btn-sm" id="btn-compare-save-vars" type="button" title="Compare with another save file to find which variables changed">Compare Save (Diff Finder)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-clear-compare-vars" type="button" style="display:none;">Clear Diff</button>
+        </div>
       </div>
+      <div id="vars-diff-banner" style="display:none; background:var(--bg-header); border:1px solid var(--accent-sand); border-radius:var(--radius-sm); padding:8px 14px; font-size:0.8rem; color:var(--accent-sand);"></div>
       <div class="items-card-grid" id="variables-cards-container"></div>
     </div>
 
     <!-- TAB 6: SWITCHES -->
     <div class="section-panel" id="tab-switches">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; justify-content:space-between; gap:12px;">
-        <input type="text" id="switches-search" placeholder="Filter by switch ID or name..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
+        <input type="text" id="switches-search" placeholder="Filter by switch ID (#1-9999) or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <select id="switches-filter" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
           <option value="all">All Switches</option>
           <option value="on">ON Only</option>
           <option value="off">OFF Only</option>
+          <option value="diff">Changed in Diff Only</option>
         </select>
       </div>
       <div class="items-card-grid" id="switches-cards-container"></div>
@@ -1013,13 +1035,14 @@
         </div>
       </div>
       <input type="file" id="db-multi-file-input" multiple accept=".json" style="display:none;">
-      <div style="display:flex; gap:8px;">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <button class="btn btn-secondary btn-sm" id="btn-db-browse-multi" type="button">Select JSON Files</button>
+        <button class="btn btn-primary btn-sm" id="btn-db-download-all" type="button" title="Download all modified database JSON files at once">Download All Modified</button>
         <button class="btn btn-secondary btn-sm" id="btn-db-clear-all" type="button" title="Clear all loaded database files">Clear All Files</button>
       </div>
     </div>
 
-    <!-- 4 Category Status Cards -->
+    <!-- Category Status Cards -->
     <div class="db-slot-grid">
       <button class="db-cat-btn active" data-cat="weapons" id="slot-btn-weapons" type="button">
         <div class="db-slot-top">
@@ -1062,6 +1085,39 @@
         <div class="db-slot-sub">
           <span id="db-slot-status-skills">Not loaded</span>
           <span id="db-slot-mod-skills" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
+        </div>
+      </button>
+
+      <button class="db-cat-btn" data-cat="enemies" id="slot-btn-enemies" type="button">
+        <div class="db-slot-top">
+          <span>Enemies</span>
+          <span id="db-slot-file-enemies" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Enemies.json</span>
+        </div>
+        <div class="db-slot-sub">
+          <span id="db-slot-status-enemies">Not loaded</span>
+          <span id="db-slot-mod-enemies" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
+        </div>
+      </button>
+
+      <button class="db-cat-btn" data-cat="classes" id="slot-btn-classes" type="button">
+        <div class="db-slot-top">
+          <span>Classes</span>
+          <span id="db-slot-file-classes" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Classes.json</span>
+        </div>
+        <div class="db-slot-sub">
+          <span id="db-slot-status-classes">Not loaded</span>
+          <span id="db-slot-mod-classes" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
+        </div>
+      </button>
+
+      <button class="db-cat-btn" data-cat="actors" id="slot-btn-actors" type="button">
+        <div class="db-slot-top">
+          <span>Actors</span>
+          <span id="db-slot-file-actors" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Actors.json</span>
+        </div>
+        <div class="db-slot-sub">
+          <span id="db-slot-status-actors">Not loaded</span>
+          <span id="db-slot-mod-actors" style="color:var(--accent-sage-bright); font-weight:600; font-family:var(--font-mono);"></span>
         </div>
       </button>
     </div>
@@ -1495,12 +1551,15 @@ if (typeof module !== 'undefined') {
     name: '', size: 0, rawBytes: null, format: '', formatLabel: '', parsedRoot: null, engine: ''
   };
 
-  // Multi-file Database Store (keeps Weapons, Armors, Items, Skills in memory simultaneously)
+  // Multi-file Database Store (keeps Weapons, Armors, Items, Skills, Enemies, Classes, Actors in memory simultaneously)
   const dbStore = {
     weapons: null,
     armors: null,
     items: null,
-    skills: null
+    skills: null,
+    enemies: null,
+    classes: null,
+    actors: null
   };
 
   // Active Database State
@@ -1514,7 +1573,8 @@ if (typeof module !== 'undefined') {
     modifiedIds: new Set()
   };
 
-  const gameData = { items: {}, weapons: {}, armors: {}, variables: {}, switches: {} };
+  const gameData = { items: {}, itemTypes: {}, weapons: {}, armors: {}, skills: {}, variables: {}, switches: {} };
+  let compareBaseline = null;
   let flatEntries = [];
   let activeCharacterIndex = 1;
   let originalGold = 0;
@@ -1673,7 +1733,7 @@ if (typeof module !== 'undefined') {
 
   function isDatabaseJsonFilename(name) {
     const n = name.toLowerCase();
-    return n === 'weapons.json' || n === 'armors.json' || n === 'items.json' || n === 'skills.json' || n === 'system.json';
+    return n === 'weapons.json' || n === 'armors.json' || n === 'items.json' || n === 'skills.json' || n === 'enemies.json' || n === 'classes.json' || n === 'actors.json' || n === 'system.json';
   }
 
   function handleIncomingFile(file) {
@@ -1700,14 +1760,20 @@ if (typeof module !== 'undefined') {
     if (!Array.isArray(jsonArr)) return null;
     const sample = jsonArr.find(x => x && typeof x === 'object' && x.id);
     if (sample) {
-      // Reject non-item/equip/skill RPG Maker tables (e.g. Classes.json has 2D params, Actors/Enemies/States/etc.)
-      if (Array.isArray(sample.params) && Array.isArray(sample.params[0])) return null;
-      if ('expParams' in sample || 'learnings' in sample || 'classId' in sample || 'equips' in sample ||
-          'initialLevel' in sample || 'dropItems' in sample || 'actions' in sample || 'battlerName' in sample ||
-          'restriction' in sample || 'autoRemovalTiming' in sample || 'members' in sample || 'pages' in sample ||
+      // Reject unsupported RPG Maker tables (States, Troops, Tilesets, MapInfos, CommonEvents, Animations)
+      if ('restriction' in sample || 'autoRemovalTiming' in sample || 'members' in sample || 'pages' in sample ||
           'tilesetNames' in sample || 'parentId' in sample || 'list' in sample || 'frames' in sample ||
           'timings' in sample || 'effectName' in sample) {
         return null;
+      }
+      if ((Array.isArray(sample.params) && Array.isArray(sample.params[0])) || 'expParams' in sample || 'learnings' in sample) {
+        return 'classes';
+      }
+      if ('classId' in sample || 'initialLevel' in sample || 'maxLevel' in sample || 'equips' in sample) {
+        return 'actors';
+      }
+      if ('dropItems' in sample || 'actions' in sample || 'battlerName' in sample) {
+        return 'enemies';
       }
       if ('wtypeId' in sample) return 'weapons';
       if ('atypeId' in sample || 'etypeId' in sample) return 'armors';
@@ -1719,6 +1785,9 @@ if (typeof module !== 'undefined') {
     if (baseName.includes('armor')) return 'armors';
     if (baseName.includes('item')) return 'items';
     if (baseName.includes('skill')) return 'skills';
+    if (baseName.includes('enem')) return 'enemies';
+    if (baseName.includes('class')) return 'classes';
+    if (baseName.includes('actor')) return 'actors';
     return null;
   }
 
@@ -1744,7 +1813,12 @@ if (typeof module !== 'undefined') {
     const validItems = json.filter(x => x && x.id);
 
     if (gameData[cat]) {
-      validItems.forEach(x => { if (x.id && x.name) gameData[cat][x.id] = x.name; });
+      validItems.forEach(x => {
+        if (x.id && x.name) {
+          gameData[cat][x.id] = x.name;
+          if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
+        }
+      });
     }
 
     dbStore[cat] = {
@@ -1795,7 +1869,10 @@ if (typeof module !== 'undefined') {
   }
 
   function syncCurrentDbFromStore(cat) {
-    const defaultNames = { weapons: 'Weapons.json', armors: 'Armors.json', items: 'Items.json', skills: 'Skills.json' };
+    const defaultNames = {
+      weapons: 'Weapons.json', armors: 'Armors.json', items: 'Items.json', skills: 'Skills.json',
+      enemies: 'Enemies.json', classes: 'Classes.json', actors: 'Actors.json'
+    };
     if (dbStore[cat]) {
       currentDb.category = cat;
       currentDb.fileName = dbStore[cat].fileName;
@@ -1830,12 +1907,13 @@ if (typeof module !== 'undefined') {
   }
 
   function clearAllDatabaseFiles() {
-    const loaded = ['weapons', 'armors', 'items', 'skills'].some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
+    const allCats = ['weapons', 'armors', 'items', 'skills', 'enemies', 'classes', 'actors'];
+    const loaded = allCats.some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
     if (!loaded) {
       showToast('No database files are currently loaded.', 'info');
       return;
     }
-    ['weapons', 'armors', 'items', 'skills'].forEach(c => {
+    allCats.forEach(c => {
       dbStore[c] = null;
       if (gameData && gameData[c]) gameData[c] = {};
     });
@@ -1849,8 +1927,11 @@ if (typeof module !== 'undefined') {
   }
 
   function updateDbSlotBadges() {
-    const defaultNames = { weapons: 'Weapons.json', armors: 'Armors.json', items: 'Items.json', skills: 'Skills.json' };
-    ['weapons', 'armors', 'items', 'skills'].forEach(cat => {
+    const defaultNames = {
+      weapons: 'Weapons.json', armors: 'Armors.json', items: 'Items.json', skills: 'Skills.json',
+      enemies: 'Enemies.json', classes: 'Classes.json', actors: 'Actors.json'
+    };
+    Object.keys(defaultNames).forEach(cat => {
       const slotBtn = document.getElementById('slot-btn-' + cat);
       const statusEl = document.getElementById('db-slot-status-' + cat);
       const modEl = document.getElementById('db-slot-mod-' + cat);
@@ -1891,7 +1972,10 @@ if (typeof module !== 'undefined') {
       weapons: 'WEAPONS DATABASE',
       armors: 'ARMORS DATABASE',
       items: 'ITEMS DATABASE',
-      skills: 'SKILLS DATABASE'
+      skills: 'SKILLS DATABASE',
+      enemies: 'ENEMIES DATABASE',
+      classes: 'CLASSES DATABASE',
+      actors: 'ACTORS DATABASE'
     };
     document.getElementById('db-label-type').textContent = catTitles[cat] || 'DATABASE MODDER';
   }
@@ -1933,6 +2017,22 @@ if (typeof module !== 'undefined') {
       buttonsHtml += `
         <button class="btn btn-primary btn-sm" id="btn-bulk-free-mp-all" type="button">All 0 MP/TP Cost</button>
       `;
+    } else if (cat === 'enemies') {
+      buttonsHtml += `
+        <button class="btn btn-gold btn-sm" id="btn-bulk-enemy-drops" type="button">All 100% Drop Rate</button>
+        <button class="btn btn-primary btn-sm" id="btn-bulk-enemy-rewards" type="button">All EXP/Gold x5</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-enemy-1hp" type="button">All 1 HP (Easy Win)</button>
+      `;
+    } else if (cat === 'classes') {
+      buttonsHtml += `
+        <button class="btn btn-gold btn-sm" id="btn-bulk-class-fast-exp" type="button">All Fast EXP Curve</button>
+        <button class="btn btn-primary btn-sm" id="btn-bulk-class-lv1-skills" type="button">All Skills at Lv 1</button>
+      `;
+    } else if (cat === 'actors') {
+      buttonsHtml += `
+        <button class="btn btn-gold btn-sm" id="btn-bulk-actor-maxlv" type="button">All Max Level 999</button>
+        <button class="btn btn-primary btn-sm" id="btn-bulk-actor-initlv" type="button">All Initial Level 99</button>
+      `;
     }
     buttonsHtml += `
       <button class="btn btn-secret btn-sm" id="btn-secret-db-god" type="button" title="Apply max parameters and zero cost across this entire table">Max Table Preset</button>
@@ -1961,10 +2061,98 @@ if (typeof module !== 'undefined') {
           } else if (cat === 'skills') {
             if (it.mpCost !== undefined) it.mpCost = 0;
             if (it.tpCost !== undefined) it.tpCost = 0;
+          } else if (cat === 'enemies') {
+            if (Array.isArray(it.dropItems)) it.dropItems.forEach(d => { if (d && d.kind > 0) d.denominator = 1; });
+            if (typeof it.exp === 'number') it.exp = Math.max(100, it.exp * 10);
+            if (typeof it.gold === 'number') it.gold = Math.max(100, it.gold * 10);
+          } else if (cat === 'classes') {
+            it.expParams = [10, 0, 0, 0];
+            if (Array.isArray(it.learnings)) it.learnings.forEach(l => { if (l) l.level = 1; });
+          } else if (cat === 'actors') {
+            it.maxLevel = 999;
+            it.initialLevel = 99;
           }
           currentDb.modifiedIds.add(it.id);
         });
         finishBulkAction('Applied Max Table Preset to all entries.');
+      };
+    }
+
+    const btnEnemyDrops = document.getElementById('btn-bulk-enemy-drops');
+    if (btnEnemyDrops) {
+      btnEnemyDrops.onclick = () => {
+        validItems.forEach(it => {
+          if (Array.isArray(it.dropItems)) {
+            it.dropItems.forEach(d => { if (d && d.kind > 0) d.denominator = 1; });
+            currentDb.modifiedIds.add(it.id);
+          }
+        });
+        finishBulkAction('Set all enemy drop rates to 100% (1/1).');
+      };
+    }
+    const btnEnemyRewards = document.getElementById('btn-bulk-enemy-rewards');
+    if (btnEnemyRewards) {
+      btnEnemyRewards.onclick = () => {
+        validItems.forEach(it => {
+          if (typeof it.exp === 'number') it.exp *= 5;
+          if (typeof it.gold === 'number') it.gold *= 5;
+          currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('Multiplied all enemy EXP and Gold rewards by 5x.');
+      };
+    }
+    const btnEnemy1Hp = document.getElementById('btn-bulk-enemy-1hp');
+    if (btnEnemy1Hp) {
+      btnEnemy1Hp.onclick = () => {
+        validItems.forEach(it => {
+          if (Array.isArray(it.params) && !Array.isArray(it.params[0])) {
+            it.params[0] = 1;
+            currentDb.modifiedIds.add(it.id);
+          }
+        });
+        finishBulkAction('Set all enemy Max HP to 1.');
+      };
+    }
+    const btnClassFastExp = document.getElementById('btn-bulk-class-fast-exp');
+    if (btnClassFastExp) {
+      btnClassFastExp.onclick = () => {
+        validItems.forEach(it => {
+          it.expParams = [10, 0, 0, 0];
+          currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('Set fast leveling EXP curve on all classes.');
+      };
+    }
+    const btnClassLv1Skills = document.getElementById('btn-bulk-class-lv1-skills');
+    if (btnClassLv1Skills) {
+      btnClassLv1Skills.onclick = () => {
+        validItems.forEach(it => {
+          if (Array.isArray(it.learnings)) {
+            it.learnings.forEach(l => { if (l) l.level = 1; });
+            currentDb.modifiedIds.add(it.id);
+          }
+        });
+        finishBulkAction('Set all class skills to unlock at Level 1.');
+      };
+    }
+    const btnActorMaxLv = document.getElementById('btn-bulk-actor-maxlv');
+    if (btnActorMaxLv) {
+      btnActorMaxLv.onclick = () => {
+        validItems.forEach(it => {
+          it.maxLevel = 999;
+          currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('Set Max Level cap to 999 for all actors.');
+      };
+    }
+    const btnActorInitLv = document.getElementById('btn-bulk-actor-initlv');
+    if (btnActorInitLv) {
+      btnActorInitLv.onclick = () => {
+        validItems.forEach(it => {
+          it.initialLevel = 99;
+          currentDb.modifiedIds.add(it.id);
+        });
+        finishBulkAction('Set Initial Level to 99 for all actors.');
       };
     }
 
@@ -2154,6 +2342,16 @@ if (typeof module !== 'undefined') {
     if (currentDb.category === 'items') {
       const inf = item.consumable === false ? 'INF · ' : '';
       return inf + (item.price !== undefined ? `${item.price} G` : '');
+    }
+    if (currentDb.category === 'enemies') {
+      return `${item.exp || 0} EXP · ${item.gold || 0} G`;
+    }
+    if (currentDb.category === 'classes') {
+      const skillsCount = Array.isArray(item.learnings) ? item.learnings.length : 0;
+      return `${skillsCount} skills`;
+    }
+    if (currentDb.category === 'actors') {
+      return `Lv ${item.initialLevel || 1}–${item.maxLevel || 99}`;
     }
     return '';
   }
@@ -2355,6 +2553,77 @@ if (typeof module !== 'undefined') {
           </div>
         </div>
       `;
+    } else if (cat === 'enemies') {
+      const paramLabels = [
+        'MHP (Max HP)', 'MMP (Max MP)', 'ATK (Attack)', 'DEF (Defense)',
+        'MAT (Magic Attack)', 'MDF (Magic Defense)', 'AGI (Agility)', 'LUK (Luck)'
+      ];
+      const p = (Array.isArray(item.params) && !Array.isArray(item.params[0])) ? item.params : [0,0,0,0,0,0,0,0];
+      let paramInputs = '';
+      paramLabels.forEach((label, i) => {
+        paramInputs += `
+          <div class="db-field-box">
+            <span class="db-field-label">${label}</span>
+            <input type="number" class="stat-input db-stat-input" data-idx="${i}" value="${p[i]||0}">
+          </div>
+        `;
+      });
+      specificHtml = `
+        <div class="preset-bar">
+          <span style="font-weight:600; color:var(--text-secondary); font-size:0.76rem; text-transform:uppercase;">Quick Presets:</span>
+          <button class="btn btn-gold btn-sm" id="btn-enemy-100-drop" type="button">100% Drop Rate</button>
+          <button class="btn btn-primary btn-sm" id="btn-enemy-1hp" type="button">Set HP to 1 (Easy Boss)</button>
+        </div>
+        <div class="db-field-grid">
+          <div class="db-field-box">
+            <span class="db-field-label">EXP Reward</span>
+            <input type="number" class="stat-input" id="enemy-exp" value="${item.exp || 0}">
+          </div>
+          <div class="db-field-box">
+            <span class="db-field-label">Gold Reward</span>
+            <input type="number" class="stat-input" id="enemy-gold" value="${item.gold || 0}">
+          </div>
+        </div>
+        <div class="db-field-grid">${paramInputs}</div>
+      `;
+    } else if (cat === 'classes') {
+      const expP = Array.isArray(item.expParams) ? item.expParams : [30, 20, 30, 30];
+      specificHtml = `
+        <div class="preset-bar">
+          <span style="font-weight:600; color:var(--text-secondary); font-size:0.76rem; text-transform:uppercase;">Quick Presets:</span>
+          <button class="btn btn-gold btn-sm" id="btn-class-fast-exp" type="button">Fast Leveling Curve</button>
+          <button class="btn btn-primary btn-sm" id="btn-class-lv1-skills" type="button">Unlock All Class Skills at Lv 1</button>
+          <button class="btn btn-secondary btn-sm" id="btn-class-2x-curve" type="button">Boost Lv1–99 Stat Growth (2x)</button>
+        </div>
+        <div class="db-field-grid">
+          <div class="db-field-box">
+            <span class="db-field-label">EXP Basis (Lower = Faster Leveling)</span>
+            <input type="number" class="stat-input" id="class-exp-basis" value="${expP[0] || 30}">
+          </div>
+        </div>
+      `;
+    } else if (cat === 'actors') {
+      specificHtml = `
+        <div class="preset-bar">
+          <span style="font-weight:600; color:var(--text-secondary); font-size:0.76rem; text-transform:uppercase;">Quick Presets:</span>
+          <button class="btn btn-gold btn-sm" id="btn-actor-cap-999" type="button">Max Level Cap 999</button>
+          <button class="btn btn-primary btn-sm" id="btn-actor-init-99" type="button">Initial Level 99</button>
+        </div>
+        <div class="db-field-grid">
+          <div class="db-field-box">
+            <span class="db-field-label">Initial Level</span>
+            <input type="number" class="stat-input" id="actor-init-lvl" value="${item.initialLevel || 1}">
+          </div>
+          <div class="db-field-box">
+            <span class="db-field-label">Max Level Cap</span>
+            <input type="number" class="stat-input" id="actor-max-lvl" value="${item.maxLevel || 99}">
+          </div>
+          <div class="db-field-box">
+            <span class="db-field-label">Nickname</span>
+            <input type="text" class="stat-input" id="actor-nickname" value="${escapeHtml(item.nickname || '')}">
+          </div>
+        </div>
+      `;
     }
 
     container.innerHTML = `
@@ -2404,6 +2673,9 @@ if (typeof module !== 'undefined') {
     if (cat === 'armors') return 'ARM';
     if (cat === 'items') return 'ITM';
     if (cat === 'skills') return 'SKL';
+    if (cat === 'enemies') return 'ENM';
+    if (cat === 'classes') return 'CLS';
+    if (cat === 'actors') return 'ACT';
     return 'DB';
   }
 
@@ -2623,6 +2895,91 @@ if (typeof module !== 'undefined') {
     if (btnDetDl) btnDetDl.onclick = downloadDatabaseFile;
     const btnDetSave = document.getElementById('btn-detail-save-disk');
     if (btnDetSave) btnDetSave.onclick = saveDatabaseToDisk;
+
+    const enemyExp = document.getElementById('enemy-exp');
+    if (enemyExp) enemyExp.onchange = () => { item.exp = parseInt(enemyExp.value, 10) || 0; markModified(item); renderDbMasterList(); };
+    const enemyGold = document.getElementById('enemy-gold');
+    if (enemyGold) enemyGold.onchange = () => { item.gold = parseInt(enemyGold.value, 10) || 0; markModified(item); renderDbMasterList(); };
+    const btnEnemy100Drop = document.getElementById('btn-enemy-100-drop');
+    if (btnEnemy100Drop) {
+      btnEnemy100Drop.onclick = () => {
+        if (Array.isArray(item.dropItems)) item.dropItems.forEach(d => { if (d && d.kind > 0) d.denominator = 1; });
+        markModified(item);
+        showToast('Enemy drop rate set to 100%.', 'success');
+      };
+    }
+    const btnEnemy1Hp = document.getElementById('btn-enemy-1hp');
+    if (btnEnemy1Hp) {
+      btnEnemy1Hp.onclick = () => {
+        if (Array.isArray(item.params) && !Array.isArray(item.params[0])) item.params[0] = 1;
+        markModified(item);
+        renderDbDetail(item);
+        showToast('Enemy Max HP set to 1.', 'success');
+      };
+    }
+
+    const classExpBasis = document.getElementById('class-exp-basis');
+    if (classExpBasis) {
+      classExpBasis.onchange = () => {
+        if (!Array.isArray(item.expParams)) item.expParams = [30, 20, 30, 30];
+        item.expParams[0] = Math.max(1, parseInt(classExpBasis.value, 10) || 10);
+        markModified(item);
+      };
+    }
+    const btnClassFast = document.getElementById('btn-class-fast-exp');
+    if (btnClassFast) {
+      btnClassFast.onclick = () => {
+        item.expParams = [10, 0, 0, 0];
+        markModified(item);
+        renderDbDetail(item);
+        showToast('Fast leveling EXP curve applied.', 'success');
+      };
+    }
+    const btnClassSkills = document.getElementById('btn-class-lv1-skills');
+    if (btnClassSkills) {
+      btnClassSkills.onclick = () => {
+        if (Array.isArray(item.learnings)) item.learnings.forEach(l => { if (l) l.level = 1; });
+        markModified(item);
+        showToast('All class skills set to unlock at Level 1.', 'success');
+      };
+    }
+    const btnClass2x = document.getElementById('btn-class-2x-curve');
+    if (btnClass2x) {
+      btnClass2x.onclick = () => {
+        if (Array.isArray(item.params) && Array.isArray(item.params[0])) {
+          item.params = item.params.map(row => Array.isArray(row) ? row.map(v => Math.min(9999, (Number(v) || 0) * 2)) : row);
+        }
+        markModified(item);
+        showToast('Doubled class stat curve across all levels.', 'success');
+      };
+    }
+
+    const actorInitLvl = document.getElementById('actor-init-lvl');
+    if (actorInitLvl) actorInitLvl.onchange = () => { item.initialLevel = parseInt(actorInitLvl.value, 10) || 1; markModified(item); renderDbMasterList(); };
+    const actorMaxLvl = document.getElementById('actor-max-lvl');
+    if (actorMaxLvl) actorMaxLvl.onchange = () => { item.maxLevel = parseInt(actorMaxLvl.value, 10) || 99; markModified(item); renderDbMasterList(); };
+    const actorNick = document.getElementById('actor-nickname');
+    if (actorNick) actorNick.onchange = () => { item.nickname = actorNick.value; markModified(item); };
+    const btnActorCap999 = document.getElementById('btn-actor-cap-999');
+    if (btnActorCap999) {
+      btnActorCap999.onclick = () => {
+        item.maxLevel = 999;
+        markModified(item);
+        renderDbMasterList();
+        renderDbDetail(item);
+        showToast('Max Level cap set to 999.', 'success');
+      };
+    }
+    const btnActorInit99 = document.getElementById('btn-actor-init-99');
+    if (btnActorInit99) {
+      btnActorInit99.onclick = () => {
+        item.initialLevel = 99;
+        markModified(item);
+        renderDbMasterList();
+        renderDbDetail(item);
+        showToast('Initial Level set to 99.', 'success');
+      };
+    }
   }
 
   async function saveDatabaseToDisk() {
@@ -2669,6 +3026,31 @@ if (typeof module !== 'undefined') {
 
   const btnDbDl = document.getElementById('btn-db-download');
   if (btnDbDl) btnDbDl.onclick = downloadDatabaseFile;
+
+  const btnDbDlAll = document.getElementById('btn-db-download-all');
+  if (btnDbDlAll) {
+    btnDbDlAll.onclick = () => {
+      const cats = Object.keys(dbStore).filter(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0 && dbStore[c].modifiedIds.size > 0);
+      const targetCats = cats.length > 0 ? cats : Object.keys(dbStore).filter(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
+      if (targetCats.length === 0) {
+        showToast('No database files loaded to download.', 'warn');
+        return;
+      }
+      targetCats.forEach(c => {
+        const st = dbStore[c];
+        const blob = new Blob([JSON.stringify(st.items, null, 2)], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = st.fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+      showToast(`Downloaded ${targetCats.length} database file(s).`, 'success');
+    };
+  }
 
   document.getElementById('btn-open-db-file').onclick = async () => {
     try {
@@ -2798,7 +3180,7 @@ if (typeof module !== 'undefined') {
   }
 
   function getGameAdapters(root, engine) {
-    let partyObj = null, actorsObj = null, varsObj = null, swObj = null;
+    let partyObj = null, actorsObj = null, varsObj = null, swObj = null, sysObj = null, playerObj = null;
     if (Array.isArray(root)) {
       for (const item of root) {
         if (!item || typeof item !== 'object') continue;
@@ -2807,6 +3189,8 @@ if (typeof module !== 'undefined') {
         else if (cls.includes('Actors') || (item['@data'] && Array.isArray(item['@data']) && item['@data'][1] && item['@data'][1]['@name'])) actorsObj = item;
         else if (cls.includes('Variables') || (cls.includes('System') && item['@variables'])) varsObj = item;
         else if (cls.includes('Switches') || (cls.includes('System') && item['@switches'])) swObj = item;
+        else if (cls.includes('System')) sysObj = item;
+        else if (cls.includes('Player')) playerObj = item;
       }
       if (!partyObj && root[4] && root[4]['@gold'] !== undefined) partyObj = root[4];
       if (!actorsObj && root[10] && root[10]['@data']) actorsObj = root[10];
@@ -2817,8 +3201,10 @@ if (typeof module !== 'undefined') {
       actorsObj = root.actors || {};
       varsObj = root.variables || {};
       swObj = root.switches || {};
+      sysObj = root.system || null;
+      playerObj = root.player || null;
     }
-    return { party: partyObj, actors: actorsObj, variables: varsObj, switches: swObj };
+    return { party: partyObj, actors: actorsObj, variables: varsObj, switches: swObj, system: sysObj, player: playerObj };
   }
 
   let saveChanges = new Set();
@@ -2956,6 +3342,47 @@ if (typeof module !== 'undefined') {
     const swFilter = document.getElementById('switches-filter');
     if (swFilter) swFilter.onchange = () => renderSwitchesTab(adapt.switches);
 
+    const btnCompare = document.getElementById('btn-compare-save-vars');
+    const compareInput = document.getElementById('compare-save-input');
+    const btnClearCompare = document.getElementById('btn-clear-compare-vars');
+    if (btnCompare && compareInput) {
+      btnCompare.onclick = () => compareInput.click();
+      compareInput.onchange = (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          try {
+            const p = await parseSaveData(new Uint8Array(r.result), f.name);
+            const ad = getGameAdapters(p.root, p.engine);
+            compareBaseline = {
+              fileName: f.name,
+              vars: getJsonExArray(ad.variables ? (ad.variables['@data'] || ad.variables._data || ad.variables) : []),
+              switches: getJsonExArray(ad.switches ? (ad.switches['@data'] || ad.switches._data || ad.switches) : [])
+            };
+            if (btnClearCompare) btnClearCompare.style.display = 'inline-block';
+            renderVariablesTab(adapt.variables);
+            renderSwitchesTab(adapt.switches);
+            showToast('Compared against ' + f.name, 'success');
+          } catch (err) {
+            showToast('Could not parse comparison save: ' + err.message, 'danger');
+          }
+        };
+        r.readAsArrayBuffer(f);
+        compareInput.value = '';
+      };
+    }
+    if (btnClearCompare) {
+      btnClearCompare.onclick = () => {
+        compareBaseline = null;
+        btnClearCompare.style.display = 'none';
+        renderVariablesTab(adapt.variables);
+        renderSwitchesTab(adapt.switches);
+        showToast('Cleared save comparison filter.', 'info');
+      };
+    }
+
+    renderSystemQolBar(adapt.system, adapt.player);
     renderCharactersTab(adapt.actors);
     renderInventoryTab(adapt.party);
     renderWeaponsTab(adapt.party);
@@ -3050,6 +3477,21 @@ if (typeof module !== 'undefined') {
       showToast('Full HP/MP restore applied.', 'success');
     };
 
+    const btnCureStates = document.getElementById('btn-char-cure-states');
+    if (btnCureStates) {
+      btnCureStates.onclick = () => {
+        const actor = actorsData[activeCharacterIndex];
+        if (!actor) return;
+        let cleared = 0;
+        if (Array.isArray(actor._states)) { cleared = actor._states.length; actor._states = []; }
+        else if (actor._states && Array.isArray(actor._states['@a'])) { cleared = actor._states['@a'].length; actor._states['@a'] = []; }
+        if (Array.isArray(actor['@states'])) { cleared = actor['@states'].length; actor['@states'] = []; }
+        renderCharacterStats(actor);
+        markSaveModified('Cure States');
+        showToast(`Cleared ${cleared} active status effect(s).`, 'success');
+      };
+    }
+
     document.getElementById('btn-char-max-stats').onclick = () => {
       const actor = actorsData[activeCharacterIndex];
       if (!actor) return;
@@ -3111,6 +3553,88 @@ if (typeof module !== 'undefined') {
     }
   }
 
+  function renderSystemQolBar(sysObj, playerObj) {
+    const qolBar = document.getElementById('qol-system-bar');
+    if (!qolBar) return;
+    qolBar.innerHTML = '';
+    if (!sysObj && !playerObj) return;
+
+    if (playerObj) {
+      const spdKey = playerObj['@move_speed'] !== undefined ? '@move_speed' : '_moveSpeed';
+      const curSpd = playerObj[spdKey] !== undefined ? playerObj[spdKey] : 4;
+      const spdCard = document.createElement('div');
+      spdCard.className = 'stat-card';
+      spdCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="stat-title">MOVE SPEED</span>
+          <span class="stat-desc">4=Normal, 5=Fast, 6=Max</span>
+        </div>
+        <input type="number" id="qol-move-speed" class="stat-input" min="1" max="6" value="${escapeHtml(curSpd)}">
+      `;
+      spdCard.querySelector('input').onchange = (e) => {
+        const v = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 4));
+        playerObj[spdKey] = v;
+        e.target.value = v;
+        markSaveModified('Move Speed');
+      };
+      qolBar.appendChild(spdCard);
+
+      const thrKey = playerObj['@through'] !== undefined ? '@through' : '_through';
+      const isThr = Boolean(playerObj[thrKey]);
+      const thrCard = document.createElement('div');
+      thrCard.className = 'stat-card';
+      thrCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="stat-title">NO-CLIP (WALK THRU)</span>
+          <label class="toggle-switch"><input type="checkbox" id="qol-noclip" ${isThr?'checked':''}><span class="slider"></span></label>
+        </div>
+        <span class="stat-desc">Bypass walls / stuck tiles</span>
+      `;
+      thrCard.querySelector('input').onchange = (e) => {
+        playerObj[thrKey] = e.target.checked;
+        markSaveModified('No-Clip');
+      };
+      qolBar.appendChild(thrCard);
+    }
+
+    if (sysObj) {
+      const isRuby = sysObj['@save_disabled'] !== undefined || currentFile.engine === 'ruby';
+      const saveAllowed = isRuby ? !sysObj['@save_disabled'] : (sysObj._saveEnabled !== false);
+      const saveCard = document.createElement('div');
+      saveCard.className = 'stat-card';
+      saveCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="stat-title">ALLOW SAVE</span>
+          <label class="toggle-switch"><input type="checkbox" id="qol-allow-save" ${saveAllowed?'checked':''}><span class="slider"></span></label>
+        </div>
+        <span class="stat-desc">Unlock saving anywhere</span>
+      `;
+      saveCard.querySelector('input').onchange = (e) => {
+        if (isRuby) sysObj['@save_disabled'] = !e.target.checked;
+        else sysObj._saveEnabled = e.target.checked;
+        markSaveModified('Allow Save');
+      };
+      qolBar.appendChild(saveCard);
+
+      const encAllowed = isRuby ? !sysObj['@encounter_disabled'] : (sysObj._encounterEnabled !== false);
+      const encCard = document.createElement('div');
+      encCard.className = 'stat-card';
+      encCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="stat-title">ENCOUNTERS</span>
+          <label class="toggle-switch"><input type="checkbox" id="qol-encounters" ${encAllowed?'checked':''}><span class="slider"></span></label>
+        </div>
+        <span class="stat-desc">Random monster battles</span>
+      `;
+      encCard.querySelector('input').onchange = (e) => {
+        if (isRuby) sysObj['@encounter_disabled'] = !e.target.checked;
+        else sysObj._encounterEnabled = e.target.checked;
+        markSaveModified('Encounters');
+      };
+      qolBar.appendChild(encCard);
+    }
+  }
+
   function renderCharacterStats(actor) {
     const container = document.getElementById('char-stats-container');
     container.innerHTML = '';
@@ -3158,12 +3682,98 @@ if (typeof module !== 'undefined') {
     const mpKey = actor['@mp'] !== undefined ? '@mp' : (actor['@sp'] !== undefined ? '@sp' : '_mp');
     makeCard('MP / SP', 'Current MP / SP', actor[mpKey] || 50, (v) => actor[mpKey] = v);
 
+    const nameKey = actor['@name'] !== undefined ? '@name' : '_name';
+    if (actor[nameKey] !== undefined) {
+      makeCard('NAME', 'Character Name', String(actor[nameKey] || ''), (v) => {
+        actor[nameKey] = String(v);
+      });
+    }
+
     const paramPlus = actor._paramPlus || actor['@param_plus'];
     if (paramPlus) {
       const pPlus = getJsonExArray(paramPlus);
       const names = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
       names.forEach((name, i) => makeCard(name, `${name} Bonus`, pPlus[i] || 0, (v) => pPlus[i] = v));
     }
+
+    renderCharacterSkills(actor);
+  }
+
+  function renderCharacterSkills(actor) {
+    const panel = document.getElementById('char-skills-panel');
+    if (!panel || !actor) return;
+    const rawSkills = actor['@skills'] !== undefined ? actor['@skills'] : actor._skills;
+    let skillsArr = [];
+    if (Array.isArray(rawSkills)) {
+      skillsArr = rawSkills;
+    } else if (rawSkills && Array.isArray(rawSkills['@a'])) {
+      skillsArr = rawSkills['@a'];
+    } else {
+      if (actor['@skills'] !== undefined) actor['@skills'] = [];
+      else actor._skills = [];
+      skillsArr = actor['@skills'] || actor._skills;
+    }
+
+    const badgesHtml = skillsArr.map((sid, idx) => {
+      const sName = (gameData.skills && gameData.skills[sid]) ? `#${sid} ${gameData.skills[sid]}` : `Skill #${sid}`;
+      return `<span class="meta-pill" style="display:inline-flex; align-items:center; gap:6px; padding:4px 8px;">${escapeHtml(sName)} <button type="button" class="btn-del-skill" data-idx="${idx}" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-weight:700;">&times;</button></span>`;
+    }).join('');
+
+    panel.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+        <span style="font-size:0.82rem; font-weight:600; color:var(--accent-sand); text-transform:uppercase;">Learned Skills (${skillsArr.length})</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="number" id="char-add-skill-id" class="stat-input" placeholder="Skill ID" style="width:95px; padding:4px 8px;" min="1">
+          <button type="button" class="btn btn-primary btn-sm" id="btn-char-add-skill">+ Learn Skill</button>
+        </div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px;">${badgesHtml || '<span style="font-size:0.8rem; color:var(--text-secondary);">No skills learned yet.</span>'}</div>
+    `;
+
+    const btnAddSkill = document.getElementById('btn-char-add-skill');
+    const inpAddSkill = document.getElementById('char-add-skill-id');
+    if (btnAddSkill && inpAddSkill) {
+      btnAddSkill.onclick = () => {
+        const sid = parseInt(inpAddSkill.value, 10);
+        if (!sid || sid <= 0) return;
+        if (!skillsArr.includes(sid)) {
+          skillsArr.push(sid);
+          markSaveModified('Learn Skill #' + sid);
+          renderCharacterSkills(actor);
+          showToast('Learned Skill #' + sid, 'success');
+        }
+      };
+    }
+    panel.querySelectorAll('.btn-del-skill').forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        if (!isNaN(idx)) {
+          skillsArr.splice(idx, 1);
+          markSaveModified('Remove Skill');
+          renderCharacterSkills(actor);
+        }
+      };
+    });
+  }
+
+  function isDummyDbName(name) {
+    if (!name) return true;
+    const t = String(name).trim();
+    return t === '' || /^[-=_*#]+/.test(t);
+  }
+
+  function populateEntityPicker(selectEl, dictObj, typeMap = null) {
+    if (!selectEl) return;
+    const ids = Object.keys(dictObj || {}).filter(id => !isDummyDbName(dictObj[id]));
+    if (ids.length === 0) {
+      selectEl.style.display = 'none';
+      return;
+    }
+    selectEl.style.display = 'inline-block';
+    selectEl.innerHTML = '<option value="">-- Select from DB --</option>' + ids.map(id => {
+      const tag = (typeMap && typeMap[id] === 2) ? ' [Key]' : '';
+      return `<option value="${escapeHtml(id)}">#${escapeHtml(id)} ${escapeHtml(dictObj[id])}${tag}</option>`;
+    }).join('');
   }
 
   function renderInventoryTab(partyObj) {
@@ -3173,6 +3783,9 @@ if (typeof module !== 'undefined') {
     const itemsObj = partyObj['@items'] || partyObj._items || partyObj.items || {};
     const itemIds = Object.keys(itemsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-item-count').textContent = itemIds.length;
+
+    const picker = document.getElementById('inventory-picker-select');
+    populateEntityPicker(picker, gameData.items, gameData.itemTypes);
 
     document.getElementById('btn-items-set-all-99').onclick = () => {
       let count = 0;
@@ -3187,12 +3800,38 @@ if (typeof module !== 'undefined') {
       showToast('Set ' + count + ' owned items to 99.', 'success');
     };
 
+    const btnUnlockSafe = document.getElementById('btn-items-unlock-safe');
+    if (btnUnlockSafe) {
+      btnUnlockSafe.onclick = () => {
+        const dbIds = Object.keys(gameData.items || {});
+        if (dbIds.length === 0) {
+          showToast('Drop Items.json in Data Files tab first so Key Items can be safely filtered out.', 'warn');
+          return;
+        }
+        let added = 0;
+        let skippedKey = 0;
+        dbIds.forEach(id => {
+          if (isDummyDbName(gameData.items[id])) return;
+          if (gameData.itemTypes && gameData.itemTypes[id] === 2) {
+            skippedKey++;
+            return;
+          }
+          itemsObj[id] = 99;
+          added++;
+        });
+        renderInventoryTab(partyObj);
+        markSaveModified('Safe Unlock Items');
+        showToast(`Unlocked ${added} regular items (skipped ${skippedKey} Key Items for safety).`, 'success');
+      };
+    }
+
     document.getElementById('btn-add-item-dialog').onclick = () => {
-      const id = prompt('Enter Item ID to add:');
+      const picked = picker && picker.value ? picker.value : null;
+      const id = picked || prompt('Enter Item ID to add:');
       if (!id || isNaN(id)) return;
-      const qty = prompt('Enter quantity (1-99):', '99');
-      const val = parseInt(qty, 10) || 99;
+      const val = picked ? 99 : (parseInt(prompt('Enter quantity (1-99):', '99'), 10) || 99);
       itemsObj[id] = val;
+      if (picker) picker.value = '';
       renderInventoryTab(partyObj);
       markSaveModified('Add Item #' + id);
       showToast('Added Item #' + id + ' (x' + val + ').', 'success');
@@ -3245,10 +3884,41 @@ if (typeof module !== 'undefined') {
     const ids = Object.keys(weaponsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-weapon-count').textContent = ids.length;
 
+    const picker = document.getElementById('weapons-picker-select');
+    populateEntityPicker(picker, gameData.weapons);
+
+    const btnSet99 = document.getElementById('btn-weapons-set-all-99');
+    if (btnSet99) {
+      btnSet99.onclick = () => {
+        let c = 0;
+        ids.forEach(id => { if (weaponsObj[id] > 0) { weaponsObj[id] = 99; c++; } });
+        renderWeaponsTab(partyObj);
+        markSaveModified('Weapons 99');
+        showToast('Set ' + c + ' owned weapons to 99.', 'success');
+      };
+    }
+
+    const btnUnlockAll = document.getElementById('btn-weapons-unlock-all');
+    if (btnUnlockAll) {
+      btnUnlockAll.onclick = () => {
+        const dbIds = Object.keys(gameData.weapons || {}).filter(id => !isDummyDbName(gameData.weapons[id]));
+        if (dbIds.length === 0) {
+          showToast('Drop Weapons.json first to unlock all database weapons.', 'warn');
+          return;
+        }
+        dbIds.forEach(id => { weaponsObj[id] = 99; });
+        renderWeaponsTab(partyObj);
+        markSaveModified('Unlock All Weapons');
+        showToast('Unlocked ' + dbIds.length + ' weapons (x99).', 'success');
+      };
+    }
+
     document.getElementById('btn-add-weapon-dialog').onclick = () => {
-      const id = prompt('Enter Weapon ID to add:');
+      const picked = picker && picker.value ? picker.value : null;
+      const id = picked || prompt('Enter Weapon ID to add:');
       if (!id || isNaN(id)) return;
-      weaponsObj[id] = 1;
+      weaponsObj[id] = (weaponsObj[id] || 0) + 1;
+      if (picker) picker.value = '';
       renderWeaponsTab(partyObj);
       markSaveModified('Add Weapon #' + id);
       showToast('Added Weapon #' + id + '.', 'success');
@@ -3282,10 +3952,41 @@ if (typeof module !== 'undefined') {
     const ids = Object.keys(armorsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-armor-count').textContent = ids.length;
 
+    const picker = document.getElementById('armors-picker-select');
+    populateEntityPicker(picker, gameData.armors);
+
+    const btnSet99 = document.getElementById('btn-armors-set-all-99');
+    if (btnSet99) {
+      btnSet99.onclick = () => {
+        let c = 0;
+        ids.forEach(id => { if (armorsObj[id] > 0) { armorsObj[id] = 99; c++; } });
+        renderArmorsTab(partyObj);
+        markSaveModified('Armors 99');
+        showToast('Set ' + c + ' owned armors to 99.', 'success');
+      };
+    }
+
+    const btnUnlockAll = document.getElementById('btn-armors-unlock-all');
+    if (btnUnlockAll) {
+      btnUnlockAll.onclick = () => {
+        const dbIds = Object.keys(gameData.armors || {}).filter(id => !isDummyDbName(gameData.armors[id]));
+        if (dbIds.length === 0) {
+          showToast('Drop Armors.json first to unlock all database armors.', 'warn');
+          return;
+        }
+        dbIds.forEach(id => { armorsObj[id] = 99; });
+        renderArmorsTab(partyObj);
+        markSaveModified('Unlock All Armors');
+        showToast('Unlocked ' + dbIds.length + ' armors (x99).', 'success');
+      };
+    }
+
     document.getElementById('btn-add-armor-dialog').onclick = () => {
-      const id = prompt('Enter Armor ID to add:');
+      const picked = picker && picker.value ? picker.value : null;
+      const id = picked || prompt('Enter Armor ID to add:');
       if (!id || isNaN(id)) return;
-      armorsObj[id] = 1;
+      armorsObj[id] = (armorsObj[id] || 0) + 1;
+      if (picker) picker.value = '';
       renderArmorsTab(partyObj);
       markSaveModified('Add Armor #' + id);
       showToast('Added Armor #' + id + '.', 'success');
@@ -3317,22 +4018,33 @@ if (typeof module !== 'undefined') {
     if (!varsObj) return;
     const varsArr = getJsonExArray(varsObj['@data'] || varsObj._data || varsObj);
     const nonZeroOnly = document.getElementById('vars-nonzero-only').checked;
-    const q = document.getElementById('variables-search').value.trim().toLowerCase();
+    const q = document.getElementById('variables-search').value.trim().toLowerCase().replace(/^#/, '');
+    const diffBanner = document.getElementById('vars-diff-banner');
 
     let count = 0;
-    for (let id = 1; id < Math.min(varsArr.length, 500); id++) {
+    let rendered = 0;
+    const maxLen = compareBaseline ? Math.max(varsArr.length, compareBaseline.vars.length) : varsArr.length;
+    for (let id = 1; id < maxLen; id++) {
       const val = varsArr[id];
-      if (val === undefined || val === null) continue;
-      if (nonZeroOnly && (val === 0 || val === '0')) continue;
+      const baseVal = compareBaseline ? compareBaseline.vars[id] : undefined;
+      if (compareBaseline) {
+        if ((val ?? 0) === (baseVal ?? 0)) continue;
+      } else {
+        if (val === undefined || val === null) continue;
+        if (nonZeroOnly && (val === 0 || val === '0')) continue;
+      }
       const vName = (gameData && gameData.variables && gameData.variables[id]) || `Variable #${id}`;
-      if (q && !String(id).includes(q) && !String(val).toLowerCase().includes(q) && !vName.toLowerCase().includes(q)) continue;
+      if (q && !String(id).includes(q) && !String(val ?? '').toLowerCase().includes(q) && !vName.toLowerCase().includes(q)) continue;
       count++;
+      if (rendered >= 250) continue;
+      rendered++;
 
+      const diffSub = compareBaseline ? ` <span style="color:var(--accent-sand); font-size:0.72rem;">(Was: ${escapeHtml(String(baseVal ?? 0))})</span>` : '';
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = `
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="${escapeHtml(vName)}">${escapeHtml(vName)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#${escapeHtml(id)}</span></div>
-        <input type="text" class="stat-input" value="${escapeHtml(val)}" style="padding:5px 8px;">
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="${escapeHtml(vName)}">${escapeHtml(vName)}${diffSub}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#${escapeHtml(id)}</span></div>
+        <input type="text" class="stat-input" value="${escapeHtml(val ?? 0)}" style="padding:5px 8px;">
       `;
       card.querySelector('input').onchange = (e) => {
         let n = e.target.value;
@@ -3341,6 +4053,14 @@ if (typeof module !== 'undefined') {
         markSaveModified('Var #' + id);
       };
       container.appendChild(card);
+    }
+    if (diffBanner) {
+      if (compareBaseline) {
+        diffBanner.style.display = 'block';
+        diffBanner.textContent = `Comparing against ${compareBaseline.fileName}: Showing ${count} changed variable(s).`;
+      } else {
+        diffBanner.style.display = 'none';
+      }
     }
     document.getElementById('badge-var-count').textContent = count;
   }
@@ -3351,18 +4071,22 @@ if (typeof module !== 'undefined') {
     if (!swObj) return;
     const swArr = getJsonExArray(swObj['@data'] || swObj._data || swObj);
     const qEl = document.getElementById('switches-search');
-    const q = qEl ? qEl.value.trim().toLowerCase() : '';
+    const q = qEl ? qEl.value.trim().toLowerCase().replace(/^#/, '') : '';
     const fEl = document.getElementById('switches-filter');
     const filter = fEl ? fEl.value : 'all';
 
     let trueCount = 0;
-    for (let id = 1; id < Math.min(swArr.length, 500); id++) {
+    let rendered = 0;
+    for (let id = 1; id < swArr.length; id++) {
       const val = Boolean(swArr[id]);
       if (val) trueCount++;
       if (filter === 'on' && !val) continue;
       if (filter === 'off' && val) continue;
+      if (filter === 'diff' && (!compareBaseline || Boolean(compareBaseline.switches[id]) === val)) continue;
       const name = (gameData && gameData.switches && gameData.switches[id]) || `Switch #${id}`;
       if (q && !String(id).includes(q) && !name.toLowerCase().includes(q)) continue;
+      if (rendered >= 250) continue;
+      rendered++;
 
       const card = document.createElement('div');
       card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
@@ -3465,7 +4189,12 @@ if (typeof module !== 'undefined') {
               showToast(`Skipped ${file.name}: Unsupported reference data file.`, 'warn');
               return;
             }
-            json.forEach(x => { if (x && x.id && x.name) target[x.id] = x.name; });
+            json.forEach(x => {
+              if (x && x.id && x.name) {
+                target[x.id] = x.name;
+                if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
+              }
+            });
           } else if (json && typeof json === 'object' && (Array.isArray(json.variables) || Array.isArray(json.switches))) {
             if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
             if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
