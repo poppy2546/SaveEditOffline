@@ -1,16 +1,17 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const pakoCode = fs.readFileSync(path.join(__dirname, 'pako.min.js'), 'utf8');
 const lzCode = fs.readFileSync(path.join(__dirname, 'node_modules/lz-string/libs/lz-string.min.js'), 'utf8');
 const rubyMarshalCode = fs.readFileSync(path.join(__dirname, 'ruby_marshal.js'), 'utf8');
 
-const htmlContent = `<!DOCTYPE html>
+let htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' __CSP_SCRIPT_HASHES__; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
 <title>Universal RPG Maker Save Editor</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23242933'/%3E%3Cstop%20offset='100%25'%20stop-color='%2314161B'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='gold'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23FFF2D6'/%3E%3Cstop%20offset='40%25'%20stop-color='%23E2B86B'/%3E%3Cstop%20offset='100%25'%20stop-color='%23B88028'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='crystal'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23C2F0BC'/%3E%3Cstop%20offset='60%25'%20stop-color='%2373A86E'/%3E%3Cstop%20offset='100%25'%20stop-color='%233B6338'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='14'%20fill='url(%23bg)'%20stroke='url(%23gold)'%20stroke-width='2.5'/%3E%3Cpath%20d='M16%2013h24l9%209v27a2%202%200%200%201-2%202H18a2%202%200%200%201-2-2V13z'%20fill='%231C2028'%20stroke='%23444B57'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3Cpath%20d='M22%2013h18v12a1%201%200%200%201-1%201H23a1%201%200%200%201-1-1V13z'%20fill='url(%23gold)'/%3E%3Crect%20x='26'%20y='16'%20width='3.5'%20height='6'%20rx='1'%20fill='%2314161B'/%3E%3Cpolygon%20points='32,29%2042,39%2032,49%2022,39'%20fill='url(%23crystal)'%20stroke='%23A2C79D'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3Cpolygon%20points='32,32%2039,39%2032,46%2025,39'%20fill='%23E8FCE4'%20opacity='0.35'/%3E%3Ccircle%20cx='32'%20cy='39'%20r='2.2'%20fill='%23FFFFFF'/%3E%3C/svg%3E">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -791,6 +792,7 @@ const htmlContent = `<!DOCTYPE html>
       Clear File
     </button>
     <button class="btn btn-secondary btn-sm" id="btn-export-json" type="button">Export JSON</button>
+    <button class="btn btn-secondary btn-sm" id="btn-backup-raw" type="button" title="Download original unmodified save file (.bak)">Backup (.bak)</button>
     <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download Save
@@ -832,7 +834,7 @@ const htmlContent = `<!DOCTYPE html>
       </div>
       <input type="file" id="file-input" multiple style="display:none;">
       <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
-        <button class="btn btn-primary" type="button" onclick="document.getElementById('file-input').click()">Select Save File</button>
+        <button class="btn btn-primary" type="button" id="btn-select-save-file">Select Save File</button>
         <button class="btn btn-secondary" type="button" id="btn-quick-open-db">Open Database JSON (data/*.json)</button>
       </div>
     </div>
@@ -1007,6 +1009,10 @@ const htmlContent = `<!DOCTYPE html>
 
     <!-- TAB 8: RAW TREE -->
     <div class="section-panel" id="tab-raw">
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; gap:10px; align-items:center;">
+        <input type="text" id="raw-search-input" placeholder="Search property path or value..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <span id="raw-showing-label" class="meta-pill">0 entries</span>
+      </div>
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden;">
         <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
           <thead>
@@ -1174,24 +1180,6 @@ const htmlContent = `<!DOCTYPE html>
 
 </div>
 
-<!-- DIFF MODAL -->
-<div class="modal-overlay" id="diff-modal" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,17,21,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
-  <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); max-width:860px; width:90%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden;">
-    <div style="padding:14px 20px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-weight:600; color:var(--text-primary);">Review Changes Before Saving</span>
-      <button class="btn btn-secondary btn-sm" id="btn-close-modal" type="button">&times;</button>
-    </div>
-    <div style="padding:18px 20px; overflow-y:auto; flex:1;" id="diff-content"></div>
-    <div style="padding:12px 20px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; background:var(--bg-header);">
-      <button class="btn btn-secondary" id="btn-modal-bak" type="button">Download Backup (.bak)</button>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" id="btn-modal-cancel" type="button">Keep Editing</button>
-        <button class="btn btn-primary" id="btn-modal-download" type="button">Download Edited File</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast" role="status" aria-live="polite">Notification</div>
 
 <!-- Embedded Libraries -->
@@ -1271,6 +1259,8 @@ const htmlContent = `<!DOCTYPE html>
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
+      .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
+      .replace(/[\u{E0000}-\u{E007F}]/gu, '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
@@ -1278,15 +1268,77 @@ const htmlContent = `<!DOCTYPE html>
       .replace(/'/g, '&#039;');
   }
 
-  function getJsonExArray(val) {
-    if (!val) return [];
+  function isSafeKey(k) {
+    const s = String(k);
+    return s !== '__proto__' && s !== 'constructor' && s !== 'prototype';
+  }
+
+  function sanitizeDownloadName(name, fallback) {
+    const cleaned = String(name || '')
+      .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
+      .replace(/[\u{E0000}-\u{E007F}]/gu, '')
+      .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')
+      .replace(/^[.\s]+|[.\s]+$/g, '');
+    return cleaned || fallback;
+  }
+
+  function triggerBlobDownload(blob, fileName, fallback) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = sanitizeDownloadName(fileName, fallback);
+    document.body.appendChild(a);
+    a.click();
+    if (typeof document.body.removeChild === 'function') document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function isDangerousFormula(formula) {
+    if (typeof formula !== 'string' || !formula) return false;
+    return /\b(require|child_process|process|globalThis|window|document|Function|eval|fetch|XMLHttpRequest|WebSocket|localStorage)\b/i.test(formula);
+  }
+
+  function safeJsonStringify(root, space = 2, maxNodes = 250000) {
+    const ancestors = [];
+    let count = 0;
+    return JSON.stringify(root, function(key, val) {
+      if (++count > maxNodes) {
+        throw new Error('Object graph exceeds safe serialization limit (possible reference amplification attack)');
+      }
+      if (typeof val === 'object' && val !== null) {
+        while (ancestors.length > 0 && ancestors[ancestors.length - 1] !== this) {
+          ancestors.pop();
+        }
+        if (ancestors.includes(val)) return '[Circular]';
+        ancestors.push(val);
+      }
+      return val;
+    }, space);
+  }
+
+  function getJsonExArray(val, depth = 0) {
+    if (!val || depth > 8) return [];
     if (Array.isArray(val)) return val;
-    if (typeof val === 'object' && Array.isArray(val['@a'])) return val['@a'];
-    if (typeof val === 'object' && Array.isArray(val['@data'])) return val['@data'];
     if (typeof val === 'object') {
-      return Object.keys(val).filter(k => !k.startsWith('@')).map(k => val[k]);
+      if (Array.isArray(val.__table_data__)) return val.__table_data__;
+      if (Array.isArray(val['@a'])) return val['@a'];
+      if (val['@data'] && typeof val['@data'] === 'object') return getJsonExArray(val['@data'], depth + 1);
+      if (val._data && typeof val._data === 'object') return getJsonExArray(val._data, depth + 1);
     }
     return [];
+  }
+
+  function ensurePartyBag(partyObj, baseName) {
+    if (!partyObj || typeof partyObj !== 'object') return {};
+    const rubyKey = '@' + baseName;
+    const mzKey = '_' + baseName;
+    if (partyObj[rubyKey] && typeof partyObj[rubyKey] === 'object') return partyObj[rubyKey];
+    if (partyObj[mzKey] && typeof partyObj[mzKey] === 'object') return partyObj[mzKey];
+    if (partyObj[baseName] && typeof partyObj[baseName] === 'object') return partyObj[baseName];
+    const isRuby = currentFile.engine === 'ruby' || partyObj.__ruby_class__ || partyObj['@gold'] !== undefined;
+    const targetKey = isRuby ? rubyKey : mzKey;
+    partyObj[targetKey] = {};
+    return partyObj[targetKey];
   }
 
   // Switch App Modes
@@ -1326,6 +1378,8 @@ const htmlContent = `<!DOCTYPE html>
 
   btnModeSave.onclick = () => switchAppMode('save');
   btnModeDb.onclick = () => switchAppMode('database');
+  const btnSelectSave = document.getElementById('btn-select-save-file');
+  if (btnSelectSave) btnSelectSave.onclick = () => fileInput.click();
   document.getElementById('btn-quick-open-db').onclick = () => {
     switchAppMode('database');
     document.getElementById('btn-open-db-file').click();
@@ -1345,6 +1399,7 @@ const htmlContent = `<!DOCTYPE html>
   dropzone.ondragleave = () => { dropzone.style.borderColor = 'var(--text-secondary)'; };
   dropzone.ondrop = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     dropzone.style.borderColor = 'var(--text-secondary)';
     if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleIncomingFiles(e.dataTransfer.files);
@@ -1364,6 +1419,14 @@ const htmlContent = `<!DOCTYPE html>
     };
     dbDropBanner.onclick = (e) => {
       if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') dbMultiFileInput.click();
+    };
+    dbDropBanner.ondrop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dbDropBanner.classList.remove('drag-over');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleIncomingFiles(e.dataTransfer.files);
+      }
     };
     dbMultiFileInput.onchange = (e) => {
       if (e.target.files && e.target.files.length > 0) {
@@ -1403,13 +1466,12 @@ const htmlContent = `<!DOCTYPE html>
     const files = Array.from(fileList || []);
     if (files.length === 0) return;
 
+    const saveFile = files.find(f => !f.name.toLowerCase().endsWith('.json'));
     const jsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.json'));
+    if (saveFile) loadSaveFile(saveFile);
     if (jsonFiles.length > 0) {
-      jsonFiles.forEach((f, idx) => loadDatabaseFile(f, null, idx === 0));
-      return;
+      jsonFiles.forEach((f, idx) => loadDatabaseFile(f, null, !saveFile && idx === 0));
     }
-
-    loadSaveFile(files[0]);
   }
 
   // -------------------------------------------------------------
@@ -1453,12 +1515,19 @@ const htmlContent = `<!DOCTYPE html>
   function applyDatabaseJson(fileName, json, handle = null, autoSwitch = true) {
     if (!Array.isArray(json) && json && typeof json === 'object') {
       if (Array.isArray(json.variables) || Array.isArray(json.switches)) {
-        if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
-        if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+        if (Array.isArray(json.variables)) {
+          gameData.variables = {};
+          json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
+        }
+        if (Array.isArray(json.switches)) {
+          gameData.switches = {};
+          json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+        }
+        if (currentFile.parsedRoot) setupVisualEditor();
         showToast(\`Loaded Variable/Switch names from \${fileName}\`, 'success');
         return true;
       }
-      showToast(\`Skipped \${fileName}: Only Weapons, Armors, Items, Skills, or System.json are supported.\`, 'warn');
+      showToast(\`Skipped \${fileName}: Only Weapons, Armors, Items, Skills, Enemies, Classes, Actors, or System.json are supported.\`, 'warn');
       return false;
     }
 
@@ -1466,19 +1535,23 @@ const htmlContent = `<!DOCTYPE html>
 
     const cat = detectDbCategory(fileName, json);
     if (!cat) {
-      showToast(\`Skipped \${fileName}: Unsupported database file (use Weapons, Armors, Items, or Skills).\`, 'warn');
+      showToast(\`Skipped \${fileName}: Unsupported database file.\`, 'warn');
       return false;
     }
-    const validItems = json.filter(x => x && x.id);
+    const validItems = json.filter(x => x && x.id && isSafeKey(x.id));
+    const hasRiskyFormula = validItems.some(x => x.damage && isDangerousFormula(x.damage.formula));
 
     if (gameData[cat]) {
+      gameData[cat] = {};
+      if (cat === 'items') gameData.itemTypes = {};
       validItems.forEach(x => {
-        if (x.id && x.name) {
+        if (x.id && x.name && isSafeKey(x.id)) {
           gameData[cat][x.id] = x.name;
           if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
         }
       });
     }
+    if (currentFile.parsedRoot) setupVisualEditor();
 
     dbStore[cat] = {
       category: cat,
@@ -1498,7 +1571,11 @@ const htmlContent = `<!DOCTYPE html>
     updateDbSlotBadges();
     renderDbBulkActions();
     renderDbMasterList();
-    showToast(\`Loaded \${fileName} (\${validItems.length} entries)\`, 'success');
+    if (hasRiskyFormula) {
+      showToast(\`Warning: \${fileName} contains suspicious script calls in damage.formula!\`, 'danger');
+    } else {
+      showToast(\`Loaded \${fileName} (\${validItems.length} entries)\`, 'success');
+    }
     return true;
   }
 
@@ -1715,8 +1792,7 @@ const htmlContent = `<!DOCTYPE html>
           } else if (cat === 'items') {
             if (it.consumable !== undefined) it.consumable = false;
             if (it.price !== undefined) it.price = 0;
-            if (it.description && !it.description.includes('[0W]')) it.description += ' [0W]';
-            if (it.note && !it.note.includes('<Weight: 0>')) it.note += '\\n<Weight: 0>';
+            zeroItemWeight(it);
           } else if (cat === 'skills') {
             if (it.mpCost !== undefined) it.mpCost = 0;
             if (it.tpCost !== undefined) it.tpCost = 0;
@@ -1872,6 +1948,15 @@ const htmlContent = `<!DOCTYPE html>
         if (dbStore[cat]) {
           dbStore[cat].items = currentDb.items;
         }
+        if (gameData[cat]) {
+          gameData[cat] = {};
+          currentDb.items.forEach(x => {
+            if (x && x.id && x.name && isSafeKey(x.id)) {
+              gameData[cat][x.id] = x.name;
+              if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
+            }
+          });
+        }
         updateDbSlotBadges();
         renderDbBulkActions();
         renderDbMasterList();
@@ -1885,13 +1970,27 @@ const htmlContent = `<!DOCTYPE html>
   }
 
   function zeroItemWeight(item) {
+    if (!item || typeof item !== 'object') return false;
     let changed = false;
-    if (typeof item.description === 'string' && /weight\\s*:\\s*\\d+/i.test(item.description)) {
-      item.description = item.description.replace(/(weight\\s*:\\s*)\\d+(\\s*w?)/gi, '$10$2');
-      changed = true;
+    if (typeof item.description === 'string') {
+      if (/weight\\s*:\\s*\\d+/i.test(item.description)) {
+        item.description = item.description.replace(/(weight\\s*:\\s*)\\d+(\\s*w?)/gi, '$10$2');
+        changed = true;
+      } else if (!item.description.includes('[0W]')) {
+        item.description = (item.description ? item.description + ' ' : '') + '[0W]';
+        changed = true;
+      }
     }
-    if (typeof item.note === 'string' && /weight\\s*:\\s*\\d+/i.test(item.note)) {
-      item.note = item.note.replace(/(weight\\s*:\\s*)\\d+(\\s*w?)/gi, '$10$2');
+    if (typeof item.note === 'string') {
+      if (/weight\\s*:\\s*\\d+/i.test(item.note)) {
+        item.note = item.note.replace(/(weight\\s*:\\s*)\\d+(\\s*w?)/gi, '$10$2');
+        changed = true;
+      } else if (!item.note.includes('<Weight: 0>')) {
+        item.note = (item.note ? item.note + '\\n' : '') + '<Weight: 0>';
+        changed = true;
+      }
+    } else if (item.note === undefined) {
+      item.note = '<Weight: 0>';
       changed = true;
     }
     return changed;
@@ -1906,7 +2005,7 @@ const htmlContent = `<!DOCTYPE html>
   }
 
   // Render Master List (Left Pane)
-  function renderDbMasterList() {
+  function renderDbMasterList(skipDetailRender = false) {
     const container = document.getElementById('db-items-list-container');
     const detailContainer = document.getElementById('db-detail-container');
     const showingLabel = document.getElementById('db-list-showing-label');
@@ -1962,10 +2061,10 @@ const htmlContent = `<!DOCTYPE html>
       row.className = \`db-list-row \${currentDb.selectedId === item.id ? 'active' : ''} \${currentDb.modifiedIds.has(item.id) ? 'is-modified' : ''}\`;
       row.innerHTML = \`
         <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-          <span class="db-row-id">#\${item.id}</span>
+          <span class="db-row-id">#\${escapeHtml(item.id)}</span>
           <span class="db-row-name" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
         </div>
-        <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono); white-space:nowrap;">\${getQuickPreviewBadge(item)}</span>
+        <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono); white-space:nowrap;">\${escapeHtml(getQuickPreviewBadge(item))}</span>
       \`;
 
       row.onclick = () => {
@@ -1984,7 +2083,7 @@ const htmlContent = `<!DOCTYPE html>
     const selectedObj = validItems.find(x => x.id === currentDb.selectedId) || validItems[0];
     if (selectedObj) {
       currentDb.selectedId = selectedObj.id;
-      renderDbDetail(selectedObj);
+      if (skipDetailRender !== true) renderDbDetail(selectedObj);
     }
   }
 
@@ -2024,7 +2123,8 @@ const htmlContent = `<!DOCTYPE html>
     const eff = item.effects.find(e => e && e.code === code && (!e.dataId || e.dataId === 0));
     if (!eff) return 0;
     if (field === 'pct') return Math.round((eff.value1 || 0) * 100);
-    return eff.value2 || eff.value1 || 0;
+    if (code === 13) return eff.value1 ?? 0;
+    return eff.value2 ?? 0;
   }
 
   function setEffectValue(item, code, pctVal, flatVal) {
@@ -2062,7 +2162,7 @@ const htmlContent = `<!DOCTYPE html>
         paramInputs += \`
           <div class="db-field-box">
             <span class="db-field-label">\${label}</span>
-            <input type="number" class="stat-input db-stat-input" data-idx="\${i}" value="\${p[i]||0}">
+            <input type="number" class="stat-input db-stat-input" data-idx="\${i}" value="\${escapeHtml(p[i]||0)}">
           </div>
         \`;
       });
@@ -2125,12 +2225,12 @@ const htmlContent = `<!DOCTYPE html>
 
           <div class="db-field-box">
             <span class="db-field-label">Repeats</span>
-            <input type="number" class="stat-input" id="item-repeats" value="\${item.repeats || 1}" min="1" max="99">
+            <input type="number" class="stat-input" id="item-repeats" value="\${escapeHtml(item.repeats || 1)}" min="1" max="99">
           </div>
 
           <div class="db-field-box">
             <span class="db-field-label">TP Gain on Use</span>
-            <input type="number" class="stat-input" id="item-tp-gain" value="\${item.tpGain || 0}">
+            <input type="number" class="stat-input" id="item-tp-gain" value="\${escapeHtml(item.tpGain || 0)}">
           </div>
         </div>
 
@@ -2139,24 +2239,24 @@ const htmlContent = `<!DOCTYPE html>
           <div class="db-field-box">
             <span class="db-field-label">HP Recovery (%) + Flat</span>
             <div style="display:flex; gap:6px; align-items:center;">
-              <input type="number" class="stat-input" id="item-eff-hp-pct" value="\${hpPct}" placeholder="%" title="HP Recovery Percentage" style="width:50%;">
+              <input type="number" class="stat-input" id="item-eff-hp-pct" value="\${escapeHtml(hpPct)}" placeholder="%" title="HP Recovery Percentage" style="width:50%;">
               <span style="color:var(--text-secondary); font-size:0.78rem;">% +</span>
-              <input type="number" class="stat-input" id="item-eff-hp-flat" value="\${hpFlat}" placeholder="Flat" title="Flat HP Recovery" style="width:50%;">
+              <input type="number" class="stat-input" id="item-eff-hp-flat" value="\${escapeHtml(hpFlat)}" placeholder="Flat" title="Flat HP Recovery" style="width:50%;">
             </div>
           </div>
 
           <div class="db-field-box">
             <span class="db-field-label">MP Recovery (%) + Flat</span>
             <div style="display:flex; gap:6px; align-items:center;">
-              <input type="number" class="stat-input" id="item-eff-mp-pct" value="\${mpPct}" placeholder="%" title="MP Recovery Percentage" style="width:50%;">
+              <input type="number" class="stat-input" id="item-eff-mp-pct" value="\${escapeHtml(mpPct)}" placeholder="%" title="MP Recovery Percentage" style="width:50%;">
               <span style="color:var(--text-secondary); font-size:0.78rem;">% +</span>
-              <input type="number" class="stat-input" id="item-eff-mp-flat" value="\${mpFlat}" placeholder="Flat" title="Flat MP Recovery" style="width:50%;">
+              <input type="number" class="stat-input" id="item-eff-mp-flat" value="\${escapeHtml(mpFlat)}" placeholder="Flat" title="Flat MP Recovery" style="width:50%;">
             </div>
           </div>
 
           <div class="db-field-box">
             <span class="db-field-label">Effect TP Gain</span>
-            <input type="number" class="stat-input" id="item-eff-tp" value="\${tpEff}">
+            <input type="number" class="stat-input" id="item-eff-tp" value="\${escapeHtml(tpEff)}">
           </div>
 
           <div class="db-field-box">
@@ -2177,11 +2277,11 @@ const htmlContent = `<!DOCTYPE html>
         <div class="db-field-grid">
           <div class="db-field-box">
             <span class="db-field-label">MP Cost</span>
-            <input type="number" class="stat-input" id="skill-mp-cost" value="\${item.mpCost || 0}">
+            <input type="number" class="stat-input" id="skill-mp-cost" value="\${escapeHtml(item.mpCost || 0)}">
           </div>
           <div class="db-field-box">
             <span class="db-field-label">TP Cost</span>
-            <input type="number" class="stat-input" id="skill-tp-cost" value="\${item.tpCost || 0}">
+            <input type="number" class="stat-input" id="skill-tp-cost" value="\${escapeHtml(item.tpCost || 0)}">
           </div>
           <div class="db-field-box">
             <span class="db-field-label">Allow Critical Hits</span>
@@ -2200,11 +2300,11 @@ const htmlContent = `<!DOCTYPE html>
           </div>
           <div class="db-field-box">
             <span class="db-field-label">Repeats</span>
-            <input type="number" class="stat-input" id="skill-repeats" value="\${item.repeats || 1}" min="1" max="99">
+            <input type="number" class="stat-input" id="skill-repeats" value="\${escapeHtml(item.repeats || 1)}" min="1" max="99">
           </div>
           <div class="db-field-box">
             <span class="db-field-label">TP Gain</span>
-            <input type="number" class="stat-input" id="skill-tp-gain" value="\${item.tpGain || 0}">
+            <input type="number" class="stat-input" id="skill-tp-gain" value="\${escapeHtml(item.tpGain || 0)}">
           </div>
           <div class="db-field-box" style="grid-column: 1 / -1;">
             <span class="db-field-label">Damage Formula</span>
@@ -2223,7 +2323,7 @@ const htmlContent = `<!DOCTYPE html>
         paramInputs += \`
           <div class="db-field-box">
             <span class="db-field-label">\${label}</span>
-            <input type="number" class="stat-input db-stat-input" data-idx="\${i}" value="\${p[i]||0}">
+            <input type="number" class="stat-input db-stat-input" data-idx="\${i}" value="\${escapeHtml(p[i]||0)}">
           </div>
         \`;
       });
@@ -2236,11 +2336,11 @@ const htmlContent = `<!DOCTYPE html>
         <div class="db-field-grid">
           <div class="db-field-box">
             <span class="db-field-label">EXP Reward</span>
-            <input type="number" class="stat-input" id="enemy-exp" value="\${item.exp || 0}">
+            <input type="number" class="stat-input" id="enemy-exp" value="\${escapeHtml(item.exp || 0)}">
           </div>
           <div class="db-field-box">
             <span class="db-field-label">Gold Reward</span>
-            <input type="number" class="stat-input" id="enemy-gold" value="\${item.gold || 0}">
+            <input type="number" class="stat-input" id="enemy-gold" value="\${escapeHtml(item.gold || 0)}">
           </div>
         </div>
         <div class="db-field-grid">\${paramInputs}</div>
@@ -2257,7 +2357,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="db-field-grid">
           <div class="db-field-box">
             <span class="db-field-label">EXP Basis (Lower = Faster Leveling)</span>
-            <input type="number" class="stat-input" id="class-exp-basis" value="\${expP[0] || 30}">
+            <input type="number" class="stat-input" id="class-exp-basis" value="\${escapeHtml(expP[0] || 30)}">
           </div>
         </div>
       \`;
@@ -2271,11 +2371,11 @@ const htmlContent = `<!DOCTYPE html>
         <div class="db-field-grid">
           <div class="db-field-box">
             <span class="db-field-label">Initial Level</span>
-            <input type="number" class="stat-input" id="actor-init-lvl" value="\${item.initialLevel || 1}">
+            <input type="number" class="stat-input" id="actor-init-lvl" value="\${escapeHtml(item.initialLevel || 1)}">
           </div>
           <div class="db-field-box">
             <span class="db-field-label">Max Level Cap</span>
-            <input type="number" class="stat-input" id="actor-max-lvl" value="\${item.maxLevel || 99}">
+            <input type="number" class="stat-input" id="actor-max-lvl" value="\${escapeHtml(item.maxLevel || 99)}">
           </div>
           <div class="db-field-box">
             <span class="db-field-label">Nickname</span>
@@ -2350,13 +2450,20 @@ const htmlContent = `<!DOCTYPE html>
 
   function bindDetailEvents(item) {
     const nameEl = document.getElementById('detail-name');
-    if (nameEl) nameEl.onchange = () => { item.name = nameEl.value; markModified(item); renderDbMasterList(); };
+    if (nameEl) nameEl.onchange = () => {
+      item.name = nameEl.value;
+      if (gameData[currentDb.category] && isSafeKey(item.id)) {
+        gameData[currentDb.category][item.id] = item.name;
+      }
+      markModified(item);
+      renderDbMasterList(true);
+    };
     const descEl = document.getElementById('detail-desc');
     if (descEl) descEl.onchange = () => { item.description = descEl.value; markModified(item); };
     const noteEl = document.getElementById('detail-note');
     if (noteEl) noteEl.onchange = () => { item.note = noteEl.value; markModified(item); };
     const priceEl = document.getElementById('detail-price');
-    if (priceEl) priceEl.onchange = () => { item.price = parseInt(priceEl.value) || 0; markModified(item); renderDbMasterList(); };
+    if (priceEl) priceEl.onchange = () => { item.price = parseInt(priceEl.value) || 0; markModified(item); renderDbMasterList(true); };
 
     document.querySelectorAll('.db-stat-input').forEach(inp => {
       inp.onchange = () => {
@@ -2364,7 +2471,7 @@ const htmlContent = `<!DOCTYPE html>
         if (!item.params) item.params = [0,0,0,0,0,0,0,0];
         item.params[idx] = parseInt(inp.value) || 0;
         markModified(item);
-        renderDbMasterList();
+        renderDbMasterList(true);
       };
     });
 
@@ -2381,7 +2488,6 @@ const htmlContent = `<!DOCTYPE html>
         }
         markModified(item);
         renderDbMasterList();
-        renderDbDetail(item);
         showToast('Parameters set to 9999.', 'success');
       };
     }
@@ -2392,7 +2498,6 @@ const htmlContent = `<!DOCTYPE html>
         item.price = 0;
         markModified(item);
         renderDbMasterList();
-        renderDbDetail(item);
         showToast('Price set to 0 G.', 'success');
       };
     }
@@ -2408,7 +2513,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     const chkCons = document.getElementById('item-consumable');
-    if (chkCons) chkCons.onchange = () => { item.consumable = chkCons.checked; markModified(item); renderDbMasterList(); renderDbDetail(item); };
+    if (chkCons) chkCons.onchange = () => { item.consumable = chkCons.checked; markModified(item); renderDbMasterList(); };
     const selScope = document.getElementById('item-scope');
     if (selScope) selScope.onchange = () => { item.scope = parseInt(selScope.value); markModified(item); };
     const inpRepeats = document.getElementById('item-repeats');
@@ -2417,6 +2522,11 @@ const htmlContent = `<!DOCTYPE html>
     if (inpTpGain) inpTpGain.onchange = () => { item.tpGain = parseInt(inpTpGain.value) || 0; markModified(item); };
     const txtFormula = document.getElementById('item-formula');
     if (txtFormula) txtFormula.onchange = () => {
+      if (isDangerousFormula(txtFormula.value)) {
+        showToast('Blocked unsafe script keyword in damage formula.', 'danger');
+        txtFormula.value = (item.damage && item.damage.formula) || '0';
+        return;
+      }
       if (!item.damage) item.damage = { type: 1, formula: '0' };
       item.damage.formula = txtFormula.value;
       markModified(item);
@@ -2456,7 +2566,6 @@ const htmlContent = `<!DOCTYPE html>
         item.consumable = false;
         markModified(item);
         renderDbMasterList();
-        renderDbDetail(item);
         showToast('Item set to non-consumable (infinite).', 'success');
       };
     }
@@ -2485,7 +2594,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     const mpCost = document.getElementById('skill-mp-cost');
-    if (mpCost) mpCost.onchange = () => { item.mpCost = parseInt(mpCost.value) || 0; markModified(item); renderDbMasterList(); };
+    if (mpCost) mpCost.onchange = () => { item.mpCost = parseInt(mpCost.value) || 0; markModified(item); renderDbMasterList(true); };
     const tpCost = document.getElementById('skill-tp-cost');
     if (tpCost) tpCost.onchange = () => { item.tpCost = parseInt(tpCost.value) || 0; markModified(item); };
     const chkCrit = document.getElementById('skill-critical');
@@ -2502,6 +2611,11 @@ const htmlContent = `<!DOCTYPE html>
     if (skillTpGain) skillTpGain.onchange = () => { item.tpGain = parseInt(skillTpGain.value) || 0; markModified(item); };
     const skillFormula = document.getElementById('skill-formula');
     if (skillFormula) skillFormula.onchange = () => {
+      if (isDangerousFormula(skillFormula.value)) {
+        showToast('Blocked unsafe script keyword in damage formula.', 'danger');
+        skillFormula.value = (item.damage && item.damage.formula) || '';
+        return;
+      }
       if (!item.damage) item.damage = { type: 1 };
       item.damage.formula = skillFormula.value;
       markModified(item);
@@ -2514,7 +2628,6 @@ const htmlContent = `<!DOCTYPE html>
         item.tpCost = 0;
         markModified(item);
         renderDbMasterList();
-        renderDbDetail(item);
         showToast('Skill cost set to 0 MP / 0 TP.', 'success');
       };
     }
@@ -2541,10 +2654,12 @@ const htmlContent = `<!DOCTYPE html>
         const idx = currentDb.items.findIndex(x => x && x.id === item.id);
         if (origItem && idx !== -1) {
           currentDb.items[idx] = JSON.parse(JSON.stringify(origItem));
+          if (gameData[currentDb.category] && isSafeKey(item.id)) {
+            gameData[currentDb.category][item.id] = origItem.name || '';
+          }
           currentDb.modifiedIds.delete(item.id);
           updateDbSlotBadges();
           renderDbMasterList();
-          renderDbDetail(currentDb.items[idx]);
           showToast(\`Reverted entry #\${item.id} to original values.\`, 'info');
         }
       };
@@ -2556,9 +2671,9 @@ const htmlContent = `<!DOCTYPE html>
     if (btnDetSave) btnDetSave.onclick = saveDatabaseToDisk;
 
     const enemyExp = document.getElementById('enemy-exp');
-    if (enemyExp) enemyExp.onchange = () => { item.exp = parseInt(enemyExp.value, 10) || 0; markModified(item); renderDbMasterList(); };
+    if (enemyExp) enemyExp.onchange = () => { item.exp = parseInt(enemyExp.value, 10) || 0; markModified(item); renderDbMasterList(true); };
     const enemyGold = document.getElementById('enemy-gold');
-    if (enemyGold) enemyGold.onchange = () => { item.gold = parseInt(enemyGold.value, 10) || 0; markModified(item); renderDbMasterList(); };
+    if (enemyGold) enemyGold.onchange = () => { item.gold = parseInt(enemyGold.value, 10) || 0; markModified(item); renderDbMasterList(true); };
     const btnEnemy100Drop = document.getElementById('btn-enemy-100-drop');
     if (btnEnemy100Drop) {
       btnEnemy100Drop.onclick = () => {
@@ -2614,9 +2729,9 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     const actorInitLvl = document.getElementById('actor-init-lvl');
-    if (actorInitLvl) actorInitLvl.onchange = () => { item.initialLevel = parseInt(actorInitLvl.value, 10) || 1; markModified(item); renderDbMasterList(); };
+    if (actorInitLvl) actorInitLvl.onchange = () => { item.initialLevel = parseInt(actorInitLvl.value, 10) || 1; markModified(item); renderDbMasterList(true); };
     const actorMaxLvl = document.getElementById('actor-max-lvl');
-    if (actorMaxLvl) actorMaxLvl.onchange = () => { item.maxLevel = parseInt(actorMaxLvl.value, 10) || 99; markModified(item); renderDbMasterList(); };
+    if (actorMaxLvl) actorMaxLvl.onchange = () => { item.maxLevel = parseInt(actorMaxLvl.value, 10) || 99; markModified(item); renderDbMasterList(true); };
     const actorNick = document.getElementById('actor-nickname');
     if (actorNick) actorNick.onchange = () => { item.nickname = actorNick.value; markModified(item); };
     const btnActorCap999 = document.getElementById('btn-actor-cap-999');
@@ -2625,7 +2740,6 @@ const htmlContent = `<!DOCTYPE html>
         item.maxLevel = 999;
         markModified(item);
         renderDbMasterList();
-        renderDbDetail(item);
         showToast('Max Level cap set to 999.', 'success');
       };
     }
@@ -2635,7 +2749,6 @@ const htmlContent = `<!DOCTYPE html>
         item.initialLevel = 99;
         markModified(item);
         renderDbMasterList();
-        renderDbDetail(item);
         showToast('Initial Level set to 99.', 'success');
       };
     }
@@ -2672,14 +2785,7 @@ const htmlContent = `<!DOCTYPE html>
     }
     const jsonStr = JSON.stringify(currentDb.items, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = currentDb.fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    triggerBlobDownload(blob, currentDb.fileName, 'Database.json');
     showToast(\`Downloaded \${currentDb.fileName}.\`, 'success');
   }
 
@@ -2698,14 +2804,7 @@ const htmlContent = `<!DOCTYPE html>
       targetCats.forEach(c => {
         const st = dbStore[c];
         const blob = new Blob([JSON.stringify(st.items, null, 2)], { type: 'application/json;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = st.fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        triggerBlobDownload(blob, st.fileName, c + '.json');
       });
       showToast(\`Downloaded \${targetCats.length} database file(s).\`, 'success');
     };
@@ -2760,6 +2859,16 @@ const htmlContent = `<!DOCTYPE html>
           parsedRoot: parsed.root, engine: parsed.engine
         };
 
+        compareBaseline = null;
+        varsRenderLimit = 250;
+        switchesRenderLimit = 250;
+        rawRenderLimit = 100;
+        activeCharacterIndex = 1;
+        const btnClearCompare = document.getElementById('btn-clear-compare-vars');
+        if (btnClearCompare) btnClearCompare.style.display = 'none';
+        const diffBanner = document.getElementById('vars-diff-banner');
+        if (diffBanner) diffBanner.style.display = 'none';
+
         flatEntries = flattenObject(currentFile.parsedRoot).map((item, idx) => ({ ...item, id: idx }));
 
         labelFilename.textContent = file.name;
@@ -2780,7 +2889,8 @@ const htmlContent = `<!DOCTYPE html>
 
   async function parseSaveData(rawBytes, fileName) {
     const textDecoder = new TextDecoder('utf-8', { fatal: false });
-    const text = textDecoder.decode(rawBytes).trim();
+    const rawText = textDecoder.decode(rawBytes);
+    const text = rawText.trim();
 
     if (rawBytes.length >= 2 && rawBytes[0] === 0x04 && rawBytes[1] === 0x08) {
       try {
@@ -2793,16 +2903,19 @@ const htmlContent = `<!DOCTYPE html>
       } catch(e) {}
     }
 
+    const MAX_DECOMPRESSED_LEN = 100 * 1024 * 1024;
     if (typeof pako !== 'undefined') {
-      try {
-        const unzipped = pako.inflate(text, { to: 'string' });
-        if (unzipped && (unzipped.startsWith('{') || unzipped.startsWith('['))) {
-          return { format: 'rmmzsave', formatLabel: 'RPG Maker MZ (.rmmzsave)', root: JSON.parse(unzipped), engine: 'mz' };
-        }
-      } catch (e) {}
+      for (const candidate of [rawText, text]) {
+        try {
+          const unzipped = pako.inflate(candidate, { to: 'string' });
+          if (unzipped && unzipped.length <= MAX_DECOMPRESSED_LEN && (unzipped.startsWith('{') || unzipped.startsWith('['))) {
+            return { format: 'rmmzsave', formatLabel: 'RPG Maker MZ (.rmmzsave)', root: JSON.parse(unzipped), engine: 'mz' };
+          }
+        } catch (e) {}
+      }
       try {
         const unzipped = pako.inflate(rawBytes, { to: 'string' });
-        if (unzipped && (unzipped.startsWith('{') || unzipped.startsWith('['))) {
+        if (unzipped && unzipped.length <= MAX_DECOMPRESSED_LEN && (unzipped.startsWith('{') || unzipped.startsWith('['))) {
           return { format: 'rmmzsave_bin', formatLabel: 'RPG Maker MZ / Zlib', root: JSON.parse(unzipped), engine: 'mz' };
         }
       } catch (e) {}
@@ -2811,7 +2924,7 @@ const htmlContent = `<!DOCTYPE html>
     if (fileName.endsWith('.rpgsave') || /^[A-Za-z0-9+/=]+$/.test(text)) {
       try {
         const decompressed = LZString.decompressFromBase64(text);
-        if (decompressed && (decompressed.startsWith('{') || decompressed.startsWith('['))) {
+        if (decompressed && decompressed.length <= MAX_DECOMPRESSED_LEN && (decompressed.startsWith('{') || decompressed.startsWith('['))) {
           return { format: 'rpgmaker_lz', formatLabel: 'RPG Maker MV (.rpgsave)', root: JSON.parse(decompressed), engine: 'mv' };
         }
       } catch (e) {}
@@ -2844,6 +2957,15 @@ const htmlContent = `<!DOCTYPE html>
       for (const item of root) {
         if (!item || typeof item !== 'object') continue;
         const cls = item.__ruby_class__ || '';
+        if (!cls && !Array.isArray(item) && (item.party || item.actors || item.variables || item.switches || item.system || item.player)) {
+          if (item.party) partyObj = item.party;
+          if (item.actors) actorsObj = item.actors;
+          if (item.variables) varsObj = item.variables;
+          if (item.switches) swObj = item.switches;
+          if (item.system) sysObj = item.system;
+          if (item.player) playerObj = item.player;
+          continue;
+        }
         if (cls.includes('Party') || item['@gold'] !== undefined) partyObj = item;
         else if (cls.includes('Actors') || (item['@data'] && Array.isArray(item['@data']) && item['@data'][1] && item['@data'][1]['@name'])) actorsObj = item;
         else if (cls.includes('Variables') || (cls.includes('System') && item['@variables'])) varsObj = item;
@@ -2851,17 +2973,21 @@ const htmlContent = `<!DOCTYPE html>
         else if (cls.includes('System')) sysObj = item;
         else if (cls.includes('Player')) playerObj = item;
       }
+      if (!partyObj && root[8] && root[8]['@gold'] !== undefined) partyObj = root[8];
       if (!partyObj && root[4] && root[4]['@gold'] !== undefined) partyObj = root[4];
+      if (!actorsObj && root[7] && root[7]['@data']) actorsObj = root[7];
       if (!actorsObj && root[10] && root[10]['@data']) actorsObj = root[10];
+      if (!varsObj && root[4] && root[4]['@data']) varsObj = root[4];
       if (!varsObj && root[8] && root[8]['@data']) varsObj = root[8];
+      if (!swObj && root[3] && root[3]['@data']) swObj = root[3];
       if (!swObj && root[9] && root[9]['@data']) swObj = root[9];
-    } else if (typeof root === 'object') {
-      partyObj = root.party || {};
-      actorsObj = root.actors || {};
-      varsObj = root.variables || {};
-      swObj = root.switches || {};
-      sysObj = root.system || null;
-      playerObj = root.player || null;
+    } else if (root && typeof root === 'object') {
+      partyObj = root.party || root['@party'] || {};
+      actorsObj = root.actors || root['@actors'] || {};
+      varsObj = root.variables || root['@variables'] || {};
+      swObj = root.switches || root['@switches'] || {};
+      sysObj = root.system || root['@system'] || null;
+      playerObj = root.player || root['@player'] || null;
     }
     return { party: partyObj, actors: actorsObj, variables: varsObj, switches: swObj, system: sysObj, player: playerObj };
   }
@@ -2920,7 +3046,13 @@ const htmlContent = `<!DOCTYPE html>
         goldInput.value = num;
       }
       if (revBtn) revBtn.classList.toggle('show', num !== originalGold);
-      markSaveModified('Gold');
+      if (num === originalGold) {
+        saveChanges.delete('Gold');
+        const badge = document.getElementById('label-changes');
+        if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+      } else {
+        markSaveModified('Gold');
+      }
     }
 
     goldInput.oninput = () => applyGold(goldInput.value, false);
@@ -2953,6 +3085,7 @@ const htmlContent = `<!DOCTYPE html>
         if (!actor) return;
         if (actor._level !== undefined) actor._level = 99;
         if (actor['@level'] !== undefined) actor['@level'] = 99;
+        if (getActorExp(actor) < 999999) setActorExp(actor, 9999999);
         if (actor._hp !== undefined) actor._hp = 9999;
         if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
         if (actor._mp !== undefined) actor._mp = 9999;
@@ -2963,13 +3096,19 @@ const htmlContent = `<!DOCTYPE html>
           const p = getJsonExArray(paramPlus);
           for (let i = 0; i < 8; i++) p[i] = 9999;
         }
+        ['@maxhp_plus', '@maxsp_plus', '@str_plus', '@dex_plus', '@agi_plus', '@int_plus'].forEach(k => {
+          if (actor[k] !== undefined) actor[k] = 9999;
+        });
       });
 
       if (adapt.party) {
-        const items = adapt.party['@items'] || adapt.party._items || adapt.party.items || {};
-        const weapons = adapt.party['@weapons'] || adapt.party._weapons || adapt.party.weapons || {};
-        const armors = adapt.party['@armors'] || adapt.party._armors || adapt.party.armors || {};
-        Object.keys(items).forEach(k => { if (items[k] > 0) items[k] = 99; });
+        const items = ensurePartyBag(adapt.party, 'items');
+        const weapons = ensurePartyBag(adapt.party, 'weapons');
+        const armors = ensurePartyBag(adapt.party, 'armors');
+        Object.keys(items).forEach(k => {
+          if (gameData.itemTypes && gameData.itemTypes[k] === 2) return;
+          if (items[k] > 0) items[k] = 99;
+        });
         Object.keys(weapons).forEach(k => { if (weapons[k] > 0) weapons[k] = 99; });
         Object.keys(armors).forEach(k => { if (armors[k] > 0) armors[k] = 99; });
       }
@@ -2985,6 +3124,7 @@ const htmlContent = `<!DOCTYPE html>
     }
     window.onkeydown = (e) => {
       if (e.ctrlKey && e.shiftKey && (e.key === 'G' || e.key === 'g')) {
+        if (currentAppMode !== 'save' || !currentFile || !currentFile.parsedRoot || currentFile.engine === 'wolf') return;
         e.preventDefault();
         triggerSuperGodMode();
       }
@@ -3009,6 +3149,11 @@ const htmlContent = `<!DOCTYPE html>
       compareInput.onchange = (e) => {
         const f = e.target.files && e.target.files[0];
         if (!f) return;
+        if (f.size > 50 * 1024 * 1024) {
+          showToast('Comparison file exceeds the 50MB safety limit.', 'danger');
+          compareInput.value = '';
+          return;
+        }
         const r = new FileReader();
         r.onload = async () => {
           try {
@@ -3060,6 +3205,12 @@ const htmlContent = `<!DOCTYPE html>
     document.getElementById('badge-armor-count').textContent = '0';
     document.getElementById('badge-var-count').textContent = '0';
     document.getElementById('badge-switch-count').textContent = '0';
+    const goldInput = document.getElementById('quick-gold-input');
+    if (goldInput) goldInput.value = 0;
+    ['qol-system-bar', 'char-skills-panel', 'inventory-cards-container', 'weapons-cards-container', 'armors-cards-container', 'variables-cards-container', 'switches-cards-container'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
 
     const container = document.getElementById('char-stats-container');
     container.innerHTML = \`
@@ -3093,7 +3244,12 @@ const htmlContent = `<!DOCTYPE html>
     charDropdown.innerHTML = '';
     const container = document.getElementById('char-stats-container');
     container.innerHTML = '';
-    if (!actorsObj) return;
+    const skillsPanel = document.getElementById('char-skills-panel');
+    if (skillsPanel) skillsPanel.innerHTML = '';
+    if (!actorsObj) {
+      document.getElementById('badge-char-count').textContent = '0';
+      return;
+    }
 
     const actorsData = getJsonExArray(actorsObj._data || actorsObj['@data'] || actorsObj);
     const validActors = [];
@@ -3115,7 +3271,8 @@ const htmlContent = `<!DOCTYPE html>
       charDropdown.appendChild(opt);
     });
 
-    activeCharacterIndex = validActors[0].index;
+    const hasCurrentIdx = validActors.some(v => v.index === activeCharacterIndex);
+    if (!hasCurrentIdx) activeCharacterIndex = validActors[0].index;
     charDropdown.value = activeCharacterIndex;
     charDropdown.onchange = () => {
       activeCharacterIndex = parseInt(charDropdown.value);
@@ -3145,6 +3302,7 @@ const htmlContent = `<!DOCTYPE html>
         if (Array.isArray(actor._states)) { cleared = actor._states.length; actor._states = []; }
         else if (actor._states && Array.isArray(actor._states['@a'])) { cleared = actor._states['@a'].length; actor._states['@a'] = []; }
         if (Array.isArray(actor['@states'])) { cleared = actor['@states'].length; actor['@states'] = []; }
+        else if (actor['@states'] && Array.isArray(actor['@states']['@a'])) { cleared = actor['@states']['@a'].length; actor['@states']['@a'] = []; }
         renderCharacterStats(actor);
         markSaveModified('Cure States');
         showToast(\`Cleared \${cleared} active status effect(s).\`, 'success');
@@ -3156,6 +3314,7 @@ const htmlContent = `<!DOCTYPE html>
       if (!actor) return;
       if (actor._level !== undefined) actor._level = 99;
       if (actor['@level'] !== undefined) actor['@level'] = 99;
+      if (getActorExp(actor) < 999999) setActorExp(actor, 9999999);
       if (actor._hp !== undefined) actor._hp = 9999;
       if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
       if (actor._mp !== undefined) actor._mp = 9999;
@@ -3166,6 +3325,9 @@ const htmlContent = `<!DOCTYPE html>
         const p = getJsonExArray(paramPlus);
         for (let i = 0; i < 8; i++) p[i] = 9999;
       }
+      ['@maxhp_plus', '@maxsp_plus', '@str_plus', '@dex_plus', '@agi_plus', '@int_plus'].forEach(k => {
+        if (actor[k] !== undefined) actor[k] = 9999;
+      });
       renderCharacterStats(actor);
       markSaveModified('Max Stats');
       showToast('All character stats and bonuses set to 9999.', 'success');
@@ -3189,13 +3351,14 @@ const htmlContent = `<!DOCTYPE html>
   function setActorExp(actor, val) {
     if (!actor) return;
     const num = Math.max(0, parseInt(val, 10) || 0);
-    const classId = actor._classId || actor['@class_id'] || 1;
+    const rawClassId = actor._classId || actor['@class_id'] || 1;
+    const classId = isSafeKey(rawClassId) ? rawClassId : 1;
     if (actor['@exp'] !== undefined) {
       if (typeof actor['@exp'] === 'number') {
         actor['@exp'] = num;
       } else if (actor['@exp'] && typeof actor['@exp'] === 'object') {
         actor['@exp'][classId] = num;
-        Object.keys(actor['@exp']).filter(k => !k.startsWith('@')).forEach(k => { actor['@exp'][k] = num; });
+        Object.keys(actor['@exp']).filter(k => !k.startsWith('@') && isSafeKey(k)).forEach(k => { actor['@exp'][k] = num; });
       }
       return;
     }
@@ -3207,7 +3370,7 @@ const htmlContent = `<!DOCTYPE html>
         actor._exp['@a'][classId] = num;
       } else {
         actor._exp[classId] = num;
-        Object.keys(actor._exp).filter(k => !k.startsWith('@')).forEach(k => { actor._exp[k] = num; });
+        Object.keys(actor._exp).filter(k => !k.startsWith('@') && isSafeKey(k)).forEach(k => { actor._exp[k] = num; });
       }
     }
   }
@@ -3299,7 +3462,7 @@ const htmlContent = `<!DOCTYPE html>
     container.innerHTML = '';
     if (!actor) return;
 
-    function makeCard(title, label, val, onCommit) {
+    function makeCard(title, label, val, onCommit, isString = false) {
       const card = document.createElement('div');
       card.className = 'stat-card';
       card.innerHTML = \`
@@ -3311,19 +3474,33 @@ const htmlContent = `<!DOCTYPE html>
       \`;
       const input = card.querySelector('input');
       input.onchange = () => {
-        let v = input.value;
-        if (/^-?\\d+$/.test(v)) v = parseInt(v, 10);
-        else if (/^-?\\d+\\.\\d+$/.test(v)) v = parseFloat(v);
-        onCommit(v);
+        if (isString) {
+          onCommit(String(input.value));
+        } else {
+          const num = Math.trunc(Number(input.value) || 0);
+          input.value = num;
+          onCommit(num);
+        }
         markSaveModified('Stat ' + title);
       };
       container.appendChild(card);
       return input;
     }
 
+    function updateDropdownOption() {
+      const dd = document.getElementById('char-dropdown');
+      if (!dd || !dd.children) return;
+      const opt = Array.from(dd.children).find(o => Number(o.value) === activeCharacterIndex);
+      if (opt) {
+        const nm = actor._name || actor['@name'] || \`Actor #\${activeCharacterIndex}\`;
+        const lv = actor._level || actor['@level'] || 1;
+        opt.textContent = \`#\${activeCharacterIndex} — \${nm} (Lv. \${lv})\`;
+      }
+    }
+
     const lvlKey = actor['@level'] !== undefined ? '@level' : '_level';
     let expInput = null;
-    makeCard('LEVEL', 'Character Level', actor[lvlKey] || 1, (v) => {
+    makeCard('LEVEL', 'Character Level', actor[lvlKey] ?? 1, (v) => {
       const prevLvl = Number(actor[lvlKey]) || 1;
       const nextLvl = Math.max(1, parseInt(v, 10) || 1);
       actor[lvlKey] = nextLvl;
@@ -3331,21 +3508,23 @@ const htmlContent = `<!DOCTYPE html>
         setActorExp(actor, 0);
         if (expInput) expInput.value = 0;
       }
+      updateDropdownOption();
     });
 
     expInput = makeCard('EXP', 'Total Experience', getActorExp(actor), (v) => setActorExp(actor, v));
 
     const hpKey = actor['@hp'] !== undefined ? '@hp' : '_hp';
-    makeCard('HP', 'Current HP', actor[hpKey] || 100, (v) => actor[hpKey] = v);
+    makeCard('HP', 'Current HP', actor[hpKey] ?? 100, (v) => actor[hpKey] = Math.max(0, v));
 
     const mpKey = actor['@mp'] !== undefined ? '@mp' : (actor['@sp'] !== undefined ? '@sp' : '_mp');
-    makeCard('MP / SP', 'Current MP / SP', actor[mpKey] || 50, (v) => actor[mpKey] = v);
+    makeCard('MP / SP', 'Current MP / SP', actor[mpKey] ?? 50, (v) => actor[mpKey] = Math.max(0, v));
 
     const nameKey = actor['@name'] !== undefined ? '@name' : '_name';
     if (actor[nameKey] !== undefined) {
       makeCard('NAME', 'Character Name', String(actor[nameKey] || ''), (v) => {
         actor[nameKey] = String(v);
-      });
+        updateDropdownOption();
+      }, true);
     }
 
     const paramPlus = actor._paramPlus || actor['@param_plus'];
@@ -3353,6 +3532,14 @@ const htmlContent = `<!DOCTYPE html>
       const pPlus = getJsonExArray(paramPlus);
       const names = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
       names.forEach((name, i) => makeCard(name, \`\${name} Bonus\`, pPlus[i] || 0, (v) => pPlus[i] = v));
+    } else if (actor['@str_plus'] !== undefined || actor['@maxhp_plus'] !== undefined) {
+      const xpStats = [
+        ['MHP', '@maxhp_plus'], ['MSP', '@maxsp_plus'], ['STR', '@str_plus'],
+        ['DEX', '@dex_plus'], ['AGI', '@agi_plus'], ['INT', '@int_plus']
+      ];
+      xpStats.forEach(([label, key]) => {
+        if (actor[key] !== undefined) makeCard(label, \`\${label} Bonus\`, actor[key] || 0, (v) => actor[key] = v);
+      });
     }
 
     renderCharacterSkills(actor);
@@ -3438,8 +3625,11 @@ const htmlContent = `<!DOCTYPE html>
   function renderInventoryTab(partyObj) {
     const container = document.getElementById('inventory-cards-container');
     container.innerHTML = '';
-    if (!partyObj) return;
-    const itemsObj = partyObj['@items'] || partyObj._items || partyObj.items || {};
+    if (!partyObj) {
+      document.getElementById('badge-item-count').textContent = '0';
+      return;
+    }
+    const itemsObj = ensurePartyBag(partyObj, 'items');
     const itemIds = Object.keys(itemsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-item-count').textContent = itemIds.length;
 
@@ -3449,6 +3639,7 @@ const htmlContent = `<!DOCTYPE html>
     document.getElementById('btn-items-set-all-99').onclick = () => {
       let count = 0;
       itemIds.forEach(id => {
+        if (gameData.itemTypes && gameData.itemTypes[id] === 2) return;
         if (itemsObj[id] > 0) {
           itemsObj[id] = 99;
           count++;
@@ -3486,9 +3677,15 @@ const htmlContent = `<!DOCTYPE html>
 
     document.getElementById('btn-add-item-dialog').onclick = () => {
       const picked = picker && picker.value ? picker.value : null;
-      const id = picked || prompt('Enter Item ID to add:');
-      if (!id || isNaN(id)) return;
-      const val = picked ? 99 : (parseInt(prompt('Enter quantity (1-99):', '99'), 10) || 99);
+      const rawId = picked || prompt('Enter Item ID to add:');
+      const id = parseInt(rawId, 10);
+      if (!id || id <= 0) return;
+      let val = 99;
+      if (!picked) {
+        const rawQty = prompt('Enter quantity (1-99):', '99');
+        if (rawQty === null) return;
+        val = Math.max(1, parseInt(rawQty, 10) || 99);
+      }
       itemsObj[id] = val;
       if (picker) picker.value = '';
       renderInventoryTab(partyObj);
@@ -3522,13 +3719,14 @@ const htmlContent = `<!DOCTYPE html>
 
       const input = card.querySelector('input');
       const commit = (v) => {
-        itemsObj[id] = v;
-        input.value = v;
+        const clamped = Math.max(0, v);
+        itemsObj[id] = clamped;
+        input.value = clamped;
         markSaveModified('Item #' + id);
       };
-      input.onchange = () => commit(parseInt(input.value) || 0);
-      card.querySelector('.btn-sub').onclick = () => commit(Math.max(0, (parseInt(input.value)||0)-1));
-      card.querySelector('.btn-add').onclick = () => commit((parseInt(input.value)||0)+1);
+      input.onchange = () => commit(parseInt(input.value, 10) || 0);
+      card.querySelector('.btn-sub').onclick = () => commit(Math.max(0, (parseInt(input.value, 10)||0)-1));
+      card.querySelector('.btn-add').onclick = () => commit((parseInt(input.value, 10)||0)+1);
       card.querySelector('.btn-99').onclick = () => commit(99);
 
       container.appendChild(card);
@@ -3538,8 +3736,11 @@ const htmlContent = `<!DOCTYPE html>
   function renderWeaponsTab(partyObj) {
     const container = document.getElementById('weapons-cards-container');
     container.innerHTML = '';
-    if (!partyObj) return;
-    const weaponsObj = partyObj['@weapons'] || partyObj._weapons || partyObj.weapons || {};
+    if (!partyObj) {
+      document.getElementById('badge-weapon-count').textContent = '0';
+      return;
+    }
+    const weaponsObj = ensurePartyBag(partyObj, 'weapons');
     const ids = Object.keys(weaponsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-weapon-count').textContent = ids.length;
 
@@ -3574,8 +3775,9 @@ const htmlContent = `<!DOCTYPE html>
 
     document.getElementById('btn-add-weapon-dialog').onclick = () => {
       const picked = picker && picker.value ? picker.value : null;
-      const id = picked || prompt('Enter Weapon ID to add:');
-      if (!id || isNaN(id)) return;
+      const rawId = picked || prompt('Enter Weapon ID to add:');
+      const id = parseInt(rawId, 10);
+      if (!id || id <= 0) return;
       weaponsObj[id] = (weaponsObj[id] || 0) + 1;
       if (picker) picker.value = '';
       renderWeaponsTab(partyObj);
@@ -3596,7 +3798,9 @@ const htmlContent = `<!DOCTYPE html>
         <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
-        weaponsObj[id] = parseInt(e.target.value) || 0;
+        const v = Math.max(0, parseInt(e.target.value, 10) || 0);
+        weaponsObj[id] = v;
+        e.target.value = v;
         markSaveModified('Weapon #' + id);
       };
       container.appendChild(card);
@@ -3606,8 +3810,11 @@ const htmlContent = `<!DOCTYPE html>
   function renderArmorsTab(partyObj) {
     const container = document.getElementById('armors-cards-container');
     container.innerHTML = '';
-    if (!partyObj) return;
-    const armorsObj = partyObj['@armors'] || partyObj._armors || partyObj.armors || {};
+    if (!partyObj) {
+      document.getElementById('badge-armor-count').textContent = '0';
+      return;
+    }
+    const armorsObj = ensurePartyBag(partyObj, 'armors');
     const ids = Object.keys(armorsObj).filter(k => !k.startsWith('@'));
     document.getElementById('badge-armor-count').textContent = ids.length;
 
@@ -3642,8 +3849,9 @@ const htmlContent = `<!DOCTYPE html>
 
     document.getElementById('btn-add-armor-dialog').onclick = () => {
       const picked = picker && picker.value ? picker.value : null;
-      const id = picked || prompt('Enter Armor ID to add:');
-      if (!id || isNaN(id)) return;
+      const rawId = picked || prompt('Enter Armor ID to add:');
+      const id = parseInt(rawId, 10);
+      if (!id || id <= 0) return;
       armorsObj[id] = (armorsObj[id] || 0) + 1;
       if (picker) picker.value = '';
       renderArmorsTab(partyObj);
@@ -3664,17 +3872,25 @@ const htmlContent = `<!DOCTYPE html>
         <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
-        armorsObj[id] = parseInt(e.target.value) || 0;
+        const v = Math.max(0, parseInt(e.target.value, 10) || 0);
+        armorsObj[id] = v;
+        e.target.value = v;
         markSaveModified('Armor #' + id);
       };
       container.appendChild(card);
     });
   }
 
+  let varsRenderLimit = 250;
+  let switchesRenderLimit = 250;
+
   function renderVariablesTab(varsObj) {
     const container = document.getElementById('variables-cards-container');
     container.innerHTML = '';
-    if (!varsObj) return;
+    if (!varsObj) {
+      document.getElementById('badge-var-count').textContent = '0';
+      return;
+    }
     const varsArr = getJsonExArray(varsObj['@data'] || varsObj._data || varsObj);
     const nonZeroOnly = document.getElementById('vars-nonzero-only').checked;
     const q = document.getElementById('variables-search').value.trim().toLowerCase().replace(/^#/, '');
@@ -3682,20 +3898,21 @@ const htmlContent = `<!DOCTYPE html>
 
     let count = 0;
     let rendered = 0;
-    const maxLen = compareBaseline ? Math.max(varsArr.length, compareBaseline.vars.length) : varsArr.length;
+    const maxNamedVar = Object.keys(gameData.variables || {}).reduce((m, k) => Math.max(m, Number(k) || 0), 0);
+    const maxLen = Math.max(varsArr.length, compareBaseline ? compareBaseline.vars.length : 0, maxNamedVar ? maxNamedVar + 1 : 0);
     for (let id = 1; id < maxLen; id++) {
       const val = varsArr[id];
       const baseVal = compareBaseline ? compareBaseline.vars[id] : undefined;
       if (compareBaseline) {
         if ((val ?? 0) === (baseVal ?? 0)) continue;
       } else {
-        if (val === undefined || val === null) continue;
-        if (nonZeroOnly && (val === 0 || val === '0')) continue;
+        if (nonZeroOnly && (val === undefined || val === null || val === 0 || val === '0')) continue;
+        if (!nonZeroOnly && (val === undefined || val === null) && !(gameData.variables && gameData.variables[id])) continue;
       }
       const vName = (gameData && gameData.variables && gameData.variables[id]) || \`Variable #\${id}\`;
       if (q && !String(id).includes(q) && !String(val ?? '').toLowerCase().includes(q) && !vName.toLowerCase().includes(q)) continue;
       count++;
-      if (rendered >= 250) continue;
+      if (rendered >= varsRenderLimit) continue;
       rendered++;
 
       const diffSub = compareBaseline ? \` <span style="color:var(--accent-sand); font-size:0.72rem;">(Was: \${escapeHtml(String(baseVal ?? 0))})</span>\` : '';
@@ -3708,10 +3925,23 @@ const htmlContent = `<!DOCTYPE html>
       card.querySelector('input').onchange = (e) => {
         let n = e.target.value;
         if (/^-?\\d+$/.test(n)) n = parseInt(n, 10);
+        else if (/^-?\\d+\\.\\d+$/.test(n)) n = parseFloat(n);
         varsArr[id] = n;
         markSaveModified('Var #' + id);
       };
       container.appendChild(card);
+    }
+    if (count > rendered) {
+      const moreBtn = document.createElement('button');
+      moreBtn.type = 'button';
+      moreBtn.className = 'btn btn-secondary btn-sm';
+      moreBtn.style.gridColumn = '1 / -1';
+      moreBtn.textContent = \`Show More Variables (\${rendered} / \${count})\`;
+      moreBtn.onclick = () => {
+        varsRenderLimit += 500;
+        renderVariablesTab(varsObj);
+      };
+      container.appendChild(moreBtn);
     }
     if (diffBanner) {
       if (compareBaseline) {
@@ -3727,7 +3957,10 @@ const htmlContent = `<!DOCTYPE html>
   function renderSwitchesTab(swObj) {
     const container = document.getElementById('switches-cards-container');
     container.innerHTML = '';
-    if (!swObj) return;
+    if (!swObj) {
+      document.getElementById('badge-switch-count').textContent = '0';
+      return;
+    }
     const swArr = getJsonExArray(swObj['@data'] || swObj._data || swObj);
     const qEl = document.getElementById('switches-search');
     const q = qEl ? qEl.value.trim().toLowerCase().replace(/^#/, '') : '';
@@ -3735,8 +3968,11 @@ const htmlContent = `<!DOCTYPE html>
     const filter = fEl ? fEl.value : 'all';
 
     let trueCount = 0;
+    let matchCount = 0;
     let rendered = 0;
-    for (let id = 1; id < swArr.length; id++) {
+    const maxNamedSw = Object.keys(gameData.switches || {}).reduce((m, k) => Math.max(m, Number(k) || 0), 0);
+    const maxLen = Math.max(swArr.length, compareBaseline ? compareBaseline.switches.length : 0, maxNamedSw ? maxNamedSw + 1 : 0);
+    for (let id = 1; id < maxLen; id++) {
       const val = Boolean(swArr[id]);
       if (val) trueCount++;
       if (filter === 'on' && !val) continue;
@@ -3744,7 +3980,8 @@ const htmlContent = `<!DOCTYPE html>
       if (filter === 'diff' && (!compareBaseline || Boolean(compareBaseline.switches[id]) === val)) continue;
       const name = (gameData && gameData.switches && gameData.switches[id]) || \`Switch #\${id}\`;
       if (q && !String(id).includes(q) && !name.toLowerCase().includes(q)) continue;
-      if (rendered >= 250) continue;
+      matchCount++;
+      if (rendered >= switchesRenderLimit) continue;
       rendered++;
 
       const card = document.createElement('div');
@@ -3758,6 +3995,18 @@ const htmlContent = `<!DOCTYPE html>
         markSaveModified('Switch #' + id);
       };
       container.appendChild(card);
+    }
+    if (matchCount > rendered) {
+      const moreBtn = document.createElement('button');
+      moreBtn.type = 'button';
+      moreBtn.className = 'btn btn-secondary btn-sm';
+      moreBtn.style.gridColumn = '1 / -1';
+      moreBtn.textContent = \`Show More Switches (\${rendered} / \${matchCount})\`;
+      moreBtn.onclick = () => {
+        switchesRenderLimit += 500;
+        renderSwitchesTab(swObj);
+      };
+      container.appendChild(moreBtn);
     }
     document.getElementById('badge-switch-count').textContent = trueCount;
   }
@@ -3777,11 +4026,37 @@ const htmlContent = `<!DOCTYPE html>
     }
   }
 
+  function getByTokens(obj, tokens) {
+    let cur = obj;
+    for (let i = 0; i < tokens.length; i++) {
+      if (cur === null || cur === undefined) return undefined;
+      if (!isSafeKey(tokens[i])) return undefined;
+      cur = cur[tokens[i]];
+    }
+    return cur;
+  }
+
+  let rawRenderLimit = 100;
+
   function renderRawTable() {
     const tbody = document.getElementById('raw-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    flatEntries.slice(0, 50).forEach(entry => {
+    const searchEl = document.getElementById('raw-search-input');
+    const q = searchEl && searchEl.value ? searchEl.value.trim().toLowerCase() : '';
+
+    let matched = 0;
+    let shown = 0;
+    flatEntries.forEach(entry => {
+      if (currentFile.parsedRoot) {
+        const liveVal = getByTokens(currentFile.parsedRoot, entry.pathTokens);
+        if (liveVal !== undefined) entry.currentVal = liveVal;
+      }
+      if (q && !entry.path.toLowerCase().includes(q) && !String(entry.currentVal ?? '').toLowerCase().includes(q)) return;
+      matched++;
+      if (shown >= rawRenderLimit) return;
+      shown++;
+
       const tr = document.createElement('tr');
       tr.style.borderBottom = '1px solid var(--border-subtle)';
       tr.innerHTML = \`
@@ -3799,29 +4074,61 @@ const htmlContent = `<!DOCTYPE html>
         else if (entry.type === 'boolean') v = (v === 'true' || v === '1');
         entry.currentVal = v;
         setByTokens(currentFile.parsedRoot, entry.pathTokens, v);
-        markSaveModified('Raw: ' + entry.path);
+        setupVisualEditor();
+        if (v === entry.origVal) {
+          saveChanges.delete('Raw: ' + entry.path);
+          const badge = document.getElementById('label-changes');
+          if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+        } else {
+          markSaveModified('Raw: ' + entry.path);
+        }
       };
       rev.onclick = () => {
         entry.currentVal = entry.origVal;
-        inp.value = entry.origVal;
+        inp.value = entry.origVal ?? '';
         setByTokens(currentFile.parsedRoot, entry.pathTokens, entry.origVal);
+        saveChanges.delete('Raw: ' + entry.path);
+        const badge = document.getElementById('label-changes');
+        if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+        setupVisualEditor();
       };
       tbody.appendChild(tr);
     });
-  }
 
-  function flattenObject(obj, prefix = '', tokens = [], visited = new WeakSet(), depth = 0) {
+    const showingLbl = document.getElementById('raw-showing-label');
+    if (showingLbl) showingLbl.textContent = \`\${shown} / \${matched} entries\`;
+
+    if (matched > shown) {
+      const trMore = document.createElement('tr');
+      trMore.innerHTML = \`<td colspan="5" style="padding:10px; text-align:center;"><button type="button" class="btn btn-secondary btn-sm" id="btn-raw-more">Show More (\${shown} / \${matched})</button></td>\`;
+      const btnMore = trMore.querySelector('#btn-raw-more');
+      if (btnMore) {
+        btnMore.onclick = () => {
+          rawRenderLimit += 200;
+          renderRawTable();
+        };
+      }
+      tbody.appendChild(trMore);
+    }
+  }
+  const rawSearchInput = document.getElementById('raw-search-input');
+  if (rawSearchInput) rawSearchInput.oninput = () => { rawRenderLimit = 100; renderRawTable(); };
+
+  const MAX_FLAT_ENTRIES = 50000;
+  function flattenObject(obj, prefix = '', tokens = [], visited = new WeakSet(), depth = 0, counter = { count: 0 }) {
     let result = [];
-    if (!obj || typeof obj !== 'object' || depth > 64) return result;
+    if (!obj || typeof obj !== 'object' || depth > 64 || counter.count >= MAX_FLAT_ENTRIES) return result;
     if (visited.has(obj)) return result;
     visited.add(obj);
     for (const [key, val] of Object.entries(obj)) {
-      if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
+      if (counter.count >= MAX_FLAT_ENTRIES) break;
+      if (!isSafeKey(key) || String(key).startsWith('__ruby_')) continue;
       const curTokens = [...tokens, key];
       const curPath = prefix ? (Array.isArray(obj) ? \`\${prefix}[\${key}]\` : \`\${prefix}.\${key}\`) : key;
       if (val !== null && typeof val === 'object' && !(val instanceof Uint8Array)) {
-        result = result.concat(flattenObject(val, curPath, curTokens, visited, depth + 1));
+        result = result.concat(flattenObject(val, curPath, curTokens, visited, depth + 1, counter));
       } else {
+        counter.count++;
         result.push({ path: curPath, pathTokens: curTokens, type: typeof val, origVal: val, currentVal: val, isModified: false });
       }
     }
@@ -3843,27 +4150,37 @@ const htmlContent = `<!DOCTYPE html>
           const json = JSON.parse(reader.result);
           if (Array.isArray(json)) {
             const cat = detectDbCategory(file.name, json);
-            const target = cat && gameData[cat] ? gameData[cat] : null;
-            if (!target) {
+            if (!cat || !gameData[cat]) {
               showToast(\`Skipped \${file.name}: Unsupported reference data file.\`, 'warn');
               return;
             }
+            gameData[cat] = {};
+            if (cat === 'items') gameData.itemTypes = {};
+            const target = gameData[cat];
             json.forEach(x => {
-              if (x && x.id && x.name) {
+              if (x && x.id && x.name && isSafeKey(x.id)) {
                 target[x.id] = x.name;
                 if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
               }
             });
           } else if (json && typeof json === 'object' && (Array.isArray(json.variables) || Array.isArray(json.switches))) {
-            if (Array.isArray(json.variables)) json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
-            if (Array.isArray(json.switches)) json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+            if (Array.isArray(json.variables)) {
+              gameData.variables = {};
+              json.variables.forEach((n, i) => { if (n) gameData.variables[i] = n; });
+            }
+            if (Array.isArray(json.switches)) {
+              gameData.switches = {};
+              json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
+            }
           } else {
             showToast(\`Skipped \${file.name}: Unsupported reference data file.\`, 'warn');
             return;
           }
           setupVisualEditor();
           showToast(\`Loaded names from \${file.name}\`, 'success');
-        } catch(e) {}
+        } catch(e) {
+          showToast(\`Invalid JSON in \${file.name}\`, 'danger');
+        }
       };
       reader.readAsText(file);
     });
@@ -3871,12 +4188,25 @@ const htmlContent = `<!DOCTYPE html>
   if (dataDropzone && dataFileInput) {
     dataDropzone.onclick = () => dataFileInput.click();
     dataDropzone.ondragover = (e) => e.preventDefault();
-    dataDropzone.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer && e.dataTransfer.files) handleDataFiles(e.dataTransfer.files); };
-    dataFileInput.onchange = (e) => { if (e.target.files) handleDataFiles(e.target.files); };
+    dataDropzone.ondrop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.dataTransfer && e.dataTransfer.files) handleDataFiles(e.dataTransfer.files);
+    };
+    dataFileInput.onchange = (e) => {
+      if (e.target.files) {
+        handleDataFiles(e.target.files);
+        dataFileInput.value = '';
+      }
+    };
   }
 
   // Save Export
   async function downloadEditedSave() {
+    if (!currentFile || !currentFile.parsedRoot) {
+      showToast('No save file loaded.', 'warn');
+      return;
+    }
     if (currentFile.engine === 'wolf') {
       showToast('WOLF RPG Pro uses proprietary encryption — please use Cheat Engine as described.', 'warn');
       return;
@@ -3885,9 +4215,12 @@ const htmlContent = `<!DOCTYPE html>
     if (currentFile.format === 'ruby_marshal') {
       const bytes = RubyMarshal.encode(currentFile.parsedRoot);
       blob = new Blob([bytes], { type: 'application/octet-stream' });
-    } else if (currentFile.format === 'rmmzsave' || currentFile.format === 'rmmzsave_bin') {
+    } else if (currentFile.format === 'rmmzsave') {
       const zipped = pako.deflate(JSON.stringify(currentFile.parsedRoot), { to: 'string', level: 1 });
       blob = new Blob([zipped], { type: 'text/plain;charset=utf-8' });
+    } else if (currentFile.format === 'rmmzsave_bin') {
+      const zipped = pako.deflate(JSON.stringify(currentFile.parsedRoot), { level: 1 });
+      blob = new Blob([zipped], { type: 'application/octet-stream' });
     } else if (currentFile.format === 'rpgmaker_lz') {
       const comp = LZString.compressToBase64(JSON.stringify(currentFile.parsedRoot));
       blob = new Blob([comp], { type: 'text/plain;charset=utf-8' });
@@ -3895,24 +4228,17 @@ const htmlContent = `<!DOCTYPE html>
       blob = new Blob([JSON.stringify(currentFile.parsedRoot, null, 2)], { type: 'application/json' });
     }
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = currentFile.name || 'savegame.rpgsave';
-    a.click();
-    URL.revokeObjectURL(url);
+    triggerBlobDownload(blob, currentFile.name, 'savegame.rpgsave');
     showToast('Download started.', 'success');
   }
 
   function downloadBackupRaw() {
-    if (!currentFile || !currentFile.rawBytes) return;
+    if (!currentFile || !currentFile.rawBytes) {
+      showToast('No save file loaded.', 'warn');
+      return;
+    }
     const blob = new Blob([currentFile.rawBytes], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = (currentFile.name || 'save') + '.bak';
-    a.click();
-    URL.revokeObjectURL(url);
+    triggerBlobDownload(blob, (currentFile.name || 'save') + '.bak', 'save.bak');
     showToast('Original backup (.bak) downloaded.', 'success');
   }
 
@@ -3920,28 +4246,23 @@ const htmlContent = `<!DOCTYPE html>
   if (btnRevDl) btnRevDl.onclick = downloadEditedSave;
   const btnBakRaw = document.getElementById('btn-backup-raw');
   if (btnBakRaw) btnBakRaw.onclick = downloadBackupRaw;
-  const btnModalBak = document.getElementById('btn-modal-bak');
-  if (btnModalBak) btnModalBak.onclick = downloadBackupRaw;
-  const btnModalDl = document.getElementById('btn-modal-download');
-  if (btnModalDl) btnModalDl.onclick = downloadEditedSave;
-  const diffModal = document.getElementById('diff-modal');
-  const btnCloseModal = document.getElementById('btn-close-modal');
-  if (btnCloseModal && diffModal) btnCloseModal.onclick = () => { diffModal.style.display = 'none'; };
-  const btnCancelModal = document.getElementById('btn-modal-cancel');
-  if (btnCancelModal && diffModal) btnCancelModal.onclick = () => { diffModal.style.display = 'none'; };
 
   const btnExpJson = document.getElementById('btn-export-json');
   if (btnExpJson) {
     btnExpJson.onclick = () => {
-      if (!currentFile || !currentFile.parsedRoot) return;
-      const blob = new Blob([JSON.stringify(currentFile.parsedRoot, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = (currentFile.name ? currentFile.name.replace(/\\.[^/.]+$/, '') : 'save') + '_decrypted.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Decrypted JSON exported.', 'success');
+      if (!currentFile || !currentFile.parsedRoot) {
+        showToast('No save file loaded.', 'warn');
+        return;
+      }
+      try {
+        const jsonOut = safeJsonStringify(currentFile.parsedRoot, 2);
+        const blob = new Blob([jsonOut], { type: 'application/json' });
+        const base = currentFile.name ? currentFile.name.replace(/\\.[^/.]+$/, '') : 'save';
+        triggerBlobDownload(blob, base + '_decrypted.json', 'save_decrypted.json');
+        showToast('Decrypted JSON exported.', 'success');
+      } catch (err) {
+        showToast('Export failed: ' + err.message, 'danger');
+      }
     };
   }
 
@@ -3956,6 +4277,15 @@ const htmlContent = `<!DOCTYPE html>
       parsedRoot: null, engine: null
     };
     flatEntries = [];
+    compareBaseline = null;
+    varsRenderLimit = 250;
+    switchesRenderLimit = 250;
+    rawRenderLimit = 100;
+    activeCharacterIndex = 1;
+    const btnClearCompare = document.getElementById('btn-clear-compare-vars');
+    if (btnClearCompare) btnClearCompare.style.display = 'none';
+    const diffBanner = document.getElementById('vars-diff-banner');
+    if (diffBanner) diffBanner.style.display = 'none';
     resetSaveModified();
     if (fileInput) fileInput.value = '';
     labelFilename.textContent = 'None';
@@ -3992,6 +4322,7 @@ const htmlContent = `<!DOCTYPE html>
   window.switchTab = (tabId) => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
     document.querySelectorAll('.section-panel').forEach(p => p.classList.toggle('active', p.id === tabId));
+    if (tabId === 'tab-raw') renderRawTable();
   };
   document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.getAttribute('data-tab')));
 
@@ -4001,6 +4332,11 @@ const htmlContent = `<!DOCTYPE html>
 </body>
 </html>
 `;
+
+const scriptHashes = [...htmlContent.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+  .map(m => `'sha256-${crypto.createHash('sha256').update(m[1], 'utf8').digest('base64')}'`)
+  .join(' ');
+htmlContent = htmlContent.replace('__CSP_SCRIPT_HASHES__', scriptHashes);
 
 fs.writeFileSync(path.join(__dirname, 'index.html'), htmlContent);
 console.log('Save & DB Studio built successfully!');

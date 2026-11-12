@@ -1,53 +1,7 @@
 const assert = require('assert');
 const http = require('http');
-const fs = require('fs');
 const path = require('path');
-
-const ROOT_DIR = path.resolve(__dirname, '../../');
-const MIME_TYPES = {
-  '.html': 'text/html',
-  '.js': 'text/javascript',
-  '.css': 'text/css',
-  '.json': 'application/json'
-};
-
-function createTestServer() {
-  return http.createServer((req, res) => {
-    let pathname;
-    try {
-      const parsed = new URL(req.url, 'http://localhost');
-      pathname = decodeURIComponent(parsed.pathname);
-    } catch (e) {
-      res.writeHead(400, { 'Content-Type': 'text/plain' });
-      res.end('400 Bad Request');
-      return;
-    }
-
-    if (pathname === '/') pathname = '/index.html';
-
-    const safeRelPath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
-    const filePath = path.resolve(ROOT_DIR, '.' + safeRelPath);
-
-    if (!filePath.startsWith(ROOT_DIR + path.sep) && filePath !== ROOT_DIR && filePath !== path.join(ROOT_DIR, 'index.html')) {
-      res.writeHead(403, { 'Content-Type': 'text/plain' });
-      res.end('403 Forbidden');
-      return;
-    }
-
-    const ext = path.extname(filePath).toLowerCase();
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
-    fs.readFile(filePath, (err, content) => {
-      if (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('404 Not Found');
-      } else {
-        res.writeHead(200, { 'Content-Type': contentType });
-        res.end(content);
-      }
-    });
-  });
-}
+const server = require(path.resolve(__dirname, '../../server.js'));
 
 function fetch(url) {
   return new Promise((resolve, reject) => {
@@ -66,8 +20,6 @@ function fetch(url) {
 }
 
 module.exports = async function runE2ESmokeTests(it) {
-  const server = createTestServer();
-
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
   const baseUrl = `http://127.0.0.1:${port}`;
@@ -77,6 +29,7 @@ module.exports = async function runE2ESmokeTests(it) {
       const res = await fetch(`${baseUrl}/`);
       assert.strictEqual(res.statusCode, 200);
       assert.ok(res.headers['content-type'].includes('text/html'));
+      assert.strictEqual(res.headers['x-content-type-options'], 'nosniff');
       assert.ok(res.body.includes('http-equiv="Content-Security-Policy"'), 'Must deliver CSP');
       assert.ok(res.body.includes('Universal RPG Maker Save Editor'), 'Must contain title');
     });
@@ -91,9 +44,28 @@ module.exports = async function runE2ESmokeTests(it) {
       assert.strictEqual(resPako.statusCode, 200);
     });
 
-    await it('E2E HTTP Security: Rejects directory traversal attempts with 403 Forbidden', async () => {
+    await it('E2E HTTP Security: Rejects directory traversal and blocked internal files with 403 Forbidden', async () => {
       const res = await fetch(`${baseUrl}/../../../../Windows/win.ini`);
       assert.ok(res.statusCode === 403 || res.statusCode === 404, 'Must not allow traversal outside root');
+
+      const resBlocked = await fetch(`${baseUrl}/server.js`);
+      assert.strictEqual(resBlocked.statusCode, 403, 'Must block internal server.js');
+
+      const resTrailingDot = await fetch(`${baseUrl}/server.js.`);
+      assert.strictEqual(resTrailingDot.statusCode, 403, 'Must block Windows trailing-dot bypass');
+
+      const resInternalDir = await fetch(`${baseUrl}/functions/_middleware.js`);
+      assert.strictEqual(resInternalDir.statusCode, 403, 'Must block non-allowlisted internal files');
+
+      const resWinDevice = await fetch(`${baseUrl}/sample/con`);
+      assert.strictEqual(resWinDevice.statusCode, 403, 'Must block Windows reserved device names');
+
+      const resDoubleEnc = await fetch(`${baseUrl}/%252e%252e/server.js`);
+      assert.strictEqual(resDoubleEnc.statusCode, 400, 'Must reject double URL encoding with 400');
+
+      const resSvg = await fetch(`${baseUrl}/favicon.svg`);
+      assert.strictEqual(resSvg.statusCode, 200);
+      assert.ok(resSvg.headers['content-security-policy'].includes("default-src 'none'"), 'Non-HTML assets must lock script execution');
     });
   } finally {
     await new Promise((resolve) => server.close(resolve));

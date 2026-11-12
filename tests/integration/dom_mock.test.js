@@ -56,6 +56,11 @@ function createDomSandbox() {
       getAttribute: (attr) => el._attrs ? el._attrs[attr] : null,
       setAttribute: (attr, val) => { el._attrs = el._attrs || {}; el._attrs[attr] = val; },
       appendChild: (child) => { children.push(child); return child; },
+      removeChild: (child) => {
+        const idx = children.indexOf(child);
+        if (idx !== -1) children.splice(idx, 1);
+        return child;
+      },
       querySelector: (sel) => {
         if (!el._qMap) el._qMap = {};
         if (!el._qMap[sel]) el._qMap[sel] = makeElement(sel, 'INPUT');
@@ -215,6 +220,9 @@ module.exports = async function runDomMockIntegrationTests(it) {
 
     elementsById['btn-gold-add-10k'].click();
     assert.strictEqual(Number(goldInput.value), 18200);
+    elementsById['gold-revert-btn'].click();
+    assert.strictEqual(Number(goldInput.value), 8200);
+    assert.ok(!elementsById['label-changes'].textContent.includes('Gold'), 'Reverting gold must remove Gold from change set');
 
     elementsById['btn-gold-max'].click();
     assert.strictEqual(Number(goldInput.value), 9999999);
@@ -239,6 +247,10 @@ module.exports = async function runDomMockIntegrationTests(it) {
     elementsById['btn-clear-save'].click();
     assert.strictEqual(elementsById['upload-section'].style.display, 'flex');
     assert.strictEqual(elementsById['save-editor-screen'].style.display, 'none');
+
+    // Verify Download Save when no file is loaded warns instead of downloading "null"
+    elementsById['btn-review-download'].click();
+    assert.ok(elementsById['toast'].textContent.includes('No save file loaded'));
 
     // Verify Clear Database Files buttons exist and are wired
     assert.strictEqual(typeof elementsById['btn-db-clear-all'].onclick, 'function');
@@ -285,5 +297,38 @@ module.exports = async function runDomMockIntegrationTests(it) {
     assert.strictEqual(elementsById['db-label-type'].textContent, 'WEAPONS DATABASE');
     assert.strictEqual(elementsById['db-label-filename'].textContent, 'my_custom_file.json');
     assert.strictEqual(elementsById['db-slot-file-weapons'].textContent, 'my_custom_file.json');
+
+    // Phase 4: Verify binary Zlib RMMZ save (rmmzsave_bin), Max Stats EXP sync, and Key Item protection on Set All 99
+    const binSave = {
+      party: { _gold: 100, _items: { 1: 2, 3: 1 } },
+      actors: { _data: [null, { _name: 'Hero', _classId: 1, _level: 5, _exp: { 1: 100 }, _hp: 0, _mp: 0, _paramPlus: [0,0,0,0,0,0,0,0] }] }
+    };
+    const rawBinBuffer = pako.deflate(JSON.stringify(binSave), { level: 1 });
+    elementsById['file-input'].onchange({
+      target: { files: [{ name: 'binary_save.rmmzsave', _buffer: rawBinBuffer }] }
+    });
+    await new Promise(r => setImmediate(r));
+
+    // Verify 0 HP / 0 MP is not masked by 100 / 50 default
+    const zeroHpCardInput = elementsById['char-stats-container'].children[2].querySelector('input');
+    const zeroMpCardInput = elementsById['char-stats-container'].children[3].querySelector('input');
+    assert.strictEqual(Number(zeroHpCardInput.value), 0, '0 HP must display as 0, not 100');
+    assert.strictEqual(Number(zeroMpCardInput.value), 0, '0 MP must display as 0, not 50');
+
+    // Verify adding weapon to a party without _weapons creates and persists party._weapons
+    elementsById['btn-add-weapon-dialog'].click();
+
+    elementsById['btn-char-max-stats'].click();
+    elementsById['btn-items-set-all-99'].click();
+    elementsById['btn-review-download'].click();
+
+    const binExportBlob = getLastBlob();
+    assert.strictEqual(binExportBlob.opts.type, 'application/octet-stream');
+    const binRoundtrip = JSON.parse(pako.inflate(binExportBlob.parts[0], { to: 'string' }));
+    assert.strictEqual(binRoundtrip.actors._data[1]._level, 99);
+    assert.strictEqual(binRoundtrip.actors._data[1]._exp[1], 9999999);
+    assert.strictEqual(binRoundtrip.party._items[1], 99);
+    assert.strictEqual(binRoundtrip.party._items[3], 1, 'Key item quantity must not be overwritten to 99');
+    assert.strictEqual(binRoundtrip.party._weapons['99'], 1, 'Newly added weapon on empty bag must persist in party._weapons');
   });
 };
