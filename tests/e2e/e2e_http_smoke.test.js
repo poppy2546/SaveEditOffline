@@ -1,4 +1,5 @@
 const assert = require('assert');
+const crypto = require('crypto');
 const http = require('http');
 const path = require('path');
 const server = require(path.resolve(__dirname, '../../server.js'));
@@ -32,6 +33,16 @@ module.exports = async function runE2ESmokeTests(it) {
       assert.strictEqual(res.headers['x-content-type-options'], 'nosniff');
       assert.ok(res.body.includes('http-equiv="Content-Security-Policy"'), 'Must deliver CSP');
       assert.ok(res.body.includes('Universal RPG Maker Save Editor'), 'Must contain title');
+      assert.ok(!/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(res.body), 'index.html must not contain unescaped ASCII control characters');
+
+      const cspMatch = res.body.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"/i);
+      assert.ok(cspMatch, 'CSP meta tag must exist');
+      const scripts = [...res.body.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+      assert.ok(scripts.length >= 4, 'Expected embedded scripts in index.html');
+      for (const m of scripts) {
+        const hash = `'sha256-${crypto.createHash('sha256').update(m[1], 'utf8').digest('base64')}'`;
+        assert.ok(cspMatch[1].includes(hash), `CSP meta must whitelist script hash ${hash}`);
+      }
     });
 
     await it('E2E HTTP: Delivers core runtime assets (ruby_marshal.js & pako.min.js)', async () => {

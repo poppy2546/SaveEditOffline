@@ -1259,8 +1259,8 @@ let htmlContent = `<!DOCTYPE html>
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
-      .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
-      .replace(/[\u{E0000}-\u{E007F}]/gu, '')
+      .replace(/[\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]/g, '')
+      .replace(/[\\u{E0000}-\\u{E007F}]/gu, '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
@@ -1275,10 +1275,10 @@ let htmlContent = `<!DOCTYPE html>
 
   function sanitizeDownloadName(name, fallback) {
     const cleaned = String(name || '')
-      .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
-      .replace(/[\u{E0000}-\u{E007F}]/gu, '')
-      .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')
-      .replace(/^[.\s]+|[.\s]+$/g, '');
+      .replace(/[\\u200e\\u200f\\u202a-\\u202e\\u2066-\\u2069]/g, '')
+      .replace(/[\\u{E0000}-\\u{E007F}]/gu, '')
+      .replace(/[<>:"/\\\\|?*\\x00-\\x1f]/g, '_')
+      .replace(/^[.\\s]+|[.\\s]+$/g, '');
     return cleaned || fallback;
   }
 
@@ -1295,7 +1295,7 @@ let htmlContent = `<!DOCTYPE html>
 
   function isDangerousFormula(formula) {
     if (typeof formula !== 'string' || !formula) return false;
-    return /\b(require|child_process|process|globalThis|window|document|Function|eval|fetch|XMLHttpRequest|WebSocket|localStorage)\b/i.test(formula);
+    return /\\b(require|child_process|process|globalThis|window|document|Function|eval|fetch|XMLHttpRequest|WebSocket|localStorage)\\b/i.test(formula);
   }
 
   function safeJsonStringify(root, space = 2, maxNodes = 250000) {
