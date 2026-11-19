@@ -1,8 +1,10 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
-const PORT = 3000;
+const parsedPort = Number(process.env.PORT);
+const PORT = Number.isInteger(parsedPort) && parsedPort > 0 && parsedPort <= 65535 ? parsedPort : 3000;
 const HOST = '127.0.0.1';
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -52,7 +54,9 @@ const server = http.createServer((req, res) => {
     'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'no-referrer',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Resource-Policy': 'same-origin',
+    'X-Permitted-Cross-Domain-Policies': 'none',
     'Content-Security-Policy': "default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
   };
 
@@ -64,7 +68,7 @@ const server = http.createServer((req, res) => {
 
   // Host header & Sec-Fetch-Site validation (blocks DNS rebinding & cross-site localhost probing)
   const hostHeader = String(req.headers.host || '').toLowerCase();
-  if (hostHeader && !/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(hostHeader)) {
+  if (!/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(hostHeader)) {
     res.writeHead(403, { ...baseSecHeaders, 'Content-Type': 'text/plain' });
     res.end('403 Forbidden - Invalid Host');
     return;
@@ -113,7 +117,7 @@ const server = http.createServer((req, res) => {
   const secHeaders = lowerPath === '/index.html'
     ? {
         ...baseSecHeaders,
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-fzIKu4b55nXw58dvy6RFS54it+PAoB+pRzD9tua/z+Y='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
       }
     : baseSecHeaders;
 
@@ -147,8 +151,23 @@ const server = http.createServer((req, res) => {
 });
 
 if (require.main === module) {
+  server.on('error', (err) => {
+    if (err && err.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is already in use. Stop the other process or run with another port, e.g. PORT=${PORT + 1} npm start`);
+      process.exit(1);
+    }
+    console.error('Server error:', err.message || err);
+    process.exit(1);
+  });
+
   server.listen(PORT, HOST, () => {
-    console.log(`SaveEdit Offline Server running at http://${HOST}:${PORT}/`);
+    const url = `http://localhost:${PORT}/`;
+    console.log(`SaveEdit Offline Server running at ${url} (bound to ${HOST})`);
+    if (process.argv.includes('--open')) {
+      const cmd = process.platform === 'win32' ? 'cmd' : (process.platform === 'darwin' ? 'open' : 'xdg-open');
+      const args = process.platform === 'win32' ? ['/c', 'start', '', url] : [url];
+      spawn(cmd, args, { detached: true, stdio: 'ignore' }).unref();
+    }
   });
 }
 

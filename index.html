@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-01PgBj8MXXH9QtHWLb5wHeeiG98UDMN4CWVTWxyrMIw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-fzIKu4b55nXw58dvy6RFS54it+PAoB+pRzD9tua/z+Y='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
 <title>Universal RPG Maker Save Editor</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23242933'/%3E%3Cstop%20offset='100%25'%20stop-color='%2314161B'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='gold'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23FFF2D6'/%3E%3Cstop%20offset='40%25'%20stop-color='%23E2B86B'/%3E%3Cstop%20offset='100%25'%20stop-color='%23B88028'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='crystal'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23C2F0BC'/%3E%3Cstop%20offset='60%25'%20stop-color='%2373A86E'/%3E%3Cstop%20offset='100%25'%20stop-color='%233B6338'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='14'%20fill='url(%23bg)'%20stroke='url(%23gold)'%20stroke-width='2.5'/%3E%3Cpath%20d='M16%2013h24l9%209v27a2%202%200%200%201-2%202H18a2%202%200%200%201-2-2V13z'%20fill='%231C2028'%20stroke='%23444B57'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3Cpath%20d='M22%2013h18v12a1%201%200%200%201-1%201H23a1%201%200%200%201-1-1V13z'%20fill='url(%23gold)'/%3E%3Crect%20x='26'%20y='16'%20width='3.5'%20height='6'%20rx='1'%20fill='%2314161B'/%3E%3Cpolygon%20points='32,29%2042,39%2032,49%2022,39'%20fill='url(%23crystal)'%20stroke='%23A2C79D'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3Cpolygon%20points='32,32%2039,39%2032,46%2025,39'%20fill='%23E8FCE4'%20opacity='0.35'/%3E%3Ccircle%20cx='32'%20cy='39'%20r='2.2'%20fill='%23FFFFFF'/%3E%3C/svg%3E">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -784,6 +784,7 @@
       Clear File
     </button>
     <button class="btn btn-secondary btn-sm" id="btn-export-json" type="button">Export JSON</button>
+    <button class="btn btn-secondary btn-sm" id="btn-revert-save" type="button" title="Revert all edits back to the original loaded save file">Revert All</button>
     <button class="btn btn-secondary btn-sm" id="btn-backup-raw" type="button" title="Download original unmodified save file (.bak)">Backup (.bak)</button>
     <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1917,11 +1918,15 @@ if (typeof module !== 'undefined') {
   const labelSize = document.getElementById('label-size');
   const labelChanges = document.getElementById('label-changes');
 
+  let toastTimer = null;
   function showToast(msg, type = 'info') {
     const t = document.getElementById('toast');
+    if (!t) return;
     t.textContent = msg;
     t.className = 'toast show ' + type;
-    setTimeout(() => { t.className = 'toast'; }, 2600);
+    if (toastTimer) clearTimeout(toastTimer);
+    const duration = (type === 'danger' || type === 'error') ? 4500 : (type === 'warn' ? 3500 : 2600);
+    toastTimer = setTimeout(() => { t.className = 'toast'; toastTimer = null; }, duration);
   }
 
   function formatBytes(b) {
@@ -2273,7 +2278,7 @@ if (typeof module !== 'undefined') {
         }
         applyDatabaseJson(file.name, json, handle, autoSwitch);
       } catch(e) {
-        alert('Error parsing database JSON:\n' + e.message);
+        showToast(`Failed to parse ${file.name}: ${e.message}`, 'danger');
       }
     };
     reader.readAsText(file);
@@ -2317,12 +2322,33 @@ if (typeof module !== 'undefined') {
     showToast(`Cleared ${cat.charAt(0).toUpperCase() + cat.slice(1)} database file.`, 'info');
   }
 
+  function hasUnsavedDbChanges() {
+    return Object.keys(dbStore).some(c => dbStore[c] && dbStore[c].modifiedIds && dbStore[c].modifiedIds.size > 0);
+  }
+
+  function hasUnsavedChanges() {
+    return (saveChanges && saveChanges.size > 0) || hasUnsavedDbChanges();
+  }
+
+  function confirmDiscardChanges(message) {
+    if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
+      return window.confirm(message);
+    }
+    return true;
+  }
+
   function clearAllDatabaseFiles() {
     const allCats = ['weapons', 'armors', 'items', 'skills', 'enemies', 'classes', 'actors'];
     const loaded = allCats.some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
     if (!loaded) {
       showToast('No database files are currently loaded.', 'info');
       return;
+    }
+    if (hasUnsavedDbChanges()) {
+      const modCount = allCats.reduce((sum, c) => sum + (dbStore[c] && dbStore[c].modifiedIds ? dbStore[c].modifiedIds.size : 0), 0);
+      if (!confirmDiscardChanges(`You have ${modCount} unsaved database modification(s). Clear all loaded database files anyway?`)) {
+        return;
+      }
     }
     allCats.forEach(c => {
       dbStore[c] = null;
@@ -3556,7 +3582,7 @@ if (typeof module !== 'undefined') {
         renderRawTable();
         showToast(`Loaded ${file.name}`, 'success');
       } catch(err) {
-        alert('Error parsing save file:\n' + err.message);
+        showToast(`Failed to parse ${file.name}: ${err.message}`, 'danger');
       }
     };
     reader.readAsArrayBuffer(file);
@@ -3668,6 +3694,7 @@ if (typeof module !== 'undefined') {
   }
 
   let saveChanges = new Set();
+  let currentGodModeHandler = null;
 
   function markSaveModified(field) {
     if (field) saveChanges.add(field);
@@ -3797,13 +3824,7 @@ if (typeof module !== 'undefined') {
     if (btnSecretGod) {
       btnSecretGod.onclick = triggerSuperGodMode;
     }
-    window.onkeydown = (e) => {
-      if (e.ctrlKey && e.shiftKey && (e.key === 'G' || e.key === 'g')) {
-        if (currentAppMode !== 'save' || !currentFile || !currentFile.parsedRoot || currentFile.engine === 'wolf') return;
-        e.preventDefault();
-        triggerSuperGodMode();
-      }
-    };
+    currentGodModeHandler = triggerSuperGodMode;
 
     document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
     document.getElementById('inventory-owned-only').onchange = () => renderInventoryTab(adapt.party);
@@ -4917,8 +4938,35 @@ if (typeof module !== 'undefined') {
     showToast('Original backup (.bak) downloaded.', 'success');
   }
 
+  async function revertAllSaveChanges() {
+    if (!currentFile || !currentFile.rawBytes) {
+      showToast('No save file loaded.', 'warn');
+      return;
+    }
+    if (saveChanges.size === 0) {
+      showToast('No save changes to revert.', 'info');
+      return;
+    }
+    if (!confirmDiscardChanges(`Revert all ${saveChanges.size} change(s) back to the original loaded file?`)) {
+      return;
+    }
+    try {
+      const parsed = await parseSaveData(currentFile.rawBytes, currentFile.name);
+      currentFile.parsedRoot = parsed.root;
+      flatEntries = flattenObject(currentFile.parsedRoot).map((item, idx) => ({ ...item, id: idx }));
+      resetSaveModified();
+      setupVisualEditor();
+      renderRawTable();
+      showToast('Reverted all save changes to original file.', 'success');
+    } catch (err) {
+      showToast('Revert failed: ' + err.message, 'danger');
+    }
+  }
+
   const btnRevDl = document.getElementById('btn-review-download');
   if (btnRevDl) btnRevDl.onclick = downloadEditedSave;
+  const btnRevSave = document.getElementById('btn-revert-save');
+  if (btnRevSave) btnRevSave.onclick = revertAllSaveChanges;
   const btnBakRaw = document.getElementById('btn-backup-raw');
   if (btnBakRaw) btnBakRaw.onclick = downloadBackupRaw;
 
@@ -4946,6 +4994,9 @@ if (typeof module !== 'undefined') {
       showToast('No save file currently open.', 'info');
       return;
     }
+    if (saveChanges.size > 0 && !confirmDiscardChanges(`You have ${saveChanges.size} unsaved save change(s). Close and discard them?`)) {
+      return;
+    }
     currentFile = {
       name: null, size: 0, rawBytes: null,
       format: null, formatLabel: null,
@@ -4953,6 +5004,7 @@ if (typeof module !== 'undefined') {
     };
     flatEntries = [];
     compareBaseline = null;
+    currentGodModeHandler = null;
     varsRenderLimit = 250;
     switchesRenderLimit = 250;
     rawRenderLimit = 100;
@@ -4992,6 +5044,78 @@ if (typeof module !== 'undefined') {
   if (btnClearDbHeader) {
     btnClearDbHeader.onclick = clearAllDatabaseFiles;
   }
+
+  function getActiveSearchInput() {
+    if (currentAppMode === 'database') {
+      return document.getElementById('db-search-input');
+    }
+    const activeTab = document.querySelector('.tab-btn.active');
+    const tabId = activeTab ? activeTab.getAttribute('data-tab') : '';
+    const map = {
+      'tab-inventory': 'inventory-search',
+      'tab-weapons': 'weapons-search',
+      'tab-armors': 'armors-search',
+      'tab-variables': 'variables-search',
+      'tab-switches': 'switches-search',
+      'tab-raw': 'raw-search-input'
+    };
+    return map[tabId] ? document.getElementById(map[tabId]) : null;
+  }
+
+  window.addEventListener('keydown', (e) => {
+    const key = (e.key || '').toLowerCase();
+    const mod = e.ctrlKey || e.metaKey;
+
+    if (mod && !e.shiftKey && key === 's') {
+      e.preventDefault();
+      if (currentAppMode === 'save' && currentFile && currentFile.parsedRoot) {
+        downloadEditedSave();
+      } else if (currentAppMode === 'database' && currentDb && currentDb.items && currentDb.items.length > 0) {
+        downloadDatabaseFile();
+      }
+      return;
+    }
+
+    if (e.ctrlKey && e.shiftKey && key === 'g') {
+      if (currentAppMode !== 'save' || !currentFile || !currentFile.parsedRoot || currentFile.engine === 'wolf') return;
+      e.preventDefault();
+      if (typeof currentGodModeHandler === 'function') currentGodModeHandler();
+      return;
+    }
+
+    const active = document.activeElement;
+    const isTyping = active && (
+      active.tagName === 'INPUT' ||
+      active.tagName === 'TEXTAREA' ||
+      active.tagName === 'SELECT' ||
+      active.isContentEditable
+    );
+
+    if (e.key === '/' && !mod && !e.altKey && !isTyping) {
+      const searchEl = getActiveSearchInput();
+      if (searchEl) {
+        e.preventDefault();
+        searchEl.focus();
+        if (typeof searchEl.select === 'function') searchEl.select();
+      }
+      return;
+    }
+
+    if (e.key === 'Escape' && active && active.tagName === 'INPUT' && active.type === 'text' && active.value) {
+      active.value = '';
+      if (typeof active.oninput === 'function') active.oninput({ target: active });
+      else if (typeof Event === 'function' && typeof active.dispatchEvent === 'function') {
+        active.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+  });
+
+  window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges()) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
 
   // Tab switching in Save Editor
   window.switchTab = (tabId) => {

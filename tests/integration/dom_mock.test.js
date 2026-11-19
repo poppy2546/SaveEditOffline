@@ -330,5 +330,18 @@ module.exports = async function runDomMockIntegrationTests(it) {
     assert.strictEqual(binRoundtrip.party._items[1], 99);
     assert.strictEqual(binRoundtrip.party._items[3], 1, 'Key item quantity must not be overwritten to 99');
     assert.strictEqual(binRoundtrip.party._weapons['99'], 1, 'Newly added weapon on empty bag must persist in party._weapons');
+
+    // Phase 5: Verify QoL Revert All Save Changes & Toast-based parse error feedback
+    assert.strictEqual(typeof elementsById['btn-revert-save'].onclick, 'function');
+    await elementsById['btn-revert-save'].onclick();
+    assert.strictEqual(elementsById['label-changes'].textContent, '0 CHANGES', 'Revert All must reset change counter');
+    assert.strictEqual(Number(elementsById['quick-gold-input'].value), 100, 'Revert All must restore original Gold');
+    assert.ok(elementsById['toast'].textContent.includes('Reverted all save changes'));
+
+    elementsById['db-multi-file-input'].onchange({
+      target: { files: [{ name: 'broken.json', _text: '{invalid json' }] }
+    });
+    assert.ok(elementsById['toast'].textContent.includes('Failed to parse broken.json'), 'Invalid JSON must report via Toast with filename');
+    assert.ok(elementsById['toast'].className.includes('danger'), 'Invalid JSON Toast must use danger style');
   });
 };

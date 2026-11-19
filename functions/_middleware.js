@@ -64,7 +64,8 @@ export async function onRequest(context) {
   const isHiddenFile = (path.includes('/.') && !path.startsWith('/.well-known')) || path.includes('..') || /[.\s](\/|$)/.test(rawNormalized);
 
   // ตรวจจับถ้า path มีคำต้องสงสัย ให้บล็อกทันที (403 Forbidden)
-  const isSuspicious = isHiddenFile || WIN_RESERVED_DEVICE_RE.test(rawNormalized) || blockedPatterns.some((pattern) => path.includes(pattern));
+  const isBlockedDir = /(^|\/)(tests|functions|node_modules)(\/|$)/.test(path);
+  const isSuspicious = isHiddenFile || isBlockedDir || WIN_RESERVED_DEVICE_RE.test(rawNormalized) || blockedPatterns.some((pattern) => path.includes(pattern));
 
   if (isSuspicious) {
     return new Response('403 Forbidden - Access Denied by WAF Middleware', {
@@ -75,6 +76,7 @@ export async function onRequest(context) {
         'X-Robots-Tag': 'noindex, nofollow',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
+        'X-Permitted-Cross-Domain-Policies': 'none',
         'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none';"
       }
     });
@@ -83,15 +85,18 @@ export async function onRequest(context) {
   const response = await context.next();
   const headers = new Headers(response.headers);
   const isHtmlDoc = path === '/' || path === '/index.html' || path.endsWith('.html');
+  headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('X-Frame-Options', 'DENY');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+  headers.set('X-Permitted-Cross-Domain-Policies', 'none');
   headers.set(
     'Content-Security-Policy',
     isHtmlDoc
-      ? "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
+      ? "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-fzIKu4b55nXw58dvy6RFS54it+PAoB+pRzD9tua/z+Y='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
       : "default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
   );
 

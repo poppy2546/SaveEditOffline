@@ -792,6 +792,7 @@ let htmlContent = `<!DOCTYPE html>
       Clear File
     </button>
     <button class="btn btn-secondary btn-sm" id="btn-export-json" type="button">Export JSON</button>
+    <button class="btn btn-secondary btn-sm" id="btn-revert-save" type="button" title="Revert all edits back to the original loaded save file">Revert All</button>
     <button class="btn btn-secondary btn-sm" id="btn-backup-raw" type="button" title="Download original unmodified save file (.bak)">Backup (.bak)</button>
     <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1242,11 +1243,15 @@ let htmlContent = `<!DOCTYPE html>
   const labelSize = document.getElementById('label-size');
   const labelChanges = document.getElementById('label-changes');
 
+  let toastTimer = null;
   function showToast(msg, type = 'info') {
     const t = document.getElementById('toast');
+    if (!t) return;
     t.textContent = msg;
     t.className = 'toast show ' + type;
-    setTimeout(() => { t.className = 'toast'; }, 2600);
+    if (toastTimer) clearTimeout(toastTimer);
+    const duration = (type === 'danger' || type === 'error') ? 4500 : (type === 'warn' ? 3500 : 2600);
+    toastTimer = setTimeout(() => { t.className = 'toast'; toastTimer = null; }, duration);
   }
 
   function formatBytes(b) {
@@ -1598,7 +1603,7 @@ let htmlContent = `<!DOCTYPE html>
         }
         applyDatabaseJson(file.name, json, handle, autoSwitch);
       } catch(e) {
-        alert('Error parsing database JSON:\\n' + e.message);
+        showToast(\`Failed to parse \${file.name}: \${e.message}\`, 'danger');
       }
     };
     reader.readAsText(file);
@@ -1642,12 +1647,33 @@ let htmlContent = `<!DOCTYPE html>
     showToast(\`Cleared \${cat.charAt(0).toUpperCase() + cat.slice(1)} database file.\`, 'info');
   }
 
+  function hasUnsavedDbChanges() {
+    return Object.keys(dbStore).some(c => dbStore[c] && dbStore[c].modifiedIds && dbStore[c].modifiedIds.size > 0);
+  }
+
+  function hasUnsavedChanges() {
+    return (saveChanges && saveChanges.size > 0) || hasUnsavedDbChanges();
+  }
+
+  function confirmDiscardChanges(message) {
+    if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
+      return window.confirm(message);
+    }
+    return true;
+  }
+
   function clearAllDatabaseFiles() {
     const allCats = ['weapons', 'armors', 'items', 'skills', 'enemies', 'classes', 'actors'];
     const loaded = allCats.some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
     if (!loaded) {
       showToast('No database files are currently loaded.', 'info');
       return;
+    }
+    if (hasUnsavedDbChanges()) {
+      const modCount = allCats.reduce((sum, c) => sum + (dbStore[c] && dbStore[c].modifiedIds ? dbStore[c].modifiedIds.size : 0), 0);
+      if (!confirmDiscardChanges(\`You have \${modCount} unsaved database modification(s). Clear all loaded database files anyway?\`)) {
+        return;
+      }
     }
     allCats.forEach(c => {
       dbStore[c] = null;
@@ -2881,7 +2907,7 @@ let htmlContent = `<!DOCTYPE html>
         renderRawTable();
         showToast(\`Loaded \${file.name}\`, 'success');
       } catch(err) {
-        alert('Error parsing save file:\\n' + err.message);
+        showToast(\`Failed to parse \${file.name}: \${err.message}\`, 'danger');
       }
     };
     reader.readAsArrayBuffer(file);
@@ -2993,6 +3019,7 @@ let htmlContent = `<!DOCTYPE html>
   }
 
   let saveChanges = new Set();
+  let currentGodModeHandler = null;
 
   function markSaveModified(field) {
     if (field) saveChanges.add(field);
@@ -3122,13 +3149,7 @@ let htmlContent = `<!DOCTYPE html>
     if (btnSecretGod) {
       btnSecretGod.onclick = triggerSuperGodMode;
     }
-    window.onkeydown = (e) => {
-      if (e.ctrlKey && e.shiftKey && (e.key === 'G' || e.key === 'g')) {
-        if (currentAppMode !== 'save' || !currentFile || !currentFile.parsedRoot || currentFile.engine === 'wolf') return;
-        e.preventDefault();
-        triggerSuperGodMode();
-      }
-    };
+    currentGodModeHandler = triggerSuperGodMode;
 
     document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
     document.getElementById('inventory-owned-only').onchange = () => renderInventoryTab(adapt.party);
@@ -4242,8 +4263,35 @@ let htmlContent = `<!DOCTYPE html>
     showToast('Original backup (.bak) downloaded.', 'success');
   }
 
+  async function revertAllSaveChanges() {
+    if (!currentFile || !currentFile.rawBytes) {
+      showToast('No save file loaded.', 'warn');
+      return;
+    }
+    if (saveChanges.size === 0) {
+      showToast('No save changes to revert.', 'info');
+      return;
+    }
+    if (!confirmDiscardChanges(\`Revert all \${saveChanges.size} change(s) back to the original loaded file?\`)) {
+      return;
+    }
+    try {
+      const parsed = await parseSaveData(currentFile.rawBytes, currentFile.name);
+      currentFile.parsedRoot = parsed.root;
+      flatEntries = flattenObject(currentFile.parsedRoot).map((item, idx) => ({ ...item, id: idx }));
+      resetSaveModified();
+      setupVisualEditor();
+      renderRawTable();
+      showToast('Reverted all save changes to original file.', 'success');
+    } catch (err) {
+      showToast('Revert failed: ' + err.message, 'danger');
+    }
+  }
+
   const btnRevDl = document.getElementById('btn-review-download');
   if (btnRevDl) btnRevDl.onclick = downloadEditedSave;
+  const btnRevSave = document.getElementById('btn-revert-save');
+  if (btnRevSave) btnRevSave.onclick = revertAllSaveChanges;
   const btnBakRaw = document.getElementById('btn-backup-raw');
   if (btnBakRaw) btnBakRaw.onclick = downloadBackupRaw;
 
@@ -4271,6 +4319,9 @@ let htmlContent = `<!DOCTYPE html>
       showToast('No save file currently open.', 'info');
       return;
     }
+    if (saveChanges.size > 0 && !confirmDiscardChanges(\`You have \${saveChanges.size} unsaved save change(s). Close and discard them?\`)) {
+      return;
+    }
     currentFile = {
       name: null, size: 0, rawBytes: null,
       format: null, formatLabel: null,
@@ -4278,6 +4329,7 @@ let htmlContent = `<!DOCTYPE html>
     };
     flatEntries = [];
     compareBaseline = null;
+    currentGodModeHandler = null;
     varsRenderLimit = 250;
     switchesRenderLimit = 250;
     rawRenderLimit = 100;
@@ -4318,6 +4370,78 @@ let htmlContent = `<!DOCTYPE html>
     btnClearDbHeader.onclick = clearAllDatabaseFiles;
   }
 
+  function getActiveSearchInput() {
+    if (currentAppMode === 'database') {
+      return document.getElementById('db-search-input');
+    }
+    const activeTab = document.querySelector('.tab-btn.active');
+    const tabId = activeTab ? activeTab.getAttribute('data-tab') : '';
+    const map = {
+      'tab-inventory': 'inventory-search',
+      'tab-weapons': 'weapons-search',
+      'tab-armors': 'armors-search',
+      'tab-variables': 'variables-search',
+      'tab-switches': 'switches-search',
+      'tab-raw': 'raw-search-input'
+    };
+    return map[tabId] ? document.getElementById(map[tabId]) : null;
+  }
+
+  window.addEventListener('keydown', (e) => {
+    const key = (e.key || '').toLowerCase();
+    const mod = e.ctrlKey || e.metaKey;
+
+    if (mod && !e.shiftKey && key === 's') {
+      e.preventDefault();
+      if (currentAppMode === 'save' && currentFile && currentFile.parsedRoot) {
+        downloadEditedSave();
+      } else if (currentAppMode === 'database' && currentDb && currentDb.items && currentDb.items.length > 0) {
+        downloadDatabaseFile();
+      }
+      return;
+    }
+
+    if (e.ctrlKey && e.shiftKey && key === 'g') {
+      if (currentAppMode !== 'save' || !currentFile || !currentFile.parsedRoot || currentFile.engine === 'wolf') return;
+      e.preventDefault();
+      if (typeof currentGodModeHandler === 'function') currentGodModeHandler();
+      return;
+    }
+
+    const active = document.activeElement;
+    const isTyping = active && (
+      active.tagName === 'INPUT' ||
+      active.tagName === 'TEXTAREA' ||
+      active.tagName === 'SELECT' ||
+      active.isContentEditable
+    );
+
+    if (e.key === '/' && !mod && !e.altKey && !isTyping) {
+      const searchEl = getActiveSearchInput();
+      if (searchEl) {
+        e.preventDefault();
+        searchEl.focus();
+        if (typeof searchEl.select === 'function') searchEl.select();
+      }
+      return;
+    }
+
+    if (e.key === 'Escape' && active && active.tagName === 'INPUT' && active.type === 'text' && active.value) {
+      active.value = '';
+      if (typeof active.oninput === 'function') active.oninput({ target: active });
+      else if (typeof Event === 'function' && typeof active.dispatchEvent === 'function') {
+        active.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+  });
+
+  window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges()) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
   // Tab switching in Save Editor
   window.switchTab = (tabId) => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
@@ -4339,4 +4463,15 @@ const scriptHashes = [...htmlContent.matchAll(/<script>([\s\S]*?)<\/script>/g)]
 htmlContent = htmlContent.replace('__CSP_SCRIPT_HASHES__', scriptHashes);
 
 fs.writeFileSync(path.join(__dirname, 'index.html'), htmlContent);
+
+// Sync strict SHA-256 script-src hashes into server.js and functions/_middleware.js
+const scriptSrcPattern = /script-src 'self' (?:'unsafe-inline'|'sha256-[^']+'(?:\s+'sha256-[^']+')*)/;
+for (const relTarget of ['server.js', 'functions/_middleware.js']) {
+  const targetPath = path.join(__dirname, relTarget);
+  if (fs.existsSync(targetPath)) {
+    const src = fs.readFileSync(targetPath, 'utf8');
+    const updated = src.replace(scriptSrcPattern, `script-src 'self' ${scriptHashes}`);
+    if (updated !== src) fs.writeFileSync(targetPath, updated);
+  }
+}
 console.log('Save & DB Studio built successfully!');

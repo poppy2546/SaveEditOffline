@@ -31,6 +31,11 @@ module.exports = async function runE2ESmokeTests(it) {
       assert.strictEqual(res.statusCode, 200);
       assert.ok(res.headers['content-type'].includes('text/html'));
       assert.strictEqual(res.headers['x-content-type-options'], 'nosniff');
+      assert.strictEqual(res.headers['cross-origin-opener-policy'], 'same-origin');
+      assert.strictEqual(res.headers['x-permitted-cross-domain-policies'], 'none');
+      const httpCsp = res.headers['content-security-policy'] || '';
+      assert.ok(httpCsp.includes("script-src 'self' 'sha256-"), 'HTTP CSP header must use strict SHA-256 script hashes');
+      assert.ok(!/script-src[^;]*'unsafe-inline'/.test(httpCsp), 'HTTP CSP script-src must not allow unsafe-inline');
       assert.ok(res.body.includes('http-equiv="Content-Security-Policy"'), 'Must deliver CSP');
       assert.ok(res.body.includes('Universal RPG Maker Save Editor'), 'Must contain title');
       assert.ok(!/[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(res.body), 'index.html must not contain unescaped ASCII control characters');

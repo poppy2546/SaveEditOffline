@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node builder_promax.js",
     "start": "node server.js",
+    "verify": "npm run build && npm test",
     "test": "node tests/run_pyramid.js",
     "test:unit": "node tests/run_pyramid.js --unit",
     "test:integration": "node tests/run_pyramid.js --integration",
