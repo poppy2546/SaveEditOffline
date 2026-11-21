@@ -255,13 +255,13 @@ let htmlContent = `<!DOCTYPE html>
   /* Navigation Tabs */
   .nav-tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0;
-    overflow-x: auto;
   }
   .tab-btn {
-    padding: 10px 16px;
+    padding: 9px 12px;
     border: none;
     background: transparent;
     color: var(--text-secondary);
@@ -325,6 +325,9 @@ let htmlContent = `<!DOCTYPE html>
   .stat-desc { font-size: 0.74rem; color: var(--text-secondary); }
   .stat-input {
     flex: 1;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     padding: 7px 10px;
     background: var(--bg-input);
     border: 1px solid var(--border-color);
@@ -814,6 +817,7 @@ let htmlContent = `<!DOCTYPE html>
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download .json
     </button>
+    <button class="btn btn-secondary btn-sm" id="btn-db-download-all" type="button" title="Download all modified database JSON files at once">Download All Modified</button>
   </div>
 </header>
 
@@ -830,8 +834,8 @@ let htmlContent = `<!DOCTYPE html>
       <div style="font-size:1.2rem; font-weight:600; color:var(--text-primary); letter-spacing:-0.01em;">
         Drop a Save File or Database JSON to begin
       </div>
-      <div style="color:var(--text-secondary); font-size:0.85rem; max-width:620px; line-height:1.6;">
-        Supports <b>Save Files</b> (<code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>) and <b>Database JSON</b> (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>)
+      <div style="color:var(--text-secondary); font-size:0.85rem; max-width:660px; line-height:1.6;">
+        Supports <b>Save Files</b> (<code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>) and <b>Database JSON</b> (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>, <code>Enemies.json</code>, <code>Classes.json</code>, <code>Actors.json</code>, <code>System.json</code>)
       </div>
       <input type="file" id="file-input" multiple style="display:none;">
       <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
@@ -866,7 +870,7 @@ let htmlContent = `<!DOCTYPE html>
         <span style="font-weight:600; font-size:0.98rem; color:var(--text-primary); font-family:var(--font-mono);" id="label-filename">savegame.rpgsave</span>
         <span class="meta-pill" id="label-format">FORMAT</span>
         <span class="meta-pill" id="label-size">0 KB</span>
-        <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage);" id="label-changes">0 CHANGES</span>
+        <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage); cursor:pointer;" id="label-changes" title="Click to inspect changes" tabindex="0" role="button">0 CHANGES</span>
       </div>
 
       <!-- Quick Gold Edit & Max Preset -->
@@ -884,6 +888,7 @@ let htmlContent = `<!DOCTYPE html>
         </button>
       </div>
     </div>
+    <div id="save-changes-drawer" style="display:none; background:var(--bg-card); border:1px solid var(--accent-sage); border-radius:var(--radius-md); padding:10px 14px; flex-wrap:wrap; align-items:center; gap:6px;"></div>
 
     <!-- Navigation Tabs -->
     <div class="nav-tabs" id="main-nav-tabs" role="tablist">
@@ -923,9 +928,11 @@ let htmlContent = `<!DOCTYPE html>
           <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
             <input type="checkbox" id="inventory-owned-only" checked> Owned only (&gt;0)
           </label>
-          <select id="inventory-picker-select" style="display:none; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <select id="inventory-picker-select" style="display:none; height:31px; line-height:1.2; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-items-set-all-99" type="button">Set All Owned to 99</button>
           <button class="btn btn-gold btn-sm" id="btn-items-unlock-safe" type="button" title="Unlock all regular items from Items.json while skipping Key Items (itypeId=2) to protect story quests">Safe Unlock All (No Key Items)</button>
+          <input type="number" id="inventory-add-id" placeholder="ID" min="1" aria-label="Item ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
+          <input type="number" id="inventory-add-qty" value="99" min="1" title="Quantity" aria-label="Item quantity to add" style="width:64px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-item-dialog" type="button">+ Add Item</button>
         </div>
       </div>
@@ -937,9 +944,10 @@ let htmlContent = `<!DOCTYPE html>
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
         <input type="text" id="weapons-search" placeholder="Filter by weapon ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <select id="weapons-picker-select" style="display:none; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <select id="weapons-picker-select" style="display:none; height:31px; line-height:1.2; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-weapons-set-all-99" type="button">Set Owned to 99</button>
           <button class="btn btn-gold btn-sm" id="btn-weapons-unlock-all" type="button">Unlock All DB Weapons</button>
+          <input type="number" id="weapons-add-id" placeholder="ID" min="1" aria-label="Weapon ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-weapon-dialog" type="button">+ Add Weapon</button>
         </div>
       </div>
@@ -951,9 +959,10 @@ let htmlContent = `<!DOCTYPE html>
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
         <input type="text" id="armors-search" placeholder="Filter by armor ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <select id="armors-picker-select" style="display:none; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <select id="armors-picker-select" style="display:none; height:31px; line-height:1.2; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-armors-set-all-99" type="button">Set Owned to 99</button>
           <button class="btn btn-gold btn-sm" id="btn-armors-unlock-all" type="button">Unlock All DB Armors</button>
+          <input type="number" id="armors-add-id" placeholder="ID" min="1" aria-label="Armor ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-armor-dialog" type="button">+ Add Armor</button>
         </div>
       </div>
@@ -1005,6 +1014,11 @@ let htmlContent = `<!DOCTYPE html>
           <div style="font-weight:600; color:var(--text-primary); font-size:0.88rem;">Drop JSON reference files here or click to browse</div>
           <input type="file" id="data-file-input" multiple accept=".json" style="display:none;">
         </div>
+        <div style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <span style="font-size:0.78rem; color:var(--text-secondary);">Japanese RPG files auto-decode stats &amp; tags offline (0 tokens).</span>
+          <button class="btn btn-secondary btn-sm" id="btn-translate-jp" type="button">Translate JP (Offline Helper)</button>
+        </div>
+        <div id="datafiles-status-list" style="margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;"></div>
       </div>
     </div>
 
@@ -1042,18 +1056,13 @@ let htmlContent = `<!DOCTYPE html>
           <svg class="ico ico-lg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         </div>
         <div>
-          <div style="font-weight:600; font-size:0.92rem; color:var(--text-primary);">Drop Database JSON files here (Multi-file supported)</div>
+          <div style="font-weight:600; font-size:0.92rem; color:var(--text-primary);">Drop Database JSON files here or click to browse (Multi-file supported)</div>
           <div style="font-size:0.78rem; color:var(--text-secondary);">
-            Locate files in your game's <code>data/</code> or <code>www/data/</code> folder (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>) and drop them together.
+            Locate files in your game's <code>data/</code> or <code>www/data/</code> folder (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>, <code>Enemies.json</code>, <code>Classes.json</code>, <code>Actors.json</code>, <code>System.json</code>) and drop them together.
           </div>
         </div>
       </div>
       <input type="file" id="db-multi-file-input" multiple accept=".json" style="display:none;">
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn btn-secondary btn-sm" id="btn-db-browse-multi" type="button">Select JSON Files</button>
-        <button class="btn btn-primary btn-sm" id="btn-db-download-all" type="button" title="Download all modified database JSON files at once">Download All Modified</button>
-        <button class="btn btn-secondary btn-sm" id="btn-db-clear-all" type="button" title="Clear all loaded database files">Clear All Files</button>
-      </div>
     </div>
 
     <!-- Category Status Cards -->
@@ -1143,6 +1152,7 @@ let htmlContent = `<!DOCTYPE html>
         <span class="meta-pill" style="color:var(--text-primary);" id="db-label-filename">Weapons.json</span>
         <span class="meta-pill" id="db-label-count">0 ITEMS</span>
         <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage); display:none;" id="db-label-modified">0 MODIFIED</span>
+        <button class="btn btn-secondary btn-sm" id="btn-db-translate-jp" type="button" title="Decode Japanese stats/tags &amp; use browser offline translator if supported">Translate JP</button>
       </div>
 
       <!-- Bulk Quick-Mod Actions for Current File -->
@@ -1221,7 +1231,11 @@ let htmlContent = `<!DOCTYPE html>
     modifiedIds: new Set()
   };
 
-  const gameData = { items: {}, itemTypes: {}, weapons: {}, armors: {}, skills: {}, variables: {}, switches: {} };
+  const gameData = {
+    items: {}, itemTypes: {}, weapons: {}, armors: {}, skills: {}, variables: {}, switches: {},
+    meta: { items: {}, weapons: {}, armors: {}, skills: {} },
+    aiTrans: {}
+  };
   let compareBaseline = null;
   let flatEntries = [];
   let activeCharacterIndex = 1;
@@ -1346,6 +1360,15 @@ let htmlContent = `<!DOCTYPE html>
     return partyObj[targetKey];
   }
 
+  function updateSaveHeaderButtons() {
+    const hasSave = Boolean(currentFile && currentFile.parsedRoot);
+    const ids = ['btn-clear-save', 'btn-export-json', 'btn-revert-save', 'btn-backup-raw', 'btn-review-download'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = hasSave ? '' : 'none';
+    });
+  }
+
   // Switch App Modes
   function switchAppMode(mode) {
     currentAppMode = mode;
@@ -1356,6 +1379,7 @@ let htmlContent = `<!DOCTYPE html>
       appBadgeMode.className = 'badge-promax';
       headerSaveActions.style.display = 'flex';
       headerDbActions.style.display = 'none';
+      updateSaveHeaderButtons();
       if (currentFile.parsedRoot) {
         uploadSection.style.display = 'none';
         saveEditorScreen.style.display = 'flex';
@@ -1380,6 +1404,7 @@ let htmlContent = `<!DOCTYPE html>
       renderDbMasterList();
     }
   }
+  updateSaveHeaderButtons();
 
   btnModeSave.onclick = () => switchAppMode('save');
   btnModeDb.onclick = () => switchAppMode('database');
@@ -1397,7 +1422,6 @@ let htmlContent = `<!DOCTYPE html>
   const fileInput = document.getElementById('file-input');
   const dbDropBanner = document.getElementById('db-drop-banner');
   const dbMultiFileInput = document.getElementById('db-multi-file-input');
-  const btnDbBrowseMulti = document.getElementById('btn-db-browse-multi');
 
   dropzone.onclick = (e) => { if (e.target.tagName !== 'BUTTON') fileInput.click(); };
   dropzone.ondragover = (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-sand)'; };
@@ -1417,11 +1441,7 @@ let htmlContent = `<!DOCTYPE html>
     }
   };
 
-  if (btnDbBrowseMulti && dbMultiFileInput) {
-    btnDbBrowseMulti.onclick = (e) => {
-      e.stopPropagation();
-      dbMultiFileInput.click();
-    };
+  if (dbDropBanner && dbMultiFileInput) {
     dbDropBanner.onclick = (e) => {
       if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') dbMultiFileInput.click();
     };
@@ -1457,11 +1477,6 @@ let htmlContent = `<!DOCTYPE html>
       handleIncomingFiles(e.dataTransfer.files);
     }
   });
-
-  function isDatabaseJsonFilename(name) {
-    const n = name.toLowerCase();
-    return n === 'weapons.json' || n === 'armors.json' || n === 'items.json' || n === 'skills.json' || n === 'enemies.json' || n === 'classes.json' || n === 'actors.json' || n === 'system.json';
-  }
 
   function handleIncomingFile(file) {
     handleIncomingFiles([file]);
@@ -1529,6 +1544,7 @@ let htmlContent = `<!DOCTYPE html>
           json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
         }
         if (currentFile.parsedRoot) setupVisualEditor();
+        renderDataFilesStatus();
         showToast(\`Loaded Variable/Switch names from \${fileName}\`, 'success');
         return true;
       }
@@ -1547,16 +1563,10 @@ let htmlContent = `<!DOCTYPE html>
     const hasRiskyFormula = validItems.some(x => x.damage && isDangerousFormula(x.damage.formula));
 
     if (gameData[cat]) {
-      gameData[cat] = {};
-      if (cat === 'items') gameData.itemTypes = {};
-      validItems.forEach(x => {
-        if (x.id && x.name && isSafeKey(x.id)) {
-          gameData[cat][x.id] = x.name;
-          if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
-        }
-      });
+      syncGameDataFromArray(cat, json);
     }
     if (currentFile.parsedRoot) setupVisualEditor();
+    renderDataFilesStatus();
 
     dbStore[cat] = {
       category: cat,
@@ -1597,7 +1607,7 @@ let htmlContent = `<!DOCTYPE html>
           (!Array.isArray(json) && (json.party || json.actors)) ||
           (Array.isArray(json) && json.some(x => x && (x.__ruby_class__ || x['@gold'] !== undefined || x['@data'] !== undefined)))
         );
-        if (isSaveJson && currentAppMode === 'save' && !handle) {
+        if (isSaveJson && !handle) {
           loadSaveFile(file);
           return;
         }
@@ -1637,7 +1647,10 @@ let htmlContent = `<!DOCTYPE html>
     if (!cat) cat = currentDb.category;
     if (!dbStore[cat] && (!currentDb.items || currentDb.items.length === 0)) return;
     dbStore[cat] = null;
-    if (gameData && gameData[cat]) gameData[cat] = {};
+    if (gameData && gameData[cat]) {
+      gameData[cat] = {};
+      if (gameData.meta && gameData.meta[cat]) gameData.meta[cat] = {};
+    }
     syncCurrentDbFromStore(cat);
     updateDbCategoryButtons(cat);
     updateDbSlotBadges();
@@ -1677,7 +1690,10 @@ let htmlContent = `<!DOCTYPE html>
     }
     allCats.forEach(c => {
       dbStore[c] = null;
-      if (gameData && gameData[c]) gameData[c] = {};
+      if (gameData && gameData[c]) {
+        gameData[c] = {};
+        if (gameData.meta && gameData.meta[c]) gameData.meta[c] = {};
+      }
     });
     syncCurrentDbFromStore(currentDb.category);
     updateDbCategoryButtons(currentDb.category);
@@ -1975,13 +1991,8 @@ let htmlContent = `<!DOCTYPE html>
           dbStore[cat].items = currentDb.items;
         }
         if (gameData[cat]) {
-          gameData[cat] = {};
-          currentDb.items.forEach(x => {
-            if (x && x.id && x.name && isSafeKey(x.id)) {
-              gameData[cat][x.id] = x.name;
-              if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
-            }
-          });
+          syncGameDataFromArray(cat, currentDb.items);
+          renderDataFilesStatus();
         }
         updateDbSlotBadges();
         renderDbBulkActions();
@@ -2075,12 +2086,14 @@ let htmlContent = `<!DOCTYPE html>
     const onlyMod = onlyModEl && onlyModEl.checked;
 
     let shownCount = 0;
+    const cleanQ = q.replace(/^#/, '');
     validItems.forEach(item => {
       const name = item.name || '(Unnamed)';
       const idStr = String(item.id);
       const desc = item.description || '';
+      const meta = decodeEntitySummary(item, currentDb.category);
       if (onlyMod && !currentDb.modifiedIds.has(item.id)) return;
-      if (q && !idStr.includes(q.replace(/^#/, '')) && !name.toLowerCase().includes(q) && !desc.toLowerCase().includes(q)) return;
+      if (q && !idStr.includes(cleanQ) && !name.toLowerCase().includes(q) && !desc.toLowerCase().includes(q) && !meta.searchBlob.includes(q)) return;
 
       shownCount++;
       const row = document.createElement('div');
@@ -2114,17 +2127,22 @@ let htmlContent = `<!DOCTYPE html>
   }
 
   function getQuickPreviewBadge(item) {
+    const meta = decodeEntitySummary(item, currentDb.category);
     if (currentDb.category === 'weapons' || currentDb.category === 'armors') {
       const params = item.params || [];
       const atk = params[2] || 0;
       const def = params[3] || 0;
+      const primary = currentDb.category === 'weapons' ? atk : def;
+      if (primary === 0 && meta.badgeText) return meta.badgeText.slice(0, 26);
       return currentDb.category === 'weapons' ? \`ATK \${atk}\` : \`DEF \${def}\`;
     }
     if (currentDb.category === 'skills') {
+      if ((item.mpCost || 0) === 0 && meta.badgeText) return meta.badgeText.slice(0, 26);
       return \`\${item.mpCost || 0} MP\`;
     }
     if (currentDb.category === 'items') {
       const inf = item.consumable === false ? 'INF · ' : '';
+      if (meta.badgeText) return inf + meta.badgeText.slice(0, 26);
       return inf + (item.price !== undefined ? \`\${item.price} G\` : '');
     }
     if (currentDb.category === 'enemies') {
@@ -2175,6 +2193,7 @@ let htmlContent = `<!DOCTYPE html>
     if (!item) return;
 
     const cat = currentDb.category;
+    const summary = decodeEntitySummary(item, cat);
     let specificHtml = '';
 
     if (cat === 'weapons' || cat === 'armors') {
@@ -2438,6 +2457,13 @@ let htmlContent = `<!DOCTYPE html>
           <textarea class="db-textarea" id="detail-note" style="font-family:var(--font-mono);" placeholder="RPG Maker Note tags...">\${escapeHtml(item.note || '')}</textarea>
         </div>
       </div>
+
+      \${(summary.badgeText || summary.cleanDesc) ? \`
+        <div id="db-decoded-hint" style="background:var(--bg-header); border:1px solid \${summary.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage)'}; border-radius:var(--radius-sm); padding:9px 12px; font-size:0.78rem; display:flex; flex-direction:column; gap:4px;">
+          \${summary.badgeText ? \`<div style="color:\${summary.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage-bright)'}; font-weight:600; font-family:var(--font-mono);">Decoded: \${escapeHtml(summary.badgeText)}</div>\` : ''}
+          \${summary.cleanDesc ? \`<div style="color:var(--text-secondary);">\${escapeHtml(summary.cleanDesc)}</div>\` : ''}
+        </div>
+      \` : ''}
 
       \${specificHtml}
 
@@ -2827,10 +2853,14 @@ let htmlContent = `<!DOCTYPE html>
         showToast('No database files loaded to download.', 'warn');
         return;
       }
-      targetCats.forEach(c => {
+      targetCats.forEach((c, idx) => {
         const st = dbStore[c];
-        const blob = new Blob([JSON.stringify(st.items, null, 2)], { type: 'application/json;charset=utf-8' });
-        triggerBlobDownload(blob, st.fileName, c + '.json');
+        const runDownload = () => {
+          const blob = new Blob([JSON.stringify(st.items, null, 2)], { type: 'application/json;charset=utf-8' });
+          triggerBlobDownload(blob, st.fileName, c + '.json');
+        };
+        if (idx === 0) runDownload();
+        else setTimeout(runDownload, idx * 250);
       });
       showToast(\`Downloaded \${targetCats.length} database file(s).\`, 'success');
     };
@@ -2902,6 +2932,7 @@ let htmlContent = `<!DOCTYPE html>
         labelSize.textContent = formatBytes(rawBytes.byteLength);
 
         switchAppMode('save');
+        updateSaveHeaderButtons();
         resetSaveModified();
         setupVisualEditor();
         renderRawTable();
@@ -3020,17 +3051,99 @@ let htmlContent = `<!DOCTYPE html>
 
   let saveChanges = new Set();
   let currentGodModeHandler = null;
+  let saveChangesDrawerOpen = false;
+
+  function renderSaveChangesDrawer() {
+    const drawer = document.getElementById('save-changes-drawer');
+    if (!drawer) return;
+    if (!saveChangesDrawerOpen || saveChanges.size === 0) {
+      drawer.style.display = 'none';
+      if (saveChanges.size === 0) saveChangesDrawerOpen = false;
+      return;
+    }
+    drawer.style.display = 'flex';
+    const items = Array.from(saveChanges).map(c => \`<span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage);">\${escapeHtml(c)}</span>\`).join('');
+    drawer.innerHTML = \`<span style="font-size:0.76rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; margin-right:4px;">Modified:</span>\${items}\`;
+  }
+
+  function updateSaveChangesBadge() {
+    const badge = document.getElementById('label-changes');
+    if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+    renderSaveChangesDrawer();
+  }
+
+  if (labelChanges) {
+    const toggleDrawer = () => {
+      if (saveChanges.size === 0) {
+        saveChangesDrawerOpen = false;
+        renderSaveChangesDrawer();
+        showToast('No unsaved save modifications yet.', 'info');
+        return;
+      }
+      saveChangesDrawerOpen = !saveChangesDrawerOpen;
+      renderSaveChangesDrawer();
+    };
+    labelChanges.onclick = toggleDrawer;
+    labelChanges.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleDrawer();
+      }
+    };
+  }
 
   function markSaveModified(field) {
     if (field) saveChanges.add(field);
-    const badge = document.getElementById('label-changes');
-    if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+    updateSaveChangesBadge();
   }
 
   function resetSaveModified() {
     saveChanges.clear();
-    const badge = document.getElementById('label-changes');
-    if (badge) badge.textContent = '0 CHANGES';
+    saveChangesDrawerOpen = false;
+    updateSaveChangesBadge();
+  }
+
+  function renderDataFilesStatus() {
+    const list = document.getElementById('datafiles-status-list');
+    if (!list) return;
+    const cats = [
+      { key: 'items', label: 'Items.json' },
+      { key: 'weapons', label: 'Weapons.json' },
+      { key: 'armors', label: 'Armors.json' },
+      { key: 'skills', label: 'Skills.json' },
+      { key: 'variables', label: 'Variables (System.json)' },
+      { key: 'switches', label: 'Switches (System.json)' }
+    ];
+    list.innerHTML = cats.map(({ key, label }) => {
+      const count = Object.keys(gameData[key] || {}).length;
+      const statusHtml = count > 0
+        ? \`<span style="color:var(--accent-sage-bright); font-family:var(--font-mono); font-size:0.78rem;">\${count} names</span>\`
+        : \`<span style="color:var(--text-secondary); font-size:0.78rem;">Not loaded</span>\`;
+      const clearBtn = count > 0
+        ? \`<button type="button" class="btn btn-secondary btn-sm btn-clear-ref" data-ref="\${key}" style="padding:3px 8px; font-size:0.74rem;">Clear</button>\`
+        : '';
+      return \`
+        <div style="background:var(--bg-header); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <div>
+            <div style="font-size:0.82rem; font-weight:600; color:var(--text-primary);">\${escapeHtml(label)}</div>
+            <div>\${statusHtml}</div>
+          </div>
+          \${clearBtn}
+        </div>
+      \`;
+    }).join('');
+    list.querySelectorAll('.btn-clear-ref').forEach(btn => {
+      btn.onclick = () => {
+        const key = btn.getAttribute('data-ref');
+        if (!key || !gameData[key]) return;
+        gameData[key] = {};
+        if (key === 'items') gameData.itemTypes = {};
+        if (gameData.meta && gameData.meta[key]) gameData.meta[key] = {};
+        renderDataFilesStatus();
+        if (currentFile && currentFile.parsedRoot) setupVisualEditor();
+        showToast(\`Cleared \${key} reference names.\`, 'info');
+      };
+    });
   }
 
   function setupVisualEditor() {
@@ -3042,6 +3155,7 @@ let htmlContent = `<!DOCTYPE html>
       return;
     }
 
+    renderDataFilesStatus();
     const adapt = getGameAdapters(root, currentFile.engine);
 
     let goldParty = adapt.party;
@@ -3075,8 +3189,7 @@ let htmlContent = `<!DOCTYPE html>
       if (revBtn) revBtn.classList.toggle('show', num !== originalGold);
       if (num === originalGold) {
         saveChanges.delete('Gold');
-        const badge = document.getElementById('label-changes');
-        if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+        updateSaveChangesBadge();
       } else {
         markSaveModified('Gold');
       }
@@ -3133,8 +3246,10 @@ let htmlContent = `<!DOCTYPE html>
         const weapons = ensurePartyBag(adapt.party, 'weapons');
         const armors = ensurePartyBag(adapt.party, 'armors');
         Object.keys(items).forEach(k => {
+          const meta = gameData.meta && gameData.meta.items ? gameData.meta.items[k] : null;
           if (gameData.itemTypes && gameData.itemTypes[k] === 2) return;
-          if (items[k] > 0) items[k] = 99;
+          if (meta && meta.isDummy) return;
+          if (items[k] > 0) items[k] = (meta && meta.maxItem) ? meta.maxItem : 99;
         });
         Object.keys(weapons).forEach(k => { if (weapons[k] > 0) weapons[k] = 99; });
         Object.keys(armors).forEach(k => { if (armors[k] > 0) armors[k] = 99; });
@@ -3476,6 +3591,59 @@ let htmlContent = `<!DOCTYPE html>
       };
       qolBar.appendChild(encCard);
     }
+
+    if (playerObj) {
+      const mapKey = playerObj['@map_id'] !== undefined ? '@map_id' : (playerObj._mapId !== undefined ? '_mapId' : (currentFile.engine === 'ruby' ? '@map_id' : '_mapId'));
+      const xKey = playerObj['@x'] !== undefined ? '@x' : (playerObj._x !== undefined ? '_x' : (currentFile.engine === 'ruby' ? '@x' : '_x'));
+      const yKey = playerObj['@y'] !== undefined ? '@y' : (playerObj._y !== undefined ? '_y' : (currentFile.engine === 'ruby' ? '@y' : '_y'));
+      const curMap = playerObj[mapKey] !== undefined ? playerObj[mapKey] : 0;
+      const curX = playerObj[xKey] !== undefined ? playerObj[xKey] : 0;
+      const curY = playerObj[yKey] !== undefined ? playerObj[yKey] : 0;
+
+      const locCard = document.createElement('div');
+      locCard.className = 'stat-card';
+      locCard.innerHTML = \`
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="stat-title">LOCATION (MAP / X / Y)</span>
+          <span class="stat-desc">Teleport coordinates</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px;">
+          <input type="number" id="qol-map-id" class="stat-input" min="0" value="\${escapeHtml(curMap)}" title="Map ID" aria-label="Map ID" style="width:100%; min-width:0; box-sizing:border-box; padding:4px 6px; font-size:0.84rem;">
+          <input type="number" id="qol-player-x" class="stat-input" min="0" value="\${escapeHtml(curX)}" title="Player X" aria-label="Player X" style="width:100%; min-width:0; box-sizing:border-box; padding:4px 6px; font-size:0.84rem;">
+          <input type="number" id="qol-player-y" class="stat-input" min="0" value="\${escapeHtml(curY)}" title="Player Y" aria-label="Player Y" style="width:100%; min-width:0; box-sizing:border-box; padding:4px 6px; font-size:0.84rem;">
+        </div>
+      \`;
+      const mapIn = locCard.querySelector('#qol-map-id');
+      const xIn = locCard.querySelector('#qol-player-x');
+      const yIn = locCard.querySelector('#qol-player-y');
+      if (mapIn) {
+        mapIn.onchange = (e) => {
+          const v = Math.max(0, parseInt(e.target.value, 10) || 0);
+          playerObj[mapKey] = v;
+          e.target.value = v;
+          markSaveModified('Player Location');
+        };
+      }
+      if (xIn) {
+        xIn.onchange = (e) => {
+          const v = Math.max(0, parseInt(e.target.value, 10) || 0);
+          playerObj[xKey] = v;
+          if (xKey === '_x' && playerObj._realX !== undefined) playerObj._realX = v;
+          e.target.value = v;
+          markSaveModified('Player Location');
+        };
+      }
+      if (yIn) {
+        yIn.onchange = (e) => {
+          const v = Math.max(0, parseInt(e.target.value, 10) || 0);
+          playerObj[yKey] = v;
+          if (yKey === '_y' && playerObj._realY !== undefined) playerObj._realY = v;
+          e.target.value = v;
+          markSaveModified('Player Location');
+        };
+      }
+      qolBar.appendChild(locCard);
+    }
   }
 
   function renderCharacterStats(actor) {
@@ -3589,25 +3757,39 @@ let htmlContent = `<!DOCTYPE html>
     panel.innerHTML = \`
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
         <span style="font-size:0.82rem; font-weight:600; color:var(--accent-sand); text-transform:uppercase;">Learned Skills (\${skillsArr.length})</span>
-        <div style="display:flex; gap:6px; align-items:center;">
-          <input type="number" id="char-add-skill-id" class="stat-input" placeholder="Skill ID" style="width:95px; padding:4px 8px;" min="1">
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+          <select id="char-skill-picker" style="display:none; height:30px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <input type="number" id="char-add-skill-id" class="stat-input" placeholder="Skill ID" style="flex:0 0 auto; width:95px; padding:4px 8px;" min="1">
           <button type="button" class="btn btn-primary btn-sm" id="btn-char-add-skill">+ Learn Skill</button>
         </div>
       </div>
       <div style="display:flex; flex-wrap:wrap; gap:6px;">\${badgesHtml || '<span style="font-size:0.8rem; color:var(--text-secondary);">No skills learned yet.</span>'}</div>
     \`;
 
+    const skillPicker = document.getElementById('char-skill-picker');
+    populateEntityPicker(skillPicker, gameData.skills, null, gameData.meta ? gameData.meta.skills : null);
+
     const btnAddSkill = document.getElementById('btn-char-add-skill');
     const inpAddSkill = document.getElementById('char-add-skill-id');
     if (btnAddSkill && inpAddSkill) {
       btnAddSkill.onclick = () => {
-        const sid = parseInt(inpAddSkill.value, 10);
-        if (!sid || sid <= 0) return;
+        const rawSkill = (skillPicker && skillPicker.value) ? skillPicker.value : inpAddSkill.value;
+        const sid = parseInt(rawSkill, 10);
+        if (!sid || sid <= 0) {
+          showToast('Select a skill or enter a valid Skill ID first.', 'warn');
+          return;
+        }
         if (!skillsArr.includes(sid)) {
           skillsArr.push(sid);
+          if (skillPicker) skillPicker.value = '';
+          inpAddSkill.value = '';
           markSaveModified('Learn Skill #' + sid);
           renderCharacterSkills(actor);
           showToast('Learned Skill #' + sid, 'success');
+        } else {
+          if (skillPicker) skillPicker.value = '';
+          inpAddSkill.value = '';
+          showToast('Skill #' + sid + ' is already learned.', 'info');
         }
       };
     }
@@ -3626,10 +3808,408 @@ let htmlContent = `<!DOCTYPE html>
   function isDummyDbName(name) {
     if (!name) return true;
     const t = String(name).trim();
-    return t === '' || /^[-=_*#]+/.test(t);
+    return t === '' || /^[-=_*#■◆▼▲]+/.test(t);
   }
 
-  function populateEntityPicker(selectEl, dictObj, typeMap = null) {
+  function cleanRpgText(str) {
+    return String(str || '')
+      .replace(/<br\\s*\\/?>/gi, ' / ')
+      .replace(/\\\\(?:c|n|v|i)\\[\\d+\\]|\\\\[{}]/gi, '')
+      .replace(/\\s+/g, ' ')
+      .trim();
+  }
+
+  function normalizeFullWidth(str) {
+    return String(str || '')
+      .replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0))
+      .replace(/＋/g, '+')
+      .replace(/－/g, '-')
+      .replace(/ー(?=[0-9])/g, '-')
+      .replace(/％/g, '%')
+      .replace(/＝/g, '=')
+      .replace(/：/g, ':')
+      .replace(/[、。]/g, ' ');
+  }
+
+  function parseMaxItemTag(note) {
+    const m = String(note || '').match(/<max\\s*item\\s*:\\s*(\\d+)>/i);
+    return m ? Math.max(1, parseInt(m[1], 10)) : null;
+  }
+
+  function isEventDummyItem(entry) {
+    if (!entry) return false;
+    const name = String(entry.name || '');
+    const desc = String(entry.description || '');
+    const note = String(entry.note || '');
+    return entry.itypeId === 3 || entry.itypeId === 4 ||
+      /<SGカテゴリ|<SG説明/i.test(note) ||
+      /イベント用|ダミー|未使用|^[\\s？?]+$/.test(name) ||
+      /イベント用|ダミー|未使用/.test(desc);
+  }
+
+  function isKeyOrEventItem(entry) {
+    if (!entry) return false;
+    const name = String(entry.name || '').trim();
+    const desc = String(entry.description || '');
+    return entry.itypeId === 2 || /イベントアイテム|貴重品|システム/.test(desc) || /^★/.test(name);
+  }
+
+  const JP_GLOSS_MAP = [
+    ['イベント用ダミー', 'Event Dummy'],
+    ['イベントアイテム', 'Event Item '],
+    ['イベント用', 'Event Use'],
+    ['ダミー', 'Dummy'],
+    ['未使用', 'Unused'],
+    ['貴重品', 'Key Item '],
+    ['換金', 'Cash Item '],
+    ['改造', 'Upgrade Mat '],
+    ['採掘', 'Mining '],
+    ['説明書', 'Manual '],
+    ['使用者', 'Self '],
+    ['良いリスナー', 'Good Listeners '],
+    ['悪いリスナー', 'Bad Listeners '],
+    ['リスナー増加率', 'Listener Rate '],
+    ['リスナー', 'Listeners '],
+    ['淫乱な気持ち', 'Lewdness '],
+    ['淫乱', 'Lewd '],
+    ['毎日', 'Daily '],
+    ['確率で', ' Chance '],
+    ['確率', ' Chance '],
+    ['増加率', ' Rate '],
+    ['意欲度', 'Motivation '],
+    ['やる気', 'Motivation '],
+    ['メンタル', 'Mental '],
+    ['ストレス', 'Stress '],
+    ['好感度', 'Affection '],
+    ['堕落度', 'Corruption '],
+    ['お金', 'Money '],
+    ['所持金', 'Gold '],
+    ['円', ' Yen'],
+    ['最高級回復薬', 'Max Potion'],
+    ['高級回復薬', 'Hi-Potion'],
+    ['回復薬', 'Potion'],
+    ['最高級霊薬', 'Max Ether'],
+    ['高級霊薬', 'Hi-Ether'],
+    ['霊薬', 'Ether'],
+    ['蘇生薬', 'Revive Potion'],
+    ['毒消し', 'Antidote'],
+    ['媚薬', 'Aphrodisiac'],
+    ['浄化草', 'Purify Herb'],
+    ['忘却葉', 'Reset Herb'],
+    ['釣り竿', 'Fishing Rod'],
+    ['強化石', 'Upgrade Stone'],
+    ['鉱石', 'Ore'],
+    ['攻撃を', 'Attack '],
+    ['防御する', ' Block'],
+    ['最大HP', 'Max HP '],
+    ['最大MP', 'Max MP '],
+    ['攻撃力', 'ATK '],
+    ['防御力', 'DEF '],
+    ['魔法力', 'MAT '],
+    ['魔法防御', 'MDF '],
+    ['敏捷性', 'AGI '],
+    ['経験値', 'EXP '],
+    ['消費MP', 'MP Cost '],
+    ['被ダメージ', 'DMG Taken '],
+    ['特大ダメージ', 'Massive DMG'],
+    ['大ダメージ', 'Heavy DMG'],
+    ['中ダメージ', 'Med DMG'],
+    ['小ダメージ', 'Light DMG'],
+    ['物理系', 'Physical '],
+    ['魔術系', 'Magic '],
+    ['回避率', 'EVA '],
+    ['必殺率', 'CRIT '],
+    ['上昇させる', ' Up'],
+    ['上昇', ' Up'],
+    ['低下させる', ' Down'],
+    ['低下', ' Down'],
+    ['治療する', ' Cure'],
+    ['治療', ' Cure'],
+    ['回復させる', ' Heal'],
+    ['全回復', 'Full Heal'],
+    ['回復する', ' Heal'],
+    ['回復', ' Heal'],
+    ['蘇生', 'Revive '],
+    ['戦闘不能', 'KO '],
+    ['封印', 'Seal '],
+    ['火球', 'Fireball '],
+    ['攻撃', 'ATK '],
+    ['防御', 'DEF '],
+    ['運', 'Luck '],
+    ['普段着', 'Casual Wear'],
+    ['衣装', 'Costume'],
+    ['カメラ', 'Camera'],
+    ['マイク', 'Mic'],
+    ['照明', 'Light'],
+    ['広告', 'Ad'],
+    ['大鎌', 'Scythe '],
+    ['大杖', 'Staff '],
+    ['軽鎧', 'Light Armor'],
+    ['重鎧', 'Heavy Armor'],
+    ['兜', 'Helm'],
+    ['帽子', 'Hat'],
+    ['お守り', 'Charm'],
+    ['ラーメン', 'Ramen'],
+    ['ソフトクリーム', 'Soft Serve'],
+    ['ハンバーガー', 'Burger'],
+    ['ポテト', 'Fries'],
+    ['ブタの貯金箱', 'Piggy Bank'],
+    ['貯金箱', 'Piggy Bank'],
+    ['花瓶', 'Vase'],
+    ['写真額', 'Photo Frame'],
+    ['フィギュア', 'Figure'],
+    ['貞操帯', 'Chastity Belt'],
+    ['同人誌', 'Doujinshi'],
+    ['薬', 'Medicine'],
+    ['鍵', 'Key'],
+    ['剣', 'Sword'],
+    ['盾', 'Shield'],
+    ['鎧', 'Armor'],
+    ['指輪', 'Ring'],
+    ['書', 'Book'],
+    ['胸回数', 'Breast Count'],
+    ['口淫回数', 'Oral Count'],
+    ['秘肛回数', 'Anal Count'],
+    ['膣交回数', 'Vaginal Count'],
+    ['自慰回数', 'Masturbation Count'],
+    ['絶頂回数', 'Climax Count'],
+    ['経験人数', 'Partners'],
+    ['クリア階層', 'Cleared Floor'],
+    ['サブクエスト', 'Subquest '],
+    ['進行変数', 'Progress'],
+    ['レベル', 'Level'],
+    ['乱数', 'RNG'],
+    ['登場', ' Appeared'],
+    ['討伐済み', ' Defeated'],
+    ['クリア済', ' Cleared'],
+    ['経験済み', ' Experienced'],
+    ['移動禁止', 'No Move'],
+    ['転移結晶', 'Teleport Crystal'],
+    ['アルバイト', 'Part-time Job'],
+    ['魔法少女', 'Magical Girl'],
+    ['勝利した', ' Victory'],
+    ['ラウンド', ' Round '],
+    ['歓楽街', 'Entertainment District'],
+    ['室内', 'Indoors'],
+    ['昼夜', 'Day/Night'],
+    ['回想', 'Recollection'],
+    ['パソコン', 'PC'],
+    ['全体', 'All '],
+    ['単体', 'Single '],
+    ['味方', 'Ally '],
+    ['敵', 'Enemy '],
+    ['物理', 'Physical '],
+    ['魔法', 'Magic '],
+    ['必中', 'Certain Hit '],
+    ['炎', 'Fire '],
+    ['氷', 'Ice '],
+    ['雷', 'Thunder '],
+    ['毒', 'Poison '],
+    ['麻痺', 'Paralysis '],
+    ['睡眠', 'Sleep '],
+    ['混乱', 'Confusion '],
+    ['暗闇', 'Blind '],
+    ['沈黙', 'Silence ']
+  ];
+
+  function decodeJpSnippet(str) {
+    const raw = String(str || '').trim();
+    if (!raw) return '';
+    if (gameData.aiTrans && gameData.aiTrans[raw]) return gameData.aiTrans[raw];
+    let out = normalizeFullWidth(cleanRpgText(raw));
+    for (let i = 0; i < JP_GLOSS_MAP.length; i++) {
+      const pair = JP_GLOSS_MAP[i];
+      if (out.includes(pair[0])) out = out.split(pair[0]).join(pair[1]);
+    }
+    out = out.replace(/(\\d+)回/g, '$1x').replace(/(\\d+)点/g, '$1').replace(/[「」『』\\[\\]・！？]/g, ' ').replace(/\\s+/g, ' ').trim();
+    return out;
+  }
+
+  function decodeEntitySummary(entry, cat) {
+    if (!entry || typeof entry !== 'object') {
+      return { badgeParts: [], badgeText: '', cleanDesc: '', enNameHint: '', searchBlob: '', maxItem: null, isDummy: false };
+    }
+    const name = String(entry.name || '');
+    const rawDesc = String(entry.description || '');
+    const rawNote = String(entry.note || '');
+    const cleanDesc = cleanRpgText(rawDesc);
+    const maxItem = parseMaxItemTag(rawNote);
+    const isHiddenGlossary = cat === 'items' && (entry.itypeId === 3 || entry.itypeId === 4 || /<SGカテゴリ/i.test(rawNote));
+    const isDummy = isEventDummyItem(entry);
+    const badgeParts = [];
+
+    if (isHiddenGlossary) badgeParts.push('⚠ Hidden/Glossary (Skip)');
+    else if (isDummy) badgeParts.push('⚠ Event Dummy');
+    if (cat === 'items' && isKeyOrEventItem(entry)) badgeParts.push('Key/Event Item');
+    if (maxItem) badgeParts.push('Max:' + maxItem);
+
+    const spMatch = rawNote.match(/<STS\\s+Get\\s+Sp\\s*:\\s*(\\d+)>/i);
+    if (spMatch) badgeParts.push('SP +' + spMatch[1]);
+    if (/<STS\\s+Reset\\s+Tree/i.test(rawNote)) badgeParts.push('Reset Skill Tree');
+    const grantSkMatch = rawNote.match(/<skill_id\\s*:\\s*(\\d+)>/i);
+    if (grantSkMatch) badgeParts.push('Grant Skill #' + grantSkMatch[1]);
+
+    if (Array.isArray(entry.params) && !Array.isArray(entry.params[0])) {
+      const pNames = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
+      const pTags = [];
+      for (let i = 0; i < 8; i++) {
+        const val = Number(entry.params[i]) || 0;
+        if (val !== 0) pTags.push(pNames[i] + (val > 0 ? '+' + val : val));
+      }
+      if (pTags.length > 0) badgeParts.push(pTags.slice(0, 3).join(' '));
+    }
+
+    if (Array.isArray(entry.effects)) {
+      entry.effects.forEach(e => {
+        if (!e || typeof e !== 'object') return;
+        if (e.code === 11) {
+          const pct = Math.round((e.value1 || 0) * 100);
+          const flat = e.value2 || 0;
+          if (pct || flat) badgeParts.push(\`HP +\${pct ? pct + '%' : ''}\${pct && flat ? '+' : ''}\${flat || ''}\`);
+        } else if (e.code === 12) {
+          const pct = Math.round((e.value1 || 0) * 100);
+          const flat = e.value2 || 0;
+          if (pct || flat) badgeParts.push(\`MP +\${pct ? pct + '%' : ''}\${pct && flat ? '+' : ''}\${flat || ''}\`);
+        } else if (e.code === 13 && e.value1) {
+          badgeParts.push('TP +' + e.value1);
+        } else if (e.code === 21 && e.dataId) {
+          badgeParts.push('Add State #' + e.dataId);
+        } else if (e.code === 22 && e.dataId) {
+          badgeParts.push('Cure State #' + e.dataId);
+        } else if (e.code === 42 && e.value1) {
+          const pNames = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
+          badgeParts.push('Grow ' + (pNames[e.dataId] || 'Stat') + ' +' + e.value1);
+        } else if (e.code === 43 && e.dataId) {
+          badgeParts.push('Learn Skill #' + e.dataId);
+        } else if (e.code === 44 && e.dataId) {
+          badgeParts.push('Event #' + e.dataId);
+        }
+      });
+    }
+
+    if (cat === 'skills') {
+      if (entry.mpCost) badgeParts.push('MP:' + entry.mpCost);
+      if (entry.tpCost) badgeParts.push('TP:' + entry.tpCost);
+      if (entry.damage && entry.damage.type > 0 && entry.damage.formula && entry.damage.formula !== '0') {
+        badgeParts.push('DMG: ' + String(entry.damage.formula).slice(0, 24));
+      }
+    }
+
+    const hasJpName = /[\\u3040-\\u30ff\\u3400-\\u9fff]/.test(name);
+    const enNameHint = hasJpName ? decodeJpSnippet(name) : '';
+    const hasAsciiWord = (s) => /[A-Za-z]/.test(s);
+    if (enNameHint && hasAsciiWord(enNameHint) && !isDummy) {
+      const asciiOnly = enNameHint.replace(/[^\\x20-\\x7E]/g, ' ').replace(/\\s+/g, ' ').trim();
+      if (asciiOnly && !badgeParts.includes(asciiOnly)) badgeParts.push(asciiOnly);
+    }
+
+    if (rawDesc && !isDummy) {
+      const segments = rawDesc.split(/<br\\s*\\/?>|\\r?\\n/i).map(s => s.trim()).filter(Boolean);
+      const effectSeg = segments.length > 1 ? segments[segments.length - 1] : segments[0];
+      if (effectSeg) {
+        const glossed = decodeJpSnippet(effectSeg);
+        const asciiEffect = glossed.replace(/[^\\x20-\\x7E]/g, ' ').replace(/\\s+/g, ' ').trim();
+        if (asciiEffect && /[A-Za-z]/.test(asciiEffect) && !badgeParts.includes(asciiEffect)) {
+          badgeParts.push(asciiEffect);
+        }
+      }
+    }
+
+    const badgeText = badgeParts.join(' · ');
+    const aiName = (gameData.aiTrans && gameData.aiTrans[name]) || '';
+    const aiDesc = (gameData.aiTrans && gameData.aiTrans[cleanDesc]) || '';
+    const searchBlob = [entry.id, name, cleanDesc, enNameHint, badgeText, aiName, aiDesc].join(' ').toLowerCase();
+
+    return { badgeParts, badgeText, cleanDesc, enNameHint, searchBlob, maxItem, isDummy };
+  }
+
+  function syncGameDataFromArray(cat, jsonArr) {
+    if (!gameData[cat] || !Array.isArray(jsonArr)) return;
+    gameData[cat] = {};
+    if (cat === 'items') gameData.itemTypes = {};
+    if (gameData.meta && gameData.meta[cat]) gameData.meta[cat] = {};
+    const target = gameData[cat];
+    const metaTarget = gameData.meta && gameData.meta[cat] ? gameData.meta[cat] : null;
+    jsonArr.forEach(x => {
+      if (x && x.id && x.name && isSafeKey(x.id)) {
+        target[x.id] = x.name;
+        if (cat === 'items') gameData.itemTypes[x.id] = isKeyOrEventItem(x) ? 2 : (x.itypeId || 1);
+        if (metaTarget) metaTarget[x.id] = decodeEntitySummary(x, cat);
+      }
+    });
+  }
+
+  async function runOfflineJpTranslationHelper() {
+    const jpRe = /[\\u3040-\\u30ff\\u3400-\\u9fff]/;
+    const candidates = new Set();
+
+    ['items', 'weapons', 'armors', 'skills'].forEach(cat => {
+      const store = dbStore[cat];
+      if (store && Array.isArray(store.items)) {
+        store.items.forEach(x => {
+          if (!x || !x.id) return;
+          if (x.name && jpRe.test(x.name)) candidates.add(String(x.name).trim());
+          const cd = cleanRpgText(x.description || '');
+          if (cd && jpRe.test(cd)) candidates.add(cd);
+        });
+      } else if (gameData[cat]) {
+        Object.values(gameData[cat]).forEach(nm => { if (nm && jpRe.test(nm)) candidates.add(String(nm).trim()); });
+      }
+    });
+    ['variables', 'switches'].forEach(cat => {
+      Object.values(gameData[cat] || {}).forEach(nm => { if (nm && jpRe.test(nm)) candidates.add(String(nm).trim()); });
+    });
+
+    const refreshDecodedViews = () => {
+      ['items', 'weapons', 'armors', 'skills'].forEach(cat => {
+        if (dbStore[cat] && Array.isArray(dbStore[cat].items)) {
+          syncGameDataFromArray(cat, dbStore[cat].items);
+        }
+      });
+      if (currentFile && currentFile.parsedRoot) setupVisualEditor();
+      if (currentAppMode === 'database') renderDbMasterList();
+    };
+
+    refreshDecodedViews();
+    showToast(\`Decoded \${candidates.size} Japanese text entries (Offline Glossary & Effect Decoder · 0 Tokens).\`, 'success');
+
+    if (typeof window !== 'undefined' && window.Translator && typeof window.Translator.availability === 'function' && candidates.size > 0) {
+      try {
+        const avail = await Promise.race([
+          window.Translator.availability({ sourceLanguage: 'ja', targetLanguage: 'en' }),
+          new Promise(r => setTimeout(() => r('timeout'), 400))
+        ]);
+        if (avail === 'available' && typeof window.Translator.create === 'function') {
+          const tr = await Promise.race([
+            window.Translator.create({ sourceLanguage: 'ja', targetLanguage: 'en' }),
+            new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 2000))
+          ]);
+          const list = Array.from(candidates).slice(0, 80);
+          for (const text of list) {
+            if (!gameData.aiTrans[text]) {
+              gameData.aiTrans[text] = await tr.translate(text);
+            }
+          }
+          refreshDecodedViews();
+          showToast(\`Decoded \${candidates.size} Japanese text entries (Glossary + On-Device Browser AI).\`, 'success');
+        }
+      } catch (e) {}
+    }
+  }
+
+  function renderBagCardMetaHtml(meta) {
+    if (!meta || (!meta.badgeText && !meta.cleanDesc)) return '';
+    const color = meta.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage-bright)';
+    const badge = meta.badgeText
+      ? \`<div style="font-size:0.72rem; color:\${color}; font-family:var(--font-mono); font-weight:600; line-height:1.35;">\${escapeHtml(meta.badgeText)}</div>\`
+      : '';
+    const descPreview = meta.cleanDesc
+      ? \`<div style="font-size:0.72rem; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="\${escapeHtml(meta.cleanDesc)}">\${escapeHtml(meta.cleanDesc)}</div>\`
+      : '';
+    return badge + descPreview;
+  }
+
+  function populateEntityPicker(selectEl, dictObj, typeMap = null, metaMap = null) {
     if (!selectEl) return;
     const ids = Object.keys(dictObj || {}).filter(id => !isDummyDbName(dictObj[id]));
     if (ids.length === 0) {
@@ -3637,9 +4217,11 @@ let htmlContent = `<!DOCTYPE html>
       return;
     }
     selectEl.style.display = 'inline-block';
-    selectEl.innerHTML = '<option value="">-- Select from DB --</option>' + ids.map(id => {
+    selectEl.innerHTML = '<option value="">Select from DB...</option>' + ids.map(id => {
       const tag = (typeMap && typeMap[id] === 2) ? ' [Key]' : '';
-      return \`<option value="\${escapeHtml(id)}">#\${escapeHtml(id)} \${escapeHtml(dictObj[id])}\${tag}</option>\`;
+      const meta = metaMap && metaMap[id] ? metaMap[id] : null;
+      const hint = (meta && meta.badgeText) ? ' — ' + meta.badgeText.slice(0, 42) : '';
+      return \`<option value="\${escapeHtml(id)}">#\${escapeHtml(id)} \${escapeHtml(dictObj[id])}\${tag}\${escapeHtml(hint)}</option>\`;
     }).join('');
   }
 
@@ -3655,20 +4237,22 @@ let htmlContent = `<!DOCTYPE html>
     document.getElementById('badge-item-count').textContent = itemIds.length;
 
     const picker = document.getElementById('inventory-picker-select');
-    populateEntityPicker(picker, gameData.items, gameData.itemTypes);
+    populateEntityPicker(picker, gameData.items, gameData.itemTypes, gameData.meta ? gameData.meta.items : null);
 
     document.getElementById('btn-items-set-all-99').onclick = () => {
       let count = 0;
       itemIds.forEach(id => {
+        const meta = gameData.meta && gameData.meta.items ? gameData.meta.items[id] : null;
         if (gameData.itemTypes && gameData.itemTypes[id] === 2) return;
+        if (meta && meta.isDummy) return;
         if (itemsObj[id] > 0) {
-          itemsObj[id] = 99;
+          itemsObj[id] = (meta && meta.maxItem) ? meta.maxItem : 99;
           count++;
         }
       });
       renderInventoryTab(partyObj);
       markSaveModified('Items 99');
-      showToast('Set ' + count + ' owned items to 99.', 'success');
+      showToast('Set ' + count + ' owned items to max safe amount.', 'success');
     };
 
     const btnUnlockSafe = document.getElementById('btn-items-unlock-safe');
@@ -3681,34 +4265,40 @@ let htmlContent = `<!DOCTYPE html>
         }
         let added = 0;
         let skippedKey = 0;
+        let skippedDummy = 0;
         dbIds.forEach(id => {
-          if (isDummyDbName(gameData.items[id])) return;
+          const meta = gameData.meta && gameData.meta.items ? gameData.meta.items[id] : null;
+          if (isDummyDbName(gameData.items[id]) || (meta && meta.isDummy)) {
+            skippedDummy++;
+            return;
+          }
           if (gameData.itemTypes && gameData.itemTypes[id] === 2) {
             skippedKey++;
             return;
           }
-          itemsObj[id] = 99;
+          itemsObj[id] = (meta && meta.maxItem) ? meta.maxItem : 99;
           added++;
         });
         renderInventoryTab(partyObj);
         markSaveModified('Safe Unlock Items');
-        showToast(\`Unlocked \${added} regular items (skipped \${skippedKey} Key Items for safety).\`, 'success');
+        showToast(\`Unlocked \${added} regular items (skipped \${skippedKey} Key Items, \${skippedDummy} Dummies).\`, 'success');
       };
     }
 
     document.getElementById('btn-add-item-dialog').onclick = () => {
+      const idInput = document.getElementById('inventory-add-id');
+      const qtyInput = document.getElementById('inventory-add-qty');
       const picked = picker && picker.value ? picker.value : null;
-      const rawId = picked || prompt('Enter Item ID to add:');
+      const rawId = picked || (idInput ? idInput.value : '');
       const id = parseInt(rawId, 10);
-      if (!id || id <= 0) return;
-      let val = 99;
-      if (!picked) {
-        const rawQty = prompt('Enter quantity (1-99):', '99');
-        if (rawQty === null) return;
-        val = Math.max(1, parseInt(rawQty, 10) || 99);
+      if (!id || id <= 0) {
+        showToast('Select an entry or enter a valid ID first.', 'warn');
+        return;
       }
+      const val = Math.max(1, parseInt(qtyInput ? qtyInput.value : '99', 10) || 99);
       itemsObj[id] = val;
       if (picker) picker.value = '';
+      if (idInput) idInput.value = '';
       renderInventoryTab(partyObj);
       markSaveModified('Add Item #' + id);
       showToast('Added Item #' + id + ' (x' + val + ').', 'success');
@@ -3721,7 +4311,8 @@ let htmlContent = `<!DOCTYPE html>
       const count = itemsObj[id];
       if (ownedOnly && count <= 0) return;
       const name = (gameData && gameData.items && gameData.items[id]) || \`Item #\${id}\`;
-      if (q && !id.includes(q) && !name.toLowerCase().includes(q)) return;
+      const meta = gameData.meta && gameData.meta.items ? gameData.meta.items[id] : null;
+      if (q && !id.includes(q) && !name.toLowerCase().includes(q) && !(meta && meta.searchBlob.includes(q))) return;
 
       const card = document.createElement('div');
       card.className = 'item-card';
@@ -3730,6 +4321,7 @@ let htmlContent = `<!DOCTYPE html>
           <span style="font-weight:600; font-size:0.86rem; color:var(--text-primary);" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
           <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span>
         </div>
+        \${renderBagCardMetaHtml(meta)}
         <div style="display:flex; align-items:center; gap:4px;">
           <button class="btn btn-secondary btn-sm btn-sub" type="button">-</button>
           <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="text-align:center; padding:4px;">
@@ -3766,7 +4358,7 @@ let htmlContent = `<!DOCTYPE html>
     document.getElementById('badge-weapon-count').textContent = ids.length;
 
     const picker = document.getElementById('weapons-picker-select');
-    populateEntityPicker(picker, gameData.weapons);
+    populateEntityPicker(picker, gameData.weapons, null, gameData.meta ? gameData.meta.weapons : null);
 
     const btnSet99 = document.getElementById('btn-weapons-set-all-99');
     if (btnSet99) {
@@ -3795,12 +4387,17 @@ let htmlContent = `<!DOCTYPE html>
     }
 
     document.getElementById('btn-add-weapon-dialog').onclick = () => {
+      const idInput = document.getElementById('weapons-add-id');
       const picked = picker && picker.value ? picker.value : null;
-      const rawId = picked || prompt('Enter Weapon ID to add:');
+      const rawId = picked || (idInput ? idInput.value : '');
       const id = parseInt(rawId, 10);
-      if (!id || id <= 0) return;
+      if (!id || id <= 0) {
+        showToast('Select an entry or enter a valid ID first.', 'warn');
+        return;
+      }
       weaponsObj[id] = (weaponsObj[id] || 0) + 1;
       if (picker) picker.value = '';
+      if (idInput) idInput.value = '';
       renderWeaponsTab(partyObj);
       markSaveModified('Add Weapon #' + id);
       showToast('Added Weapon #' + id + '.', 'success');
@@ -3810,12 +4407,14 @@ let htmlContent = `<!DOCTYPE html>
     ids.forEach(id => {
       const count = weaponsObj[id];
       const name = (gameData && gameData.weapons && gameData.weapons[id]) || \`Weapon #\${id}\`;
-      if (q && !id.includes(q) && !name.toLowerCase().includes(q)) return;
+      const meta = gameData.meta && gameData.meta.weapons ? gameData.meta.weapons[id] : null;
+      if (q && !id.includes(q) && !name.toLowerCase().includes(q) && !(meta && meta.searchBlob.includes(q))) return;
 
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
+        \${renderBagCardMetaHtml(meta)}
         <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
@@ -3840,7 +4439,7 @@ let htmlContent = `<!DOCTYPE html>
     document.getElementById('badge-armor-count').textContent = ids.length;
 
     const picker = document.getElementById('armors-picker-select');
-    populateEntityPicker(picker, gameData.armors);
+    populateEntityPicker(picker, gameData.armors, null, gameData.meta ? gameData.meta.armors : null);
 
     const btnSet99 = document.getElementById('btn-armors-set-all-99');
     if (btnSet99) {
@@ -3869,12 +4468,17 @@ let htmlContent = `<!DOCTYPE html>
     }
 
     document.getElementById('btn-add-armor-dialog').onclick = () => {
+      const idInput = document.getElementById('armors-add-id');
       const picked = picker && picker.value ? picker.value : null;
-      const rawId = picked || prompt('Enter Armor ID to add:');
+      const rawId = picked || (idInput ? idInput.value : '');
       const id = parseInt(rawId, 10);
-      if (!id || id <= 0) return;
+      if (!id || id <= 0) {
+        showToast('Select an entry or enter a valid ID first.', 'warn');
+        return;
+      }
       armorsObj[id] = (armorsObj[id] || 0) + 1;
       if (picker) picker.value = '';
+      if (idInput) idInput.value = '';
       renderArmorsTab(partyObj);
       markSaveModified('Add Armor #' + id);
       showToast('Added Armor #' + id + '.', 'success');
@@ -3884,12 +4488,14 @@ let htmlContent = `<!DOCTYPE html>
     ids.forEach(id => {
       const count = armorsObj[id];
       const name = (gameData && gameData.armors && gameData.armors[id]) || \`Armor #\${id}\`;
-      if (q && !id.includes(q) && !name.toLowerCase().includes(q)) return;
+      const meta = gameData.meta && gameData.meta.armors ? gameData.meta.armors[id] : null;
+      if (q && !id.includes(q) && !name.toLowerCase().includes(q) && !(meta && meta.searchBlob.includes(q))) return;
 
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
+        \${renderBagCardMetaHtml(meta)}
         <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
@@ -3931,16 +4537,20 @@ let htmlContent = `<!DOCTYPE html>
         if (!nonZeroOnly && (val === undefined || val === null) && !(gameData.variables && gameData.variables[id])) continue;
       }
       const vName = (gameData && gameData.variables && gameData.variables[id]) || \`Variable #\${id}\`;
-      if (q && !String(id).includes(q) && !String(val ?? '').toLowerCase().includes(q) && !vName.toLowerCase().includes(q)) continue;
+      const enHint = /[\\u3040-\\u30ff\\u3400-\\u9fff]/.test(vName) ? decodeJpSnippet(vName) : '';
+      const hasAsciiHint = enHint && /[A-Za-z]/.test(enHint);
+      if (q && !String(id).includes(q) && !String(val ?? '').toLowerCase().includes(q) && !vName.toLowerCase().includes(q) && !(hasAsciiHint && enHint.toLowerCase().includes(q))) continue;
       count++;
       if (rendered >= varsRenderLimit) continue;
       rendered++;
 
       const diffSub = compareBaseline ? \` <span style="color:var(--accent-sand); font-size:0.72rem;">(Was: \${escapeHtml(String(baseVal ?? 0))})</span>\` : '';
+      const hintSub = hasAsciiHint ? \`<div style="font-size:0.72rem; color:var(--accent-sage-bright);">\${escapeHtml(enHint)}</div>\` : '';
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = \`
         <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(vName)}">\${escapeHtml(vName)}\${diffSub}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
+        \${hintSub}
         <input type="text" class="stat-input" value="\${escapeHtml(val ?? 0)}" style="padding:5px 8px;">
       \`;
       card.querySelector('input').onchange = (e) => {
@@ -4000,15 +4610,18 @@ let htmlContent = `<!DOCTYPE html>
       if (filter === 'off' && val) continue;
       if (filter === 'diff' && (!compareBaseline || Boolean(compareBaseline.switches[id]) === val)) continue;
       const name = (gameData && gameData.switches && gameData.switches[id]) || \`Switch #\${id}\`;
-      if (q && !String(id).includes(q) && !name.toLowerCase().includes(q)) continue;
+      const enHint = /[\\u3040-\\u30ff\\u3400-\\u9fff]/.test(name) ? decodeJpSnippet(name) : '';
+      const hasAsciiHint = enHint && /[A-Za-z]/.test(enHint);
+      if (q && !String(id).includes(q) && !name.toLowerCase().includes(q) && !(hasAsciiHint && enHint.toLowerCase().includes(q))) continue;
       matchCount++;
       if (rendered >= switchesRenderLimit) continue;
       rendered++;
 
+      const hintSub = hasAsciiHint ? \`<div style="font-size:0.72rem; color:var(--accent-sage-bright);">\${escapeHtml(enHint)}</div>\` : '';
       const card = document.createElement('div');
-      card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;';
+      card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:8px;';
       card.innerHTML = \`
-        <span style="color:var(--text-primary); font-weight:500; font-size:0.84rem;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
+        <div style="min-width:0;"><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono); margin-right:6px;">#\${escapeHtml(id)}</span><span style="color:var(--text-primary); font-weight:500; font-size:0.84rem;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>\${hintSub}</div>
         <label class="toggle-switch"><input type="checkbox" \${val?'checked':''}><span class="slider"></span></label>
       \`;
       card.querySelector('input').onchange = (e) => {
@@ -4098,8 +4711,7 @@ let htmlContent = `<!DOCTYPE html>
         setupVisualEditor();
         if (v === entry.origVal) {
           saveChanges.delete('Raw: ' + entry.path);
-          const badge = document.getElementById('label-changes');
-          if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+          updateSaveChangesBadge();
         } else {
           markSaveModified('Raw: ' + entry.path);
         }
@@ -4109,8 +4721,7 @@ let htmlContent = `<!DOCTYPE html>
         inp.value = entry.origVal ?? '';
         setByTokens(currentFile.parsedRoot, entry.pathTokens, entry.origVal);
         saveChanges.delete('Raw: ' + entry.path);
-        const badge = document.getElementById('label-changes');
-        if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+        updateSaveChangesBadge();
         setupVisualEditor();
       };
       tbody.appendChild(tr);
@@ -4175,15 +4786,7 @@ let htmlContent = `<!DOCTYPE html>
               showToast(\`Skipped \${file.name}: Unsupported reference data file.\`, 'warn');
               return;
             }
-            gameData[cat] = {};
-            if (cat === 'items') gameData.itemTypes = {};
-            const target = gameData[cat];
-            json.forEach(x => {
-              if (x && x.id && x.name && isSafeKey(x.id)) {
-                target[x.id] = x.name;
-                if (cat === 'items') gameData.itemTypes[x.id] = x.itypeId || 1;
-              }
-            });
+            syncGameDataFromArray(cat, json);
           } else if (json && typeof json === 'object' && (Array.isArray(json.variables) || Array.isArray(json.switches))) {
             if (Array.isArray(json.variables)) {
               gameData.variables = {};
@@ -4198,6 +4801,7 @@ let htmlContent = `<!DOCTYPE html>
             return;
           }
           setupVisualEditor();
+          renderDataFilesStatus();
           showToast(\`Loaded names from \${file.name}\`, 'success');
         } catch(e) {
           showToast(\`Invalid JSON in \${file.name}\`, 'danger');
@@ -4206,6 +4810,10 @@ let htmlContent = `<!DOCTYPE html>
       reader.readAsText(file);
     });
   }
+  const btnTranslateJp = document.getElementById('btn-translate-jp');
+  if (btnTranslateJp) btnTranslateJp.onclick = runOfflineJpTranslationHelper;
+  const btnDbTranslateJp = document.getElementById('btn-db-translate-jp');
+  if (btnDbTranslateJp) btnDbTranslateJp.onclick = runOfflineJpTranslationHelper;
   if (dataDropzone && dataFileInput) {
     dataDropzone.onclick = () => dataFileInput.click();
     dataDropzone.ondragover = (e) => e.preventDefault();
@@ -4345,6 +4953,7 @@ let htmlContent = `<!DOCTYPE html>
     labelSize.textContent = '0 B';
     uploadSection.style.display = 'flex';
     saveEditorScreen.style.display = 'none';
+    updateSaveHeaderButtons();
     showToast('Save file cleared.', 'info');
   }
 
@@ -4358,11 +4967,6 @@ let htmlContent = `<!DOCTYPE html>
   const btnClearSave = document.getElementById('btn-clear-save');
   if (btnClearSave) {
     btnClearSave.onclick = clearSaveFile;
-  }
-
-  const btnDbClearAll = document.getElementById('btn-db-clear-all');
-  if (btnDbClearAll) {
-    btnDbClearAll.onclick = clearAllDatabaseFiles;
   }
 
   const btnClearDbHeader = document.getElementById('btn-clear-db-header');

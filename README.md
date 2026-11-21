@@ -26,15 +26,16 @@ An offline-first, 100% client-side web studio for inspecting and editing save fi
 ## Key Features
 
 ### 1. Save Editor
-- **Visual Editing Tabs:** Characters (stats, EXP, skills, status cure), Inventory, Weapons, Armors, Variables, Switches, Reference Data (`.json`), and Raw Property Tree.
+- **Visual Editing Tabs:** Characters (stats, EXP, skills with DB picker, status cure, Player Location `Map ID / X / Y`), Inventory, Weapons, Armors, Variables, Switches, Reference Data (`.json`) status manager, and Raw Property Tree.
+- **Zero-Token Japanese RPG Decoder:** Automatically decodes RPG stats, `<br>` effect lines, note tags (`<Max Item: N>`, `<STS Get Sp: N>`, `<skill_id:N>`), and Japanese variable/switch labels into English hints, with cross-language English search.
 - **Save Diff Finder:** Load a second save as a baseline to highlight changed Variables and Switches.
 - **Quick Mod Presets:**
   - Direct Gold controls (`+10K`, `+100K`, `Max 9.9M`, `Revert`)
   - `Full Restore (HP/MP)`, `Cure States`, `Max All Stats (9999)`
-  - `Set All Owned to 99` & `Safe Unlock All (No Key Items)`
+  - `Set All Owned to 99` & `Safe Unlock All (No Key Items)` (skips `イベント用ダミー`, `イベントアイテム`, `貴重品`, `★` quest items, and `itypeId 3/4` hidden glossary items; respects `<Max Item: N>`)
   - `Max All Party & Inventory` (`Ctrl+Shift+G`)
 - **Non-Destructive Safety:**
-  - One-click **`Revert All`** to restore the loaded save from its original in-memory bytes.
+  - One-click **`Revert All`** to restore the loaded save from its original in-memory bytes and clickable **`CHANGES` drawer** to inspect edits.
   - One-click **`.bak` raw backup** and **Decrypted JSON export**.
   - **Unsaved changes protection** before closing the tab or clearing files.
 
@@ -61,14 +62,19 @@ An offline-first, 100% client-side web studio for inspecting and editing save fi
 
 ---
 
-## What's New (QoL Update)
+## What's New (Patch Notes)
 
-- **Revert All Save Changes:** Added a `Revert All` button in the Save Editor header to instantly roll back all edits to the original loaded file.
-- **Unsaved Changes Guard:** Added `beforeunload` warning and confirmation prompts before clearing a modified save or database workspace.
-- **Keyboard Shortcuts:** Added `Ctrl+S` quick export, `/` instant search focus, and `Esc` search clear across tabs.
-- **Cleaner Error & Toast Feedback:** Replaced blocking `alert()` parse dialogs with non-blocking `danger` toasts including the failing filename, and fixed overlapping toast timers.
-- **Improved Local Server & Launcher:** `server.js` now supports custom `PORT`, reports `EADDRINUSE` clearly, and supports `--open` so `run-server.bat` opens the browser only after the server is ready.
-- **Single-Command Verification:** Added `npm run verify` (`build` + full test pyramid).
+### Japanese RPG Decoder & Safe Unlock Protection (0-Token Update)
+- **Zero-Token Japanese Effect & Glossary Decoder:** Automatically extracts and decodes RPG parameters, `effects`, `damage.formula`, `<br>` effect lines, note tags (`<Max Item: N>`, `<STS Get Sp: N>`, `<STS Reset Tree>`, `<skill_id:N>`), and Japanese Variable/Switch names across Save Editor and Database Modder (plus optional local `window.Translator` support via `Translate JP`).
+- **English Cross-Search:** Filter Japanese items, armors, weapons, skills, variables, and switches using English keywords (e.g., `motivation`, `corruption`, `camera`, `magic`, `district`).
+- **Smart Safe Unlock Protection:** Automatically skips event dummies (`イベント用ダミー`), event/quest items (`イベントアイテム`, `貴重品`, `★`), and hidden encyclopedia/glossary entries (`itypeId` 3/4, `<SGカテゴリ>`), and caps quantities at `<Max Item: N>`.
+
+### UI / QoL Improvements
+- **Player Location / Teleport Editor:** Added `LOCATION (MAP / X / Y)` controls in the QoL bar (syncs `_realX`/`_realY` on MV/MZ saves).
+- **Character Skill Picker & Inline Add Controls:** Added `#char-skill-picker` dropdown when `Skills.json` is loaded and replaced `window.prompt()` dialogs with inline ID/quantity inputs on Inventory, Weapons, and Armors.
+- **Change Log Drawer & Data Files Manager:** Clickable `CHANGES` badge opens a modified-fields drawer; `Data Files (.json)` tab displays loaded reference counts with individual `Clear` buttons.
+- **UI & Routing Polish:** Context-aware Save header buttons (hidden until a save is loaded), deduplicated Database Modder actions, staggered multi-file downloads, auto-routing decrypted save `.json` dropped in DB Modder mode, and responsive layout fixes.
+- **Revert All & Safety:** Restores loaded saves from original bytes with `beforeunload` unsaved guard, `Ctrl+S` / `/` / `Esc` / `Ctrl+Shift+G` shortcuts, non-blocking error toasts, custom `PORT` support in `server.js`, and `npm run verify`.
 
 ---
 
