@@ -417,9 +417,9 @@ module.exports = async function runDomMockIntegrationTests(it) {
     await new Promise(r => setImmediate(r));
     assert.strictEqual(elementsById['badge-char-count'].textContent, 'WOLF', 'WOLF RPG .sav file must set char badge to WOLF');
 
-    // Phase 8: Japanese RPG decoder (RJ01077453-style Items), <Max Item: 1>, Event Dummy skipping, & English search
+    // Phase 8: Japanese RPG decoder (RJ01077453 + RJ01104138 + Universal traits/scope + MTool translation.json)
     const jpSave = {
-      party: { _gold: 500, _items: {} },
+      party: { _gold: 500, _items: {}, _armors: { 2: 1 } },
       actors: { _data: [null, { _name: 'Kei', _classId: 1, _level: 1 }] }
     };
     const jpSaveBuf = Buffer.from(pako.deflate(JSON.stringify(jpSave), { to: 'string', level: 1 }), 'utf8');
@@ -436,17 +436,43 @@ module.exports = async function runDomMockIntegrationTests(it) {
       { id: 50, name: '概要', description: '', note: '<SGカテゴリ:人物>', itypeId: 3, effects: [] },
       { id: 51, name: '晴れの日の花瓶', description: 'ただの花瓶。<br>毎日意欲度＋１', note: '<Max Item: 1>', itypeId: 1, effects: [] },
       { id: 55, name: '淫魔の誘惑', description: 'アルコールチョコ。<br>淫乱な気持ち＋５０', note: '', itypeId: 1, effects: [{ code: 44, dataId: 766, value1: 1, value2: 0 }] },
+      { id: 60, name: '謎の秘薬', description: '未知の古代語説明', note: '', itypeId: 1, scope: 2, effects: [] },
       { id: 101, name: 'アルバイト初心者', description: 'イベント用ダミー', note: '', itypeId: 1, effects: [] }
     ]);
     elementsById['data-file-input'].onchange({
       target: { files: [{ name: 'Items.json', _text: jpItemsJson }] }
     });
+    const jpArmorsJson = JSON.stringify([
+      null,
+      { id: 2, name: '幸運のリング', description: '', note: '', etypeId: 5, params: [0,0,0,0,0,0,0,0], traits: [{ code: 22, dataId: 1, value: 0.05 }, { code: 64, dataId: 4, value: 1 }] }
+    ]);
+    elementsById['data-file-input'].onchange({
+      target: { files: [{ name: 'Armors.json', _text: jpArmorsJson }] }
+    });
+    assert.ok(elementsById['armors-cards-container'].children[0].innerHTML.includes('EVA +5%'), 'Armor card must decode traits code 22 EVA +5%');
+    assert.ok(elementsById['armors-cards-container'].children[0].innerHTML.includes('Gold x2'), 'Armor card must decode traits code 64 Gold x2');
+    assert.ok(elementsById['inventory-picker-select'].innerHTML.includes('All Enemies'), 'Picker must decode scope: 2 to All Enemies');
     assert.ok(elementsById['inventory-picker-select'].innerHTML.includes('Motivation +1'), 'Picker must include decoded English gloss');
     assert.ok(elementsById['inventory-picker-select'].innerHTML.includes('Max:1'), 'Picker must include Max:1 tag');
     assert.ok(elementsById['inventory-picker-select'].innerHTML.includes('Corruption'), 'Picker must decode 堕落度 to Corruption');
     assert.ok(elementsById['inventory-picker-select'].innerHTML.includes('SP +20'), 'Picker must decode <STS Get Sp: 20> to SP +20');
 
     elementsById['btn-items-unlock-safe'].click();
+
+    // Verify MTool translation.json import translates & enables English search
+    const mtoolJson = JSON.stringify({
+      '謎の秘薬': 'Mystic Elixir',
+      '未知の古代語説明': 'Restores all vitality'
+    });
+    elementsById['data-file-input'].onchange({
+      target: { files: [{ name: 'translation.json', _text: mtoolJson }] }
+    });
+    assert.ok(elementsById['datafiles-status-list'].innerHTML.includes('2 names'), 'Data Files tab must show MTool translation count');
+    elementsById['inventory-search'].value = 'mystic elixir';
+    elementsById['inventory-search'].oninput();
+    assert.strictEqual(elementsById['inventory-cards-container'].children.length, 1, 'Searching "mystic elixir" from MTool translation.json must match 謎の秘薬');
+    assert.ok(elementsById['inventory-cards-container'].children[0].innerHTML.includes('Restores all vitality'));
+
     elementsById['inventory-search'].value = 'motivation';
     elementsById['inventory-search'].oninput();
     assert.strictEqual(elementsById['inventory-cards-container'].children.length, 1, 'Searching "motivation" must match 晴れの日の花瓶');
@@ -464,6 +490,7 @@ module.exports = async function runDomMockIntegrationTests(it) {
     const jpExport = JSON.parse(pako.inflate(getLastBlob().parts[0], { to: 'string' }));
     assert.strictEqual(jpExport.party._items[15], 99, 'Normal Zarakiel item 媚薬 unlocks to 99');
     assert.strictEqual(jpExport.party._items[18], 99, 'Normal Zarakiel item SPの書 unlocks to 99');
+    assert.strictEqual(jpExport.party._items[60], 99, 'Normal item 謎の秘薬 unlocks to 99');
     assert.strictEqual(jpExport.party._items[21], undefined, 'Safe Unlock must protect ★イベントアイテム even if itypeId=1');
     assert.strictEqual(jpExport.party._items[50], undefined, 'Safe Unlock must skip itypeId=3 Hidden/Glossary item 概要');
     assert.strictEqual(jpExport.party._items[51], 1, 'Safe Unlock must respect <Max Item: 1> instead of 99');

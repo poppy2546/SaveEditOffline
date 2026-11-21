@@ -1234,6 +1234,7 @@ let htmlContent = `<!DOCTYPE html>
   const gameData = {
     items: {}, itemTypes: {}, weapons: {}, armors: {}, skills: {}, variables: {}, switches: {},
     meta: { items: {}, weapons: {}, armors: {}, skills: {} },
+    rawArrays: { items: null, weapons: null, armors: null, skills: null },
     aiTrans: {}
   };
   let compareBaseline = null;
@@ -1532,8 +1533,40 @@ let htmlContent = `<!DOCTYPE html>
     return null;
   }
 
+  function isTranslationMapObject(obj) {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+    if (obj.party || obj.actors || obj.variables || obj.switches || obj.__ruby_class__) return false;
+    const keys = Object.keys(obj);
+    return keys.length > 0 && keys.every(k => typeof k === 'string' && typeof obj[k] === 'string');
+  }
+
+  function applyTranslationMapJson(fileName, obj) {
+    let added = 0;
+    Object.keys(obj).forEach(k => {
+      if (!isSafeKey(k)) return;
+      const val = String(obj[k] || '').trim();
+      if (!val) return;
+      gameData.aiTrans[k] = val;
+      const ck = cleanRpgText(k);
+      if (ck && ck !== k && !gameData.aiTrans[ck]) gameData.aiTrans[ck] = val;
+      added++;
+    });
+    ['items', 'weapons', 'armors', 'skills'].forEach(cat => {
+      const src = (dbStore[cat] && Array.isArray(dbStore[cat].items)) ? dbStore[cat].items : (gameData.rawArrays && gameData.rawArrays[cat]);
+      if (src) syncGameDataFromArray(cat, src);
+    });
+    if (currentFile && currentFile.parsedRoot) setupVisualEditor();
+    if (currentAppMode === 'database') renderDbMasterList();
+    renderDataFilesStatus();
+    showToast(\`Loaded \${added} translations from \${fileName}\`, 'success');
+    return true;
+  }
+
   function applyDatabaseJson(fileName, json, handle = null, autoSwitch = true) {
     if (!Array.isArray(json) && json && typeof json === 'object') {
+      if (isTranslationMapObject(json)) {
+        return applyTranslationMapJson(fileName, json);
+      }
       if (Array.isArray(json.variables) || Array.isArray(json.switches)) {
         if (Array.isArray(json.variables)) {
           gameData.variables = {};
@@ -3112,7 +3145,8 @@ let htmlContent = `<!DOCTYPE html>
       { key: 'armors', label: 'Armors.json' },
       { key: 'skills', label: 'Skills.json' },
       { key: 'variables', label: 'Variables (System.json)' },
-      { key: 'switches', label: 'Switches (System.json)' }
+      { key: 'switches', label: 'Switches (System.json)' },
+      { key: 'aiTrans', label: 'Translation Map (MTool .json)' }
     ];
     list.innerHTML = cats.map(({ key, label }) => {
       const count = Object.keys(gameData[key] || {}).length;
@@ -3139,6 +3173,13 @@ let htmlContent = `<!DOCTYPE html>
         gameData[key] = {};
         if (key === 'items') gameData.itemTypes = {};
         if (gameData.meta && gameData.meta[key]) gameData.meta[key] = {};
+        if (gameData.rawArrays && key in gameData.rawArrays) gameData.rawArrays[key] = null;
+        if (key === 'aiTrans') {
+          ['items', 'weapons', 'armors', 'skills'].forEach(c => {
+            const src = (dbStore[c] && Array.isArray(dbStore[c].items)) ? dbStore[c].items : (gameData.rawArrays && gameData.rawArrays[c]);
+            if (src) syncGameDataFromArray(c, src);
+          });
+        }
         renderDataFilesStatus();
         if (currentFile && currentFile.parsedRoot) setupVisualEditor();
         showToast(\`Cleared \${key} reference names.\`, 'info');
@@ -3994,6 +4035,114 @@ let htmlContent = `<!DOCTYPE html>
     ['昼夜', 'Day/Night'],
     ['回想', 'Recollection'],
     ['パソコン', 'PC'],
+    ['物理攻撃', 'Phys ATK '],
+    ['魔法攻撃', 'Mag ATK '],
+    ['物理防御', 'Phys DEF '],
+    ['魔法防御', 'Mag DEF '],
+    ['命中率', 'HIT '],
+    ['会心', 'CRIT '],
+    ['行動回数', 'Actions '],
+    ['先制', 'Preemptive '],
+    ['逃走', 'Escape '],
+    ['無効', 'Immune '],
+    ['耐性', 'Resist '],
+    ['弱点', 'Weak '],
+    ['吸収', 'Drain '],
+    ['反射', 'Reflect '],
+    ['再生', 'Regen '],
+    ['消費', 'Cost '],
+    ['威力', 'Power '],
+    ['継続', 'Duration '],
+    ['ターン', 'Turn '],
+    ['状態異常', 'Ailment '],
+    ['石化', 'Petrify '],
+    ['呪い', 'Curse '],
+    ['火傷', 'Burn '],
+    ['凍傷', 'Freeze '],
+    ['感電', 'Shock '],
+    ['出血', 'Bleed '],
+    ['恐怖', 'Fear '],
+    ['魅了', 'Charm '],
+    ['暴走', 'Berserk '],
+    ['スタン', 'Stun '],
+    ['万能薬', 'Panacea'],
+    ['解毒薬', 'Antidote'],
+    ['聖水', 'Holy Water'],
+    ['たいまつ', 'Torch'],
+    ['テント', 'Tent'],
+    ['魔石', 'Magic Stone'],
+    ['宝珠', 'Orb'],
+    ['結晶', 'Crystal'],
+    ['素材', 'Material'],
+    ['料理', 'Food'],
+    ['食材', 'Ingredient'],
+    ['大剣', 'Greatsword'],
+    ['短剣', 'Dagger'],
+    ['刀', 'Katana'],
+    ['槍', 'Spear'],
+    ['斧', 'Axe'],
+    ['弓', 'Bow'],
+    ['銃', 'Gun'],
+    ['鞭', 'Whip'],
+    ['拳', 'Fist'],
+    ['爪', 'Claw'],
+    ['首飾り', 'Necklace'],
+    ['腕輪', 'Bracelet'],
+    ['耳飾り', 'Earring'],
+    ['外套', 'Cloak'],
+    ['マント', 'Cape'],
+    ['ローブ', 'Robe'],
+    ['ブーツ', 'Boots'],
+    ['靴', 'Shoes'],
+    ['手袋', 'Gloves'],
+    ['小手', 'Gauntlet'],
+    ['下着', 'Underwear'],
+    ['体力', 'Stamina '],
+    ['気力', 'Energy '],
+    ['理性', 'Sanity '],
+    ['発情', 'Estrous '],
+    ['感度', 'Sensitivity '],
+    ['露出', 'Exposure '],
+    ['奉仕', 'Service '],
+    ['被虐', 'Masochism '],
+    ['嗜虐', 'Sadism '],
+    ['処女', 'Virgin '],
+    ['信仰', 'Faith '],
+    ['知名度', 'Fame '],
+    ['人気', 'Popularity '],
+    ['評判', 'Reputation '],
+    ['クエスト', 'Quest '],
+    ['依頼', 'Request '],
+    ['討伐', 'Subjugation '],
+    ['探索', 'Explore '],
+    ['採取', 'Gather '],
+    ['調合', 'Alchemy '],
+    ['鍛冶', 'Smithing '],
+    ['合成', 'Synthesis '],
+    ['称号', 'Title '],
+    ['実績', 'Achievement '],
+    ['図鑑', 'Encyclopedia '],
+    ['難易度', 'Difficulty '],
+    ['周回', 'New Game+ '],
+    ['引き継ぎ', 'Carryover '],
+    ['宿屋', 'Inn'],
+    ['酒場', 'Tavern'],
+    ['教会', 'Church'],
+    ['ギルド', 'Guild'],
+    ['迷宮', 'Labyrinth'],
+    ['ダンジョン', 'Dungeon'],
+    ['洞窟', 'Cave'],
+    ['遺跡', 'Ruins'],
+    ['森', 'Forest'],
+    ['城', 'Castle'],
+    ['塔', 'Tower'],
+    ['地下', 'Underground'],
+    ['ボス', 'Boss'],
+    ['宝箱', 'Chest'],
+    ['罠', 'Trap'],
+    ['通行証', 'Pass'],
+    ['許可証', 'Permit'],
+    ['地図', 'Map'],
     ['全体', 'All '],
     ['単体', 'Single '],
     ['味方', 'Ally '],
@@ -4048,6 +4197,16 @@ let htmlContent = `<!DOCTYPE html>
     if (/<STS\\s+Reset\\s+Tree/i.test(rawNote)) badgeParts.push('Reset Skill Tree');
     const grantSkMatch = rawNote.match(/<skill_id\\s*:\\s*(\\d+)>/i);
     if (grantSkMatch) badgeParts.push('Grant Skill #' + grantSkMatch[1]);
+    const passiveMatch = rawNote.match(/<Passive\\s+State\\s*:\\s*(\\d+)>/i);
+    if (passiveMatch) badgeParts.push('Passive State #' + passiveMatch[1]);
+    const cdMatch = rawNote.match(/<Cooldown\\s*:\\s*(\\d+)>/i);
+    if (cdMatch) badgeParts.push('CD:' + cdMatch[1] + 'T');
+    if (/<(?:Cannot\\s+Sell|禁止売却)>/i.test(rawNote)) badgeParts.push('No Sell');
+
+    if ((cat === 'items' || cat === 'skills') && entry.scope > 0) {
+      const scopeMap = { 1: '1 Enemy', 2: 'All Enemies', 3: 'Rnd Enemies', 4: 'Rnd Enemies', 5: 'Rnd Enemies', 6: 'Rnd Enemies', 7: '1 Ally', 8: 'All Allies', 9: 'Revive', 10: 'Revive', 11: 'Self' };
+      if (scopeMap[entry.scope]) badgeParts.push(scopeMap[entry.scope]);
+    }
 
     if (Array.isArray(entry.params) && !Array.isArray(entry.params[0])) {
       const pNames = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
@@ -4057,6 +4216,30 @@ let htmlContent = `<!DOCTYPE html>
         if (val !== 0) pTags.push(pNames[i] + (val > 0 ? '+' + val : val));
       }
       if (pTags.length > 0) badgeParts.push(pTags.slice(0, 3).join(' '));
+    }
+
+    if (Array.isArray(entry.traits)) {
+      const pNames = ['MHP', 'MMP', 'ATK', 'DEF', 'MAT', 'MDF', 'AGI', 'LUK'];
+      const exNames = ['HIT', 'EVA', 'CRIT', 'CRIT-EVA', 'M-EVA', 'M-REFL', 'CNT', 'HP-REGEN', 'MP-REGEN', 'TP-REGEN'];
+      const spNames = { 4: 'MP Cost ', 6: 'Phys DMG ', 7: 'Mag DMG ', 9: 'EXP x' };
+      const partyNames = ['Half Encounter', 'No Encounter', 'No Surprise', 'Preemptive Up', 'Gold x2', 'Drop x2'];
+      entry.traits.forEach(t => {
+        if (!t || typeof t !== 'object') return;
+        if (t.code === 13 && t.value < 1 && t.dataId) badgeParts.push('Resist State #' + t.dataId);
+        else if (t.code === 14 && t.dataId) badgeParts.push('Immune State #' + t.dataId);
+        else if (t.code === 21 && t.value !== 1 && pNames[t.dataId]) badgeParts.push(pNames[t.dataId] + ' x' + Math.round(t.value * 100) + '%');
+        else if (t.code === 22 && t.value !== 0 && exNames[t.dataId]) {
+          const pct = Math.round(t.value * 100);
+          badgeParts.push(exNames[t.dataId] + ' ' + (pct > 0 ? '+' + pct : pct) + '%');
+        } else if (t.code === 23 && t.value !== 1 && spNames[t.dataId]) {
+          badgeParts.push(spNames[t.dataId] + Math.round(t.value * 100) + '%');
+        } else if (t.code === 32 && t.dataId) badgeParts.push('Atk State #' + t.dataId);
+        else if (t.code === 34 && t.value > 0) badgeParts.push('Hits +' + t.value);
+        else if (t.code === 43 && t.dataId) badgeParts.push('Grant Skill #' + t.dataId);
+        else if (t.code === 55 && t.dataId === 1) badgeParts.push('Dual Wield');
+        else if (t.code === 61 && t.value > 0) badgeParts.push('Extra Turn +' + Math.round(t.value * 100) + '%');
+        else if (t.code === 64 && partyNames[t.dataId]) badgeParts.push(partyNames[t.dataId]);
+      });
     }
 
     if (Array.isArray(entry.effects)) {
@@ -4095,15 +4278,20 @@ let htmlContent = `<!DOCTYPE html>
       }
     }
 
+    const aiName = (gameData.aiTrans && gameData.aiTrans[name]) || '';
+    const aiDesc = (gameData.aiTrans && (gameData.aiTrans[cleanDesc] || gameData.aiTrans[rawDesc])) || '';
+    if (aiName && !badgeParts.includes(aiName)) badgeParts.push(aiName);
+    if (aiDesc && !badgeParts.includes(aiDesc)) badgeParts.push(aiDesc);
+
     const hasJpName = /[\\u3040-\\u30ff\\u3400-\\u9fff]/.test(name);
     const enNameHint = hasJpName ? decodeJpSnippet(name) : '';
     const hasAsciiWord = (s) => /[A-Za-z]/.test(s);
-    if (enNameHint && hasAsciiWord(enNameHint) && !isDummy) {
+    if (!aiName && enNameHint && hasAsciiWord(enNameHint) && !isDummy) {
       const asciiOnly = enNameHint.replace(/[^\\x20-\\x7E]/g, ' ').replace(/\\s+/g, ' ').trim();
       if (asciiOnly && !badgeParts.includes(asciiOnly)) badgeParts.push(asciiOnly);
     }
 
-    if (rawDesc && !isDummy) {
+    if (!aiDesc && rawDesc && !isDummy) {
       const segments = rawDesc.split(/<br\\s*\\/?>|\\r?\\n/i).map(s => s.trim()).filter(Boolean);
       const effectSeg = segments.length > 1 ? segments[segments.length - 1] : segments[0];
       if (effectSeg) {
@@ -4116,8 +4304,6 @@ let htmlContent = `<!DOCTYPE html>
     }
 
     const badgeText = badgeParts.join(' · ');
-    const aiName = (gameData.aiTrans && gameData.aiTrans[name]) || '';
-    const aiDesc = (gameData.aiTrans && gameData.aiTrans[cleanDesc]) || '';
     const searchBlob = [entry.id, name, cleanDesc, enNameHint, badgeText, aiName, aiDesc].join(' ').toLowerCase();
 
     return { badgeParts, badgeText, cleanDesc, enNameHint, searchBlob, maxItem, isDummy };
@@ -4128,6 +4314,7 @@ let htmlContent = `<!DOCTYPE html>
     gameData[cat] = {};
     if (cat === 'items') gameData.itemTypes = {};
     if (gameData.meta && gameData.meta[cat]) gameData.meta[cat] = {};
+    if (gameData.rawArrays && cat in gameData.rawArrays) gameData.rawArrays[cat] = jsonArr;
     const target = gameData[cat];
     const metaTarget = gameData.meta && gameData.meta[cat] ? gameData.meta[cat] : null;
     jsonArr.forEach(x => {
@@ -4145,8 +4332,9 @@ let htmlContent = `<!DOCTYPE html>
 
     ['items', 'weapons', 'armors', 'skills'].forEach(cat => {
       const store = dbStore[cat];
-      if (store && Array.isArray(store.items)) {
-        store.items.forEach(x => {
+      const srcItems = (store && Array.isArray(store.items)) ? store.items : (gameData.rawArrays && gameData.rawArrays[cat]);
+      if (Array.isArray(srcItems)) {
+        srcItems.forEach(x => {
           if (!x || !x.id) return;
           if (x.name && jpRe.test(x.name)) candidates.add(String(x.name).trim());
           const cd = cleanRpgText(x.description || '');
@@ -4162,9 +4350,8 @@ let htmlContent = `<!DOCTYPE html>
 
     const refreshDecodedViews = () => {
       ['items', 'weapons', 'armors', 'skills'].forEach(cat => {
-        if (dbStore[cat] && Array.isArray(dbStore[cat].items)) {
-          syncGameDataFromArray(cat, dbStore[cat].items);
-        }
+        const src = (dbStore[cat] && Array.isArray(dbStore[cat].items)) ? dbStore[cat].items : (gameData.rawArrays && gameData.rawArrays[cat]);
+        if (Array.isArray(src)) syncGameDataFromArray(cat, src);
       });
       if (currentFile && currentFile.parsedRoot) setupVisualEditor();
       if (currentAppMode === 'database') renderDbMasterList();
@@ -4796,6 +4983,9 @@ let htmlContent = `<!DOCTYPE html>
               gameData.switches = {};
               json.switches.forEach((n, i) => { if (n) gameData.switches[i] = n; });
             }
+          } else if (isTranslationMapObject(json)) {
+            applyTranslationMapJson(file.name, json);
+            return;
           } else {
             showToast(\`Skipped \${file.name}: Unsupported reference data file.\`, 'warn');
             return;

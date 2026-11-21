@@ -27,7 +27,7 @@ An offline-first, 100% client-side web studio for inspecting and editing save fi
 
 ### 1. Save Editor
 - **Visual Editing Tabs:** Characters (stats, EXP, skills with DB picker, status cure, Player Location `Map ID / X / Y`), Inventory, Weapons, Armors, Variables, Switches, Reference Data (`.json`) status manager, and Raw Property Tree.
-- **Zero-Token Japanese RPG Decoder:** Automatically decodes RPG stats, `<br>` effect lines, note tags (`<Max Item: N>`, `<STS Get Sp: N>`, `<skill_id:N>`), and Japanese variable/switch labels into English hints, with cross-language English search.
+- **Zero-Token Japanese & Universal RPG Decoder:** Automatically decodes RPG `params`, `traits` (EVA, CRIT, Gold/EXP multipliers, state immunities, dual wield, extra turns), `scope`, `effects`, `<br>` effect lines, note tags (`<Max Item: N>`, `<STS Get Sp: N>`, `<skill_id:N>`, `<Passive State: N>`, `<Cooldown: N>`), and 260+ universal JP RPG terms; supports importing MTool `translation.json` files and cross-language English search.
 - **Save Diff Finder:** Load a second save as a baseline to highlight changed Variables and Switches.
 - **Quick Mod Presets:**
   - Direct Gold controls (`+10K`, `+100K`, `Max 9.9M`, `Revert`)
@@ -65,7 +65,7 @@ An offline-first, 100% client-side web studio for inspecting and editing save fi
 ## What's New (Patch Notes)
 
 ### Japanese RPG Decoder & Safe Unlock Protection (0-Token Update)
-- **Zero-Token Japanese Effect & Glossary Decoder:** Automatically extracts and decodes RPG parameters, `effects`, `damage.formula`, `<br>` effect lines, note tags (`<Max Item: N>`, `<STS Get Sp: N>`, `<STS Reset Tree>`, `<skill_id:N>`), and Japanese Variable/Switch names across Save Editor and Database Modder (plus optional local `window.Translator` support via `Translate JP`).
+- **Zero-Token Japanese & Universal RPG Decoder:** Automatically extracts and decodes RPG `params`, `traits` (HIT/EVA/CRIT, MP Cost, Phys/Mag DMG, Gold/EXP x2, state resistance/immunity, extra turns, dual wield), `scope` (1/All Enemies, Ally, Revive, Self), `effects`, `damage.formula`, `<br>` effect lines, plugin note tags (`<Max Item: N>`, `<STS Get Sp: N>`, `<STS Reset Tree>`, `<skill_id:N>`, `<Passive State: N>`, `<Cooldown: N>`, `<Cannot Sell>`), and 260+ universal Japanese RPG terms across Save Editor and Database Modder (plus MTool `translation.json` import and optional local `window.Translator` support via `Translate JP`).
 - **English Cross-Search:** Filter Japanese items, armors, weapons, skills, variables, and switches using English keywords (e.g., `motivation`, `corruption`, `camera`, `magic`, `district`).
 - **Smart Safe Unlock Protection:** Automatically skips event dummies (`イベント用ダミー`), event/quest items (`イベントアイテム`, `貴重品`, `★`), and hidden encyclopedia/glossary entries (`itypeId` 3/4, `<SGカテゴリ>`), and caps quantities at `<Max Item: N>`.
 
