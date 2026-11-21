@@ -763,7 +763,6 @@ let htmlContent = `<!DOCTYPE html>
     <div>
       <div style="display:flex; align-items:center;">
         <h1 class="brand-title">Save &amp; DB Studio</h1>
-        <span class="badge-promax" id="app-badge-mode">SAVE EDITOR</span>
         <span class="badge-offline">CLIENT-SIDE / 100% PRIVATE</span>
       </div>
       <div style="font-size:0.74rem; color:var(--text-secondary);">
@@ -794,9 +793,7 @@ let htmlContent = `<!DOCTYPE html>
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       Clear File
     </button>
-    <button class="btn btn-secondary btn-sm" id="btn-export-json" type="button">Export JSON</button>
     <button class="btn btn-secondary btn-sm" id="btn-revert-save" type="button" title="Revert all edits back to the original loaded save file">Revert All</button>
-    <button class="btn btn-secondary btn-sm" id="btn-backup-raw" type="button" title="Download original unmodified save file (.bak)">Backup (.bak)</button>
     <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download Save
@@ -871,6 +868,8 @@ let htmlContent = `<!DOCTYPE html>
         <span class="meta-pill" id="label-format">FORMAT</span>
         <span class="meta-pill" id="label-size">0 KB</span>
         <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage); cursor:pointer;" id="label-changes" title="Click to inspect changes" tabindex="0" role="button">0 CHANGES</span>
+        <button class="btn btn-secondary btn-sm" id="btn-export-json" type="button">Export JSON</button>
+        <button class="btn btn-secondary btn-sm" id="btn-backup-raw" type="button" title="Download original unmodified save file (.bak)">Backup (.bak)</button>
       </div>
 
       <!-- Quick Gold Edit & Max Preset -->
@@ -928,7 +927,7 @@ let htmlContent = `<!DOCTYPE html>
           <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
             <input type="checkbox" id="inventory-owned-only" checked> Owned only (&gt;0)
           </label>
-          <select id="inventory-picker-select" style="display:none; height:31px; line-height:1.2; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <select id="inventory-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-items-set-all-99" type="button">Set All Owned to 99</button>
           <button class="btn btn-gold btn-sm" id="btn-items-unlock-safe" type="button" title="Unlock all regular items from Items.json while skipping Key Items (itypeId=2) to protect story quests">Safe Unlock All (No Key Items)</button>
           <input type="number" id="inventory-add-id" placeholder="ID" min="1" aria-label="Item ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
@@ -944,7 +943,10 @@ let htmlContent = `<!DOCTYPE html>
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
         <input type="text" id="weapons-search" placeholder="Filter by weapon ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <select id="weapons-picker-select" style="display:none; height:31px; line-height:1.2; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="weapons-owned-only" checked> Owned only (&gt;0)
+          </label>
+          <select id="weapons-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-weapons-set-all-99" type="button">Set Owned to 99</button>
           <button class="btn btn-gold btn-sm" id="btn-weapons-unlock-all" type="button">Unlock All DB Weapons</button>
           <input type="number" id="weapons-add-id" placeholder="ID" min="1" aria-label="Weapon ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
@@ -959,7 +961,10 @@ let htmlContent = `<!DOCTYPE html>
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
         <input type="text" id="armors-search" placeholder="Filter by armor ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <select id="armors-picker-select" style="display:none; height:31px; line-height:1.2; max-width:220px; padding:6px 10px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="armors-owned-only" checked> Owned only (&gt;0)
+          </label>
+          <select id="armors-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-armors-set-all-99" type="button">Set Owned to 99</button>
           <button class="btn btn-gold btn-sm" id="btn-armors-unlock-all" type="button">Unlock All DB Armors</button>
           <input type="number" id="armors-add-id" placeholder="ID" min="1" aria-label="Armor ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
@@ -1016,7 +1021,7 @@ let htmlContent = `<!DOCTYPE html>
         </div>
         <div style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
           <span style="font-size:0.78rem; color:var(--text-secondary);">Japanese RPG files auto-decode stats &amp; tags offline (0 tokens).</span>
-          <button class="btn btn-secondary btn-sm" id="btn-translate-jp" type="button">Translate JP (Offline Helper)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-translate-jp" type="button" style="display:none;">Translate JP (Browser AI)</button>
         </div>
         <div id="datafiles-status-list" style="margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;"></div>
       </div>
@@ -1152,7 +1157,7 @@ let htmlContent = `<!DOCTYPE html>
         <span class="meta-pill" style="color:var(--text-primary);" id="db-label-filename">Weapons.json</span>
         <span class="meta-pill" id="db-label-count">0 ITEMS</span>
         <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage); display:none;" id="db-label-modified">0 MODIFIED</span>
-        <button class="btn btn-secondary btn-sm" id="btn-db-translate-jp" type="button" title="Decode Japanese stats/tags &amp; use browser offline translator if supported">Translate JP</button>
+        <button class="btn btn-secondary btn-sm" id="btn-db-translate-jp" type="button" style="display:none;" title="Decode Japanese stats/tags &amp; use browser offline translator if supported">Translate JP</button>
       </div>
 
       <!-- Bulk Quick-Mod Actions for Current File -->
@@ -1363,7 +1368,7 @@ let htmlContent = `<!DOCTYPE html>
 
   function updateSaveHeaderButtons() {
     const hasSave = Boolean(currentFile && currentFile.parsedRoot);
-    const ids = ['btn-clear-save', 'btn-export-json', 'btn-revert-save', 'btn-backup-raw', 'btn-review-download'];
+    const ids = ['btn-clear-save', 'btn-revert-save', 'btn-review-download'];
     ids.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = hasSave ? '' : 'none';
@@ -1376,8 +1381,10 @@ let htmlContent = `<!DOCTYPE html>
     if (mode === 'save') {
       btnModeSave.className = 'mode-btn active';
       btnModeDb.className = 'mode-btn';
-      appBadgeMode.textContent = 'SAVE EDITOR';
-      appBadgeMode.className = 'badge-promax';
+      if (appBadgeMode) {
+        appBadgeMode.textContent = 'SAVE EDITOR';
+        appBadgeMode.className = 'badge-promax';
+      }
       headerSaveActions.style.display = 'flex';
       headerDbActions.style.display = 'none';
       updateSaveHeaderButtons();
@@ -1393,8 +1400,10 @@ let htmlContent = `<!DOCTYPE html>
     } else {
       btnModeSave.className = 'mode-btn';
       btnModeDb.className = 'mode-btn active-db';
-      appBadgeMode.textContent = 'DB MODDER';
-      appBadgeMode.className = 'badge-promax';
+      if (appBadgeMode) {
+        appBadgeMode.textContent = 'DB MODDER';
+        appBadgeMode.className = 'badge-promax';
+      }
       headerSaveActions.style.display = 'none';
       headerDbActions.style.display = 'flex';
       uploadSection.style.display = 'none';
@@ -1547,8 +1556,6 @@ let htmlContent = `<!DOCTYPE html>
       const val = String(obj[k] || '').trim();
       if (!val) return;
       gameData.aiTrans[k] = val;
-      const ck = cleanRpgText(k);
-      if (ck && ck !== k && !gameData.aiTrans[ck]) gameData.aiTrans[ck] = val;
       added++;
     });
     ['items', 'weapons', 'armors', 'skills'].forEach(cat => {
@@ -2491,11 +2498,8 @@ let htmlContent = `<!DOCTYPE html>
         </div>
       </div>
 
-      \${(summary.badgeText || summary.cleanDesc) ? \`
-        <div id="db-decoded-hint" style="background:var(--bg-header); border:1px solid \${summary.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage)'}; border-radius:var(--radius-sm); padding:9px 12px; font-size:0.78rem; display:flex; flex-direction:column; gap:4px;">
-          \${summary.badgeText ? \`<div style="color:\${summary.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage-bright)'}; font-weight:600; font-family:var(--font-mono);">Decoded: \${escapeHtml(summary.badgeText)}</div>\` : ''}
-          \${summary.cleanDesc ? \`<div style="color:var(--text-secondary);">\${escapeHtml(summary.cleanDesc)}</div>\` : ''}
-        </div>
+      \${summary.badgeText ? \`
+        <div id="db-decoded-hint" style="background:var(--bg-header); border:1px solid \${summary.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage)'}; border-radius:var(--radius-sm); padding:9px 12px; font-size:0.78rem; color:\${summary.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage-bright)'}; font-weight:600; font-family:var(--font-mono);">Decoded: \${escapeHtml(summary.badgeText)}</div>
       \` : ''}
 
       \${specificHtml}
@@ -3310,7 +3314,11 @@ let htmlContent = `<!DOCTYPE html>
     document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
     document.getElementById('inventory-owned-only').onchange = () => renderInventoryTab(adapt.party);
     document.getElementById('weapons-search').oninput = () => renderWeaponsTab(adapt.party);
+    const wOwned = document.getElementById('weapons-owned-only');
+    if (wOwned) wOwned.onchange = () => renderWeaponsTab(adapt.party);
     document.getElementById('armors-search').oninput = () => renderArmorsTab(adapt.party);
+    const aOwned = document.getElementById('armors-owned-only');
+    if (aOwned) aOwned.onchange = () => renderArmorsTab(adapt.party);
     document.getElementById('variables-search').oninput = () => renderVariablesTab(adapt.variables);
     document.getElementById('vars-nonzero-only').onchange = () => renderVariablesTab(adapt.variables);
     const swSearch = document.getElementById('switches-search');
@@ -4164,7 +4172,10 @@ let htmlContent = `<!DOCTYPE html>
   function decodeJpSnippet(str) {
     const raw = String(str || '').trim();
     if (!raw) return '';
-    if (gameData.aiTrans && gameData.aiTrans[raw]) return gameData.aiTrans[raw];
+    if (gameData.aiTrans) {
+      const direct = gameData.aiTrans[raw] || gameData.aiTrans[cleanRpgText(raw)];
+      if (direct) return direct;
+    }
     let out = normalizeFullWidth(cleanRpgText(raw));
     for (let i = 0; i < JP_GLOSS_MAP.length; i++) {
       const pair = JP_GLOSS_MAP[i];
@@ -4278,8 +4289,8 @@ let htmlContent = `<!DOCTYPE html>
       }
     }
 
-    const aiName = (gameData.aiTrans && gameData.aiTrans[name]) || '';
-    const aiDesc = (gameData.aiTrans && (gameData.aiTrans[cleanDesc] || gameData.aiTrans[rawDesc])) || '';
+    const aiName = (gameData.aiTrans && (gameData.aiTrans[name] || gameData.aiTrans[cleanRpgText(name)])) || '';
+    const aiDesc = (gameData.aiTrans && (gameData.aiTrans[rawDesc] || gameData.aiTrans[cleanDesc])) || '';
     if (aiName && !badgeParts.includes(aiName)) badgeParts.push(aiName);
     if (aiDesc && !badgeParts.includes(aiDesc)) badgeParts.push(aiDesc);
 
@@ -4296,7 +4307,10 @@ let htmlContent = `<!DOCTYPE html>
       const effectSeg = segments.length > 1 ? segments[segments.length - 1] : segments[0];
       if (effectSeg) {
         const glossed = decodeJpSnippet(effectSeg);
-        const asciiEffect = glossed.replace(/[^\\x20-\\x7E]/g, ' ').replace(/\\s+/g, ' ').trim();
+        let asciiEffect = glossed.replace(/[^\\x20-\\x7E]/g, ' ').replace(/\\s+/g, ' ').trim();
+        if (badgeParts.some(b => b === 'Self' || b === '1 Ally' || b === 'All Allies')) {
+          asciiEffect = asciiEffect.replace(/^Self\\s+/i, '').trim();
+        }
         if (asciiEffect && /[A-Za-z]/.test(asciiEffect) && !badgeParts.includes(asciiEffect)) {
           badgeParts.push(asciiEffect);
         }
@@ -4412,69 +4426,108 @@ let htmlContent = `<!DOCTYPE html>
     }).join('');
   }
 
-  function renderInventoryTab(partyObj) {
-    const container = document.getElementById('inventory-cards-container');
+  function appendBagEntityCard(container, bagObj, id, count, name, meta, modLabelPrefix) {
+    const maxCap = (meta && meta.maxItem) ? meta.maxItem : 99;
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = \`
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:600; font-size:0.86rem; color:var(--text-primary);" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
+        <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span>
+      </div>
+      \${renderBagCardMetaHtml(meta)}
+      <div style="display:flex; align-items:center; gap:4px;">
+        <button class="btn btn-secondary btn-sm btn-sub" type="button">-</button>
+        <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="text-align:center; padding:4px;">
+        <button class="btn btn-secondary btn-sm btn-add" type="button">+</button>
+        <button class="btn btn-secondary btn-sm btn-99" type="button">\${maxCap}</button>
+      </div>
+    \`;
+    const input = card.querySelector('input');
+    const commit = (v) => {
+      const clamped = Math.max(0, v);
+      bagObj[id] = clamped;
+      input.value = clamped;
+      markSaveModified(modLabelPrefix + id);
+    };
+    input.onchange = () => commit(parseInt(input.value, 10) || 0);
+    card.querySelector('.btn-sub').onclick = () => commit(Math.max(0, (parseInt(input.value, 10) || 0) - 1));
+    card.querySelector('.btn-add').onclick = () => commit((parseInt(input.value, 10) || 0) + 1);
+    card.querySelector('.btn-99').onclick = () => commit(maxCap);
+    container.appendChild(card);
+  }
+
+  function renderBagTab(partyObj, cfg) {
+    const container = document.getElementById(cfg.containerId);
     container.innerHTML = '';
     if (!partyObj) {
-      document.getElementById('badge-item-count').textContent = '0';
+      document.getElementById(cfg.badgeId).textContent = '0';
       return;
     }
-    const itemsObj = ensurePartyBag(partyObj, 'items');
-    const itemIds = Object.keys(itemsObj).filter(k => !k.startsWith('@'));
-    document.getElementById('badge-item-count').textContent = itemIds.length;
+    const bagObj = ensurePartyBag(partyObj, cfg.bagKey);
+    const ids = Object.keys(bagObj).filter(k => !k.startsWith('@'));
+    document.getElementById(cfg.badgeId).textContent = ids.length;
 
-    const picker = document.getElementById('inventory-picker-select');
-    populateEntityPicker(picker, gameData.items, gameData.itemTypes, gameData.meta ? gameData.meta.items : null);
+    const dict = gameData[cfg.bagKey] || {};
+    const metaMap = gameData.meta ? gameData.meta[cfg.bagKey] : null;
+    const picker = document.getElementById(cfg.pickerId);
+    populateEntityPicker(picker, dict, cfg.isItem ? gameData.itemTypes : null, metaMap);
 
-    document.getElementById('btn-items-set-all-99').onclick = () => {
-      let count = 0;
-      itemIds.forEach(id => {
-        const meta = gameData.meta && gameData.meta.items ? gameData.meta.items[id] : null;
-        if (gameData.itemTypes && gameData.itemTypes[id] === 2) return;
-        if (meta && meta.isDummy) return;
-        if (itemsObj[id] > 0) {
-          itemsObj[id] = (meta && meta.maxItem) ? meta.maxItem : 99;
-          count++;
-        }
-      });
-      renderInventoryTab(partyObj);
-      markSaveModified('Items 99');
-      showToast('Set ' + count + ' owned items to max safe amount.', 'success');
-    };
+    const btnSet99 = document.getElementById(cfg.btnSet99Id);
+    if (btnSet99) {
+      btnSet99.onclick = () => {
+        let count = 0;
+        ids.forEach(id => {
+          const meta = metaMap ? metaMap[id] : null;
+          if (cfg.isItem && gameData.itemTypes && gameData.itemTypes[id] === 2) return;
+          if (cfg.isItem && meta && meta.isDummy) return;
+          if (bagObj[id] > 0) {
+            bagObj[id] = (meta && meta.maxItem) ? meta.maxItem : 99;
+            count++;
+          }
+        });
+        renderBagTab(partyObj, cfg);
+        markSaveModified(cfg.labelPlural + ' 99');
+        showToast('Set ' + count + ' owned ' + cfg.labelLower + ' to ' + (cfg.isItem ? 'max safe amount.' : '99.'), 'success');
+      };
+    }
 
-    const btnUnlockSafe = document.getElementById('btn-items-unlock-safe');
-    if (btnUnlockSafe) {
-      btnUnlockSafe.onclick = () => {
-        const dbIds = Object.keys(gameData.items || {});
+    const btnUnlock = document.getElementById(cfg.btnUnlockId);
+    if (btnUnlock) {
+      btnUnlock.onclick = () => {
+        const dbIds = Object.keys(dict);
         if (dbIds.length === 0) {
-          showToast('Drop Items.json in Data Files tab first so Key Items can be safely filtered out.', 'warn');
+          showToast('Drop ' + cfg.fileLabel + ' first to unlock all database ' + cfg.labelLower + '.', 'warn');
           return;
         }
         let added = 0;
         let skippedKey = 0;
         let skippedDummy = 0;
         dbIds.forEach(id => {
-          const meta = gameData.meta && gameData.meta.items ? gameData.meta.items[id] : null;
-          if (isDummyDbName(gameData.items[id]) || (meta && meta.isDummy)) {
+          const meta = metaMap ? metaMap[id] : null;
+          if (isDummyDbName(dict[id]) || (cfg.isItem && meta && meta.isDummy)) {
             skippedDummy++;
             return;
           }
-          if (gameData.itemTypes && gameData.itemTypes[id] === 2) {
+          if (cfg.isItem && gameData.itemTypes && gameData.itemTypes[id] === 2) {
             skippedKey++;
             return;
           }
-          itemsObj[id] = (meta && meta.maxItem) ? meta.maxItem : 99;
+          bagObj[id] = (meta && meta.maxItem) ? meta.maxItem : 99;
           added++;
         });
-        renderInventoryTab(partyObj);
-        markSaveModified('Safe Unlock Items');
-        showToast(\`Unlocked \${added} regular items (skipped \${skippedKey} Key Items, \${skippedDummy} Dummies).\`, 'success');
+        renderBagTab(partyObj, cfg);
+        markSaveModified('Unlock ' + cfg.labelPlural);
+        const msg = cfg.isItem
+          ? \`Unlocked \${added} regular items (skipped \${skippedKey} Key Items, \${skippedDummy} Dummies).\`
+          : \`Unlocked \${added} \${cfg.labelLower} (x99).\`;
+        showToast(msg, 'success');
       };
     }
 
-    document.getElementById('btn-add-item-dialog').onclick = () => {
-      const idInput = document.getElementById('inventory-add-id');
-      const qtyInput = document.getElementById('inventory-add-qty');
+    document.getElementById(cfg.btnAddId).onclick = () => {
+      const idInput = document.getElementById(cfg.addInputId);
+      const qtyInput = cfg.addQtyId ? document.getElementById(cfg.addQtyId) : null;
       const picked = picker && picker.value ? picker.value : null;
       const rawId = picked || (idInput ? idInput.value : '');
       const id = parseInt(rawId, 10);
@@ -4482,216 +4535,56 @@ let htmlContent = `<!DOCTYPE html>
         showToast('Select an entry or enter a valid ID first.', 'warn');
         return;
       }
-      const val = Math.max(1, parseInt(qtyInput ? qtyInput.value : '99', 10) || 99);
-      itemsObj[id] = val;
+      const val = qtyInput ? Math.max(1, parseInt(qtyInput.value, 10) || 99) : ((bagObj[id] || 0) + 1);
+      bagObj[id] = val;
       if (picker) picker.value = '';
       if (idInput) idInput.value = '';
-      renderInventoryTab(partyObj);
-      markSaveModified('Add Item #' + id);
-      showToast('Added Item #' + id + ' (x' + val + ').', 'success');
+      renderBagTab(partyObj, cfg);
+      markSaveModified('Add ' + cfg.labelSingular + ' #' + id);
+      showToast('Added ' + cfg.labelSingular + ' #' + id + (qtyInput ? ' (x' + val + ').' : '.'), 'success');
     };
 
-    const q = document.getElementById('inventory-search').value.trim().toLowerCase();
-    const ownedOnly = document.getElementById('inventory-owned-only').checked;
+    const q = (document.getElementById(cfg.searchId).value || '').trim().toLowerCase();
+    const ownedEl = document.getElementById(cfg.ownedOnlyId);
+    const ownedOnly = ownedEl ? ownedEl.checked : false;
 
-    itemIds.forEach(id => {
-      const count = itemsObj[id];
+    ids.forEach(id => {
+      const count = bagObj[id];
       if (ownedOnly && count <= 0) return;
-      const name = (gameData && gameData.items && gameData.items[id]) || \`Item #\${id}\`;
-      const meta = gameData.meta && gameData.meta.items ? gameData.meta.items[id] : null;
+      const name = dict[id] || \`\${cfg.labelSingular} #\${id}\`;
+      const meta = metaMap ? metaMap[id] : null;
       if (q && !id.includes(q) && !name.toLowerCase().includes(q) && !(meta && meta.searchBlob.includes(q))) return;
+      appendBagEntityCard(container, bagObj, id, count, name, meta, cfg.labelSingular + ' #');
+    });
+  }
 
-      const card = document.createElement('div');
-      card.className = 'item-card';
-      card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-weight:600; font-size:0.86rem; color:var(--text-primary);" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span>
-          <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span>
-        </div>
-        \${renderBagCardMetaHtml(meta)}
-        <div style="display:flex; align-items:center; gap:4px;">
-          <button class="btn btn-secondary btn-sm btn-sub" type="button">-</button>
-          <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="text-align:center; padding:4px;">
-          <button class="btn btn-secondary btn-sm btn-add" type="button">+</button>
-          <button class="btn btn-secondary btn-sm btn-99" type="button">99</button>
-        </div>
-      \`;
-
-      const input = card.querySelector('input');
-      const commit = (v) => {
-        const clamped = Math.max(0, v);
-        itemsObj[id] = clamped;
-        input.value = clamped;
-        markSaveModified('Item #' + id);
-      };
-      input.onchange = () => commit(parseInt(input.value, 10) || 0);
-      card.querySelector('.btn-sub').onclick = () => commit(Math.max(0, (parseInt(input.value, 10)||0)-1));
-      card.querySelector('.btn-add').onclick = () => commit((parseInt(input.value, 10)||0)+1);
-      card.querySelector('.btn-99').onclick = () => commit(99);
-
-      container.appendChild(card);
+  function renderInventoryTab(partyObj) {
+    renderBagTab(partyObj, {
+      bagKey: 'items', containerId: 'inventory-cards-container', badgeId: 'badge-item-count',
+      pickerId: 'inventory-picker-select', searchId: 'inventory-search', ownedOnlyId: 'inventory-owned-only',
+      btnSet99Id: 'btn-items-set-all-99', btnUnlockId: 'btn-items-unlock-safe', btnAddId: 'btn-add-item-dialog',
+      addInputId: 'inventory-add-id', addQtyId: 'inventory-add-qty',
+      labelSingular: 'Item', labelPlural: 'Items', labelLower: 'items', fileLabel: 'Items.json', isItem: true
     });
   }
 
   function renderWeaponsTab(partyObj) {
-    const container = document.getElementById('weapons-cards-container');
-    container.innerHTML = '';
-    if (!partyObj) {
-      document.getElementById('badge-weapon-count').textContent = '0';
-      return;
-    }
-    const weaponsObj = ensurePartyBag(partyObj, 'weapons');
-    const ids = Object.keys(weaponsObj).filter(k => !k.startsWith('@'));
-    document.getElementById('badge-weapon-count').textContent = ids.length;
-
-    const picker = document.getElementById('weapons-picker-select');
-    populateEntityPicker(picker, gameData.weapons, null, gameData.meta ? gameData.meta.weapons : null);
-
-    const btnSet99 = document.getElementById('btn-weapons-set-all-99');
-    if (btnSet99) {
-      btnSet99.onclick = () => {
-        let c = 0;
-        ids.forEach(id => { if (weaponsObj[id] > 0) { weaponsObj[id] = 99; c++; } });
-        renderWeaponsTab(partyObj);
-        markSaveModified('Weapons 99');
-        showToast('Set ' + c + ' owned weapons to 99.', 'success');
-      };
-    }
-
-    const btnUnlockAll = document.getElementById('btn-weapons-unlock-all');
-    if (btnUnlockAll) {
-      btnUnlockAll.onclick = () => {
-        const dbIds = Object.keys(gameData.weapons || {}).filter(id => !isDummyDbName(gameData.weapons[id]));
-        if (dbIds.length === 0) {
-          showToast('Drop Weapons.json first to unlock all database weapons.', 'warn');
-          return;
-        }
-        dbIds.forEach(id => { weaponsObj[id] = 99; });
-        renderWeaponsTab(partyObj);
-        markSaveModified('Unlock All Weapons');
-        showToast('Unlocked ' + dbIds.length + ' weapons (x99).', 'success');
-      };
-    }
-
-    document.getElementById('btn-add-weapon-dialog').onclick = () => {
-      const idInput = document.getElementById('weapons-add-id');
-      const picked = picker && picker.value ? picker.value : null;
-      const rawId = picked || (idInput ? idInput.value : '');
-      const id = parseInt(rawId, 10);
-      if (!id || id <= 0) {
-        showToast('Select an entry or enter a valid ID first.', 'warn');
-        return;
-      }
-      weaponsObj[id] = (weaponsObj[id] || 0) + 1;
-      if (picker) picker.value = '';
-      if (idInput) idInput.value = '';
-      renderWeaponsTab(partyObj);
-      markSaveModified('Add Weapon #' + id);
-      showToast('Added Weapon #' + id + '.', 'success');
-    };
-
-    const q = document.getElementById('weapons-search').value.trim().toLowerCase();
-    ids.forEach(id => {
-      const count = weaponsObj[id];
-      const name = (gameData && gameData.weapons && gameData.weapons[id]) || \`Weapon #\${id}\`;
-      const meta = gameData.meta && gameData.meta.weapons ? gameData.meta.weapons[id] : null;
-      if (q && !id.includes(q) && !name.toLowerCase().includes(q) && !(meta && meta.searchBlob.includes(q))) return;
-
-      const card = document.createElement('div');
-      card.className = 'item-card';
-      card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
-        \${renderBagCardMetaHtml(meta)}
-        <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
-      \`;
-      card.querySelector('input').onchange = (e) => {
-        const v = Math.max(0, parseInt(e.target.value, 10) || 0);
-        weaponsObj[id] = v;
-        e.target.value = v;
-        markSaveModified('Weapon #' + id);
-      };
-      container.appendChild(card);
+    renderBagTab(partyObj, {
+      bagKey: 'weapons', containerId: 'weapons-cards-container', badgeId: 'badge-weapon-count',
+      pickerId: 'weapons-picker-select', searchId: 'weapons-search', ownedOnlyId: 'weapons-owned-only',
+      btnSet99Id: 'btn-weapons-set-all-99', btnUnlockId: 'btn-weapons-unlock-all', btnAddId: 'btn-add-weapon-dialog',
+      addInputId: 'weapons-add-id', addQtyId: null,
+      labelSingular: 'Weapon', labelPlural: 'Weapons', labelLower: 'weapons', fileLabel: 'Weapons.json', isItem: false
     });
   }
 
   function renderArmorsTab(partyObj) {
-    const container = document.getElementById('armors-cards-container');
-    container.innerHTML = '';
-    if (!partyObj) {
-      document.getElementById('badge-armor-count').textContent = '0';
-      return;
-    }
-    const armorsObj = ensurePartyBag(partyObj, 'armors');
-    const ids = Object.keys(armorsObj).filter(k => !k.startsWith('@'));
-    document.getElementById('badge-armor-count').textContent = ids.length;
-
-    const picker = document.getElementById('armors-picker-select');
-    populateEntityPicker(picker, gameData.armors, null, gameData.meta ? gameData.meta.armors : null);
-
-    const btnSet99 = document.getElementById('btn-armors-set-all-99');
-    if (btnSet99) {
-      btnSet99.onclick = () => {
-        let c = 0;
-        ids.forEach(id => { if (armorsObj[id] > 0) { armorsObj[id] = 99; c++; } });
-        renderArmorsTab(partyObj);
-        markSaveModified('Armors 99');
-        showToast('Set ' + c + ' owned armors to 99.', 'success');
-      };
-    }
-
-    const btnUnlockAll = document.getElementById('btn-armors-unlock-all');
-    if (btnUnlockAll) {
-      btnUnlockAll.onclick = () => {
-        const dbIds = Object.keys(gameData.armors || {}).filter(id => !isDummyDbName(gameData.armors[id]));
-        if (dbIds.length === 0) {
-          showToast('Drop Armors.json first to unlock all database armors.', 'warn');
-          return;
-        }
-        dbIds.forEach(id => { armorsObj[id] = 99; });
-        renderArmorsTab(partyObj);
-        markSaveModified('Unlock All Armors');
-        showToast('Unlocked ' + dbIds.length + ' armors (x99).', 'success');
-      };
-    }
-
-    document.getElementById('btn-add-armor-dialog').onclick = () => {
-      const idInput = document.getElementById('armors-add-id');
-      const picked = picker && picker.value ? picker.value : null;
-      const rawId = picked || (idInput ? idInput.value : '');
-      const id = parseInt(rawId, 10);
-      if (!id || id <= 0) {
-        showToast('Select an entry or enter a valid ID first.', 'warn');
-        return;
-      }
-      armorsObj[id] = (armorsObj[id] || 0) + 1;
-      if (picker) picker.value = '';
-      if (idInput) idInput.value = '';
-      renderArmorsTab(partyObj);
-      markSaveModified('Add Armor #' + id);
-      showToast('Added Armor #' + id + '.', 'success');
-    };
-
-    const q = document.getElementById('armors-search').value.trim().toLowerCase();
-    ids.forEach(id => {
-      const count = armorsObj[id];
-      const name = (gameData && gameData.armors && gameData.armors[id]) || \`Armor #\${id}\`;
-      const meta = gameData.meta && gameData.meta.armors ? gameData.meta.armors[id] : null;
-      if (q && !id.includes(q) && !name.toLowerCase().includes(q) && !(meta && meta.searchBlob.includes(q))) return;
-
-      const card = document.createElement('div');
-      card.className = 'item-card';
-      card.innerHTML = \`
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="\${escapeHtml(name)}">\${escapeHtml(name)}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#\${escapeHtml(id)}</span></div>
-        \${renderBagCardMetaHtml(meta)}
-        <input type="number" class="stat-input" value="\${escapeHtml(count)}" style="padding:5px 8px;">
-      \`;
-      card.querySelector('input').onchange = (e) => {
-        const v = Math.max(0, parseInt(e.target.value, 10) || 0);
-        armorsObj[id] = v;
-        e.target.value = v;
-        markSaveModified('Armor #' + id);
-      };
-      container.appendChild(card);
+    renderBagTab(partyObj, {
+      bagKey: 'armors', containerId: 'armors-cards-container', badgeId: 'badge-armor-count',
+      pickerId: 'armors-picker-select', searchId: 'armors-search', ownedOnlyId: 'armors-owned-only',
+      btnSet99Id: 'btn-armors-set-all-99', btnUnlockId: 'btn-armors-unlock-all', btnAddId: 'btn-add-armor-dialog',
+      addInputId: 'armors-add-id', addQtyId: null,
+      labelSingular: 'Armor', labelPlural: 'Armors', labelLower: 'armors', fileLabel: 'Armors.json', isItem: false
     });
   }
 
@@ -5000,10 +4893,17 @@ let htmlContent = `<!DOCTYPE html>
       reader.readAsText(file);
     });
   }
+  const hasBrowserAi = typeof window !== 'undefined' && Boolean(window.Translator);
   const btnTranslateJp = document.getElementById('btn-translate-jp');
-  if (btnTranslateJp) btnTranslateJp.onclick = runOfflineJpTranslationHelper;
+  if (btnTranslateJp) {
+    btnTranslateJp.onclick = runOfflineJpTranslationHelper;
+    btnTranslateJp.style.display = hasBrowserAi ? '' : 'none';
+  }
   const btnDbTranslateJp = document.getElementById('btn-db-translate-jp');
-  if (btnDbTranslateJp) btnDbTranslateJp.onclick = runOfflineJpTranslationHelper;
+  if (btnDbTranslateJp) {
+    btnDbTranslateJp.onclick = runOfflineJpTranslationHelper;
+    btnDbTranslateJp.style.display = hasBrowserAi ? '' : 'none';
+  }
   if (dataDropzone && dataFileInput) {
     dataDropzone.onclick = () => dataFileInput.click();
     dataDropzone.ondragover = (e) => e.preventDefault();
