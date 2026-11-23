@@ -5,9 +5,12 @@
 [![Live App](https://img.shields.io/badge/Live%20App-Cloudflare%20Pages-c9a45a.svg)](https://universal-rpg-save-editor.pages.dev/)
 [![Offline PWA](https://img.shields.io/badge/Offline-PWA%20Ready-informational.svg)](#quick-start-use-online-or-offline)
 
+[![Download Project ZIP](https://img.shields.io/badge/Download_Project-SaveEditOffline--main.zip-c9a45a?style=for-the-badge&logo=github&logoColor=0c0a08)](https://github.com/poppy2546/SaveEditOffline/archive/refs/heads/main.zip)
+
 A **100% client-side, offline-capable** web workbench for inspecting and editing RPG Maker save files and JSON database tables directly in browser memory. Zero server uploads, zero tracking, and built-in revert/backup safeguards.
 
-**Live Web App:** https://universal-rpg-save-editor.pages.dev/
+- **Live Web App:** https://universal-rpg-save-editor.pages.dev/
+- **Direct Download (.zip):** [Download SaveEditOffline-main.zip](https://github.com/poppy2546/SaveEditOffline/archive/refs/heads/main.zip)
 
 ---
 
@@ -19,7 +22,7 @@ A **100% client-side, offline-capable** web workbench for inspecting and editing
 3. Once installed, the Service Worker (`sw.js`) caches the editor locally so it works **100% offline** with no internet connection.
 
 ### Option 2: Download & Run Locally on Windows
-1. Download this repository (**Code -> Download ZIP**) and extract it.
+1. Click to download directly: **[Download SaveEditOffline-main.zip](https://github.com/poppy2546/SaveEditOffline/archive/refs/heads/main.zip)** and extract the folder.
 2. Make sure [Node.js](https://nodejs.org/) is installed.
 3. Double-click **`run-server.bat`** — it starts the local HTTP server and opens the editor in your browser automatically.
 
