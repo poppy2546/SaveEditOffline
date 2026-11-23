@@ -85,6 +85,7 @@ export async function onRequest(context) {
   const response = await context.next();
   const headers = new Headers(response.headers);
   const isHtmlDoc = path === '/' || path === '/index.html' || path.endsWith('.html');
+  const isServiceWorker = path === '/sw.js';
   headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('X-Frame-Options', 'DENY');
@@ -93,11 +94,16 @@ export async function onRequest(context) {
   headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   headers.set('Cross-Origin-Resource-Policy', 'same-origin');
   headers.set('X-Permitted-Cross-Domain-Policies', 'none');
+  if (isServiceWorker) {
+    headers.set('Cache-Control', 'no-cache');
+  }
   headers.set(
     'Content-Security-Policy',
     isHtmlDoc
-      ? "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-SEOHjacjmOpGTgSHaRddD56AELjVmHYcFXW+ZSf4HUk=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
-      : "default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
+      ? "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-D8SjfqjTGvc4mD/AYuauFdeH/0LbgZgc18Qi2w40L2g=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
+      : (isServiceWorker
+          ? "default-src 'self'; connect-src 'self';"
+          : "default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';")
   );
 
   return new Response(response.body, {

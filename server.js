@@ -18,6 +18,7 @@ const MIME_TYPES = {
   '.woff2': 'font/woff2',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8'
 };
@@ -40,6 +41,8 @@ const ALLOWED_PUBLIC_FILES = new Set([
   '/pako.min.js',
   '/ruby_marshal.js',
   '/favicon.svg',
+  '/manifest.webmanifest',
+  '/sw.js',
   '/app.ico',
   '/robots.txt',
   '/sitemap.xml',
@@ -133,9 +136,15 @@ const server = http.createServer((req, res) => {
   const secHeaders = (lowerPath === '/index.html' || lowerPath === '/privacy.html' || lowerPath === '/terms.html')
     ? {
         ...baseSecHeaders,
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-SEOHjacjmOpGTgSHaRddD56AELjVmHYcFXW+ZSf4HUk=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-D8SjfqjTGvc4mD/AYuauFdeH/0LbgZgc18Qi2w40L2g=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
       }
-    : baseSecHeaders;
+    : (lowerPath === '/sw.js'
+        ? {
+            ...baseSecHeaders,
+            'Content-Security-Policy': "default-src 'self'; connect-src 'self';",
+            'Cache-Control': 'no-cache'
+          }
+        : baseSecHeaders);
 
   const safeRelPath = normalizedUrlPath.replace(/^(\.\.[\/\\])+/, '');
   const filePath = path.resolve(ROOT_DIR, '.' + safeRelPath);
