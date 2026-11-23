@@ -7,7 +7,7 @@ const lzCode = fs.readFileSync(path.join(__dirname, 'node_modules/lz-string/libs
 const rubyMarshalCode = fs.readFileSync(path.join(__dirname, 'ruby_marshal.js'), 'utf8');
 
 let htmlContent = `<!DOCTYPE html>
-<html lang="en" data-type="software" data-radius="sharp" data-ground="sage" data-buttons="arrow" data-motion>
+<html lang="en" data-type="software" data-radius="sharp" data-ground="sand" data-motion>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,9 +15,9 @@ let htmlContent = `<!DOCTYPE html>
 <meta name="site-kind" content="software">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' __CSP_SCRIPT_HASHES__; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none';">
 <title>Save Studio: Universal RPG Maker Save Editor</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23162a17'/%3E%3Cstop%20offset='100%25'%20stop-color='%230f1f10'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='lime'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23daf7be'/%3E%3Cstop%20offset='100%25'%20stop-color='%23c6f19d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='8'%20fill='url(%23bg)'%20stroke='url(%23lime)'%20stroke-width='2.5'/%3E%3Cpath%20d='M18%2015h22l8%208v26a2%202%200%200%201-2%202H20a2%202%200%200%201-2-2V15z'%20fill='%23112212'%20stroke='%23588157'%20stroke-width='1.8'/%3E%3Crect%20x='24'%20y='15'%20width='14'%20height='10'%20rx='1'%20fill='url(%23lime)'/%3E%3Crect%20x='23'%20y='33'%20width='18'%20height='11'%20rx='1.5'%20fill='%23c6f19d'%20opacity='0.24'%20stroke='%23c6f19d'%20stroke-width='1.5'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23181512'/%3E%3Cstop%20offset='100%25'%20stop-color='%230c0a08'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='gold'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23f2dfb6'/%3E%3Cstop%20offset='100%25'%20stop-color='%23c9a45a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='8'%20fill='url(%23bg)'%20stroke='url(%23gold)'%20stroke-width='2.5'/%3E%3Cpath%20d='M18%2015h22l8%208v26a2%202%200%200%201-2%202H20a2%202%200%200%201-2-2V15z'%20fill='%2312100e'%20stroke='%238a7240'%20stroke-width='1.8'/%3E%3Crect%20x='24'%20y='15'%20width='14'%20height='10'%20rx='1'%20fill='url(%23gold)'/%3E%3Crect%20x='23'%20y='33'%20width='18'%20height='11'%20rx='1.5'%20fill='%23c9a45a'%20opacity='0.24'%20stroke='%23c9a45a'%20stroke-width='1.5'/%3E%3C/svg%3E">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta name="theme-color" content="#0f1f10">
+<meta name="theme-color" content="#0c0a08">
 <meta name="description" content="Universal RPG Maker Save Editor and JSON Database Modder running locally in browser memory for MZ, MV, VX Ace, VX, XP, and Naninovel save archives.">
 <meta name="keywords" content="RPG Maker save editor, rmmzsave editor, rpgsave editor, rvdata2 editor, RPG Maker database modder, RPG save editor online">
 <meta name="robots" content="index, follow">
@@ -40,10 +40,10 @@ let htmlContent = `<!DOCTYPE html>
 <link rel="stylesheet" href="assets/icons/icon.css">
 <style>
   :root {
-    --p-bg: #0f1f10; --p-surface: #162a17; --p-ink: #ffffff; --p-muted: #9aa39a;
-    --p-accent: #c6f19d; --p-accent-ink: #0f1f10; --p-action: #c6f19d; --p-action-ink: #0f1f10;
-    --p-inv-bg: #ffffff; --p-inv-surface: #ecedec; --p-inv-ink: #0f1f10; --p-inv-muted: #606c60;
-    --p-inv-accent: #0f1f10; --p-inv-accent-ink: #ffffff; --p-inv-action: #0f1f10; --p-inv-action-ink: #ffffff;
+    --p-bg: #0c0a08; --p-surface: #181512; --p-ink: #ffffff; --p-muted: #9f9a93;
+    --p-accent: #c9a45a; --p-accent-ink: #0c0a08; --p-action: #c9a45a; --p-action-ink: #0c0a08;
+    --p-inv-bg: #ffffff; --p-inv-surface: #ecedec; --p-inv-ink: #0c0a08; --p-inv-muted: #66615b;
+    --p-inv-accent: #0c0a08; --p-inv-accent-ink: #ffffff; --p-inv-action: #0c0a08; --p-inv-action-ink: #ffffff;
     --font-display: "Instrument Sans", system-ui, sans-serif;
     --font-text: "Instrument Sans", system-ui, sans-serif;
     --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -53,29 +53,29 @@ let htmlContent = `<!DOCTYPE html>
     --display-stretch: 96%;
     --ly-scale: 1.04;
 
-    /* Workbench surface & ink tokens mapped to forest-pale-lime */
+    /* Workbench surface & ink tokens mapped to warm-black-gold (shadcn dark neutral + warm gold accent) */
     --bg-main: var(--p-bg);
-    --bg-header: #122413;
-    --bg-card: #162a17;
-    --bg-card-hover: #1d361f;
-    --bg-elevated: #224024;
-    --bg-input: #0a160b;
-    --border-color: rgba(255, 255, 255, 0.16);
-    --border-subtle: rgba(255, 255, 255, 0.09);
-    --border-focus: #c6f19d;
+    --bg-header: #12100e;
+    --bg-card: #181512;
+    --bg-card-hover: #211d19;
+    --bg-elevated: #28231e;
+    --bg-input: #090806;
+    --border-color: rgba(255, 255, 255, 0.15);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-focus: #c9a45a;
     --text-primary: #ffffff;
-    --text-secondary: #bcc7bc;
-    --text-muted: #9aa39a;
-    --accent-sand: #c6f19d;
-    --accent-sand-hover: #daf8be;
-    --accent-sand-text: #0f1f10;
-    --accent-sage: #5c8a5e;
-    --accent-sage-bright: #c6f19d;
-    --accent-sage-bg: #1d351e;
+    --text-secondary: #c8c2ba;
+    --text-muted: #9f9a93;
+    --accent-sand: #c9a45a;
+    --accent-sand-hover: #dbb86e;
+    --accent-sand-text: #0c0a08;
+    --accent-sage: #8a7240;
+    --accent-sage-bright: #e0be75;
+    --accent-sage-bg: #241e14;
     --accent-amber: #e9c46a;
-    --accent-amber-bg: #2c2817;
+    --accent-amber-bg: #2c2415;
     --accent-terra: #e28570;
-    --accent-terra-bg: #321d18;
+    --accent-terra-bg: #321b16;
     --font-sans: var(--font-text);
     --radius-sm: var(--r-sm);
     --radius-md: var(--r-md);
@@ -103,9 +103,8 @@ let htmlContent = `<!DOCTYPE html>
     .nav:not(.is-open) .nav__actions + .nav__toggle { margin-left: auto; }
   }
 
-  /* Restore 1-screen section rhythm over backgrounds.css defaults */
-  main > section.section:is(.bg-mist, .bg-dots, .studio-section, #moment),
-  main > section.section:is(.bg-mist, .bg-dots):last-of-type {
+  /* Restore 1-screen section rhythm */
+  main > section.section.studio-section {
     padding: var(--padt) 0 calc(var(--padb) + var(--bar)) !important;
     height: auto;
     min-height: calc(var(--hm, var(--h, 1)) * 100vh) !important;
@@ -115,43 +114,81 @@ let htmlContent = `<!DOCTYPE html>
     align-items: stretch;
   }
   @media (min-width: 640px) {
-    main > section.section:is(.studio-section, #moment, #faq) {
+    main > section.section.studio-section {
+      --padt: 80px;
       height: calc(var(--h, 1) * 100vh) !important;
       height: calc(var(--h, 1) * 100lvh) !important;
       min-height: calc(var(--h, 1) * 100vh) !important;
     }
   }
   @media (min-width: 1280px) {
-    main > section.section:is(.bg-mist, .bg-dots, .studio-section, #moment),
-    main > section.section:is(.bg-mist, .bg-dots):last-of-type {
+    main > section.section.studio-section {
+      --padt: 80px;
       height: calc(var(--h, 1) * 100svh) !important;
     }
   }
   main > section.section > .wrap { flex: 1 1 auto; }
-  .hero--centred .hero__kicker { justify-content: center; color: #dce5dc; font-size: 14px; }
+  .hero--centred .hero__kicker {
+    position: relative;
+    display: block;
+    width: fit-content;
+    margin-inline: auto;
+    text-align: center;
+    color: #e2ddd6;
+    font-size: 14px;
+  }
+  .hero--centred .hero__kicker::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translateY(-50%);
+  }
 
   /* Hero CSS fallback + high-contrast lead + workbench preview window */
-  .hero--centred .hero__lead { color: #dce5dc; }
-  @media (max-width: 1279px) { .hero--centred .hero__window { margin-top: var(--s-4); } }
+  .hero--centred .hero__lead { color: #e2ddd6; }
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .hero--centred .hero__c { gap: var(--s-3); }
+    .hero--centred .hero__window { margin-top: var(--s-5); }
+  }
+  @media (max-width: 1023px) { .hero--centred .hero__window { margin-top: var(--s-7); } }
+  .hero__window > button.loop-pause:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px #0c0a08;
+  }
   .hero__window {
     background:
-      radial-gradient(115% 70% at 78% 16%, rgba(198, 241, 157, 0.34) 0 42%, transparent 66%),
-      radial-gradient(95% 65% at 14% 86%, rgba(92, 138, 94, 0.48) 0 44%, transparent 72%),
-      linear-gradient(155deg, #213721 0%, #3d593b 50%, #9eb095 100%);
+      radial-gradient(115% 70% at 78% 16%, rgba(217, 204, 183, 0.42) 0 42%, transparent 66%),
+      radial-gradient(95% 65% at 14% 86%, rgba(201, 164, 90, 0.45) 0 44%, transparent 72%),
+      linear-gradient(155deg, #3a3126 0%, #6e5c46 48%, #c9bba6 100%);
+  }
+  .hero--centred .hero__window > .ly-piece { z-index: 2; }
+  .hero--centred .hero__window > button.loop-pause {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    left: auto;
+    top: auto;
+    z-index: 6;
   }
   .d-win {
     background: #ffffff;
-    color: #0f1f10;
+    color: #0c0a08;
     border-radius: var(--r-md);
     overflow: hidden;
     font: 400 14px/1.4 var(--font-text);
-    box-shadow: 0 0 0 1px rgba(15, 31, 16, 0.12), 0 28px 64px -26px rgba(0, 0, 0, 0.65);
+    box-shadow: 0 0 0 1px rgba(12, 10, 8, 0.14), 0 28px 64px -26px rgba(0, 0, 0, 0.65);
     text-align: left;
   }
   .d-win--dark {
-    background: #101d11;
+    background: #14110e;
     color: #ffffff;
-    box-shadow: 0 0 0 1px rgba(198, 241, 157, 0.18), 0 30px 70px -28px rgba(0, 0, 0, 0.85);
+    box-shadow: 0 0 0 1px rgba(201, 164, 90, 0.22), 0 30px 70px -28px rgba(0, 0, 0, 0.85);
   }
   .d-win__bar {
     display: flex;
@@ -159,33 +196,35 @@ let htmlContent = `<!DOCTYPE html>
     gap: 10px;
     height: 34px;
     padding: 0 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
     font-size: 13px;
-    color: #b7c3b7;
+    color: #c8c2ba;
   }
   .d-win__bar b { font-weight: 500; color: #ffffff; }
   .d-win__bar .sp { flex: 1; }
   .d-win__dots { display: flex; gap: 6px; }
   .d-win__dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.24); }
-  .d-win__body { display: grid; grid-template-columns: 170px 1fr; min-height: 184px; }
+  .d-win__body { display: grid; grid-template-columns: 196px 1fr; min-height: 184px; }
   .d-side {
     padding: 10px;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.09);
     display: grid;
     align-content: start;
     gap: 2px;
     font-size: 13px;
-    color: #a6b2a6;
+    color: #b7b0a7;
   }
   .d-side > span {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    white-space: nowrap;
     height: 28px;
     padding: 0 9px;
     border-radius: var(--r-sm);
   }
-  .d-side > span.is-on { background: rgba(198, 241, 157, 0.14); color: #c6f19d; font-weight: 500; }
+  .d-side > span.is-on { background: rgba(201, 164, 90, 0.16); color: #e0be75; font-weight: 500; }
   .d-side > span em { font-style: normal; font-family: var(--font-mono); font-size: 13px; opacity: 0.85; }
   .d-main { padding: 12px 16px; display: grid; align-content: start; gap: 8px; min-width: 0; }
   .d-main__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -196,32 +235,32 @@ let htmlContent = `<!DOCTYPE html>
     height: 26px;
     padding: 0 11px;
     border-radius: var(--r-btn);
-    background: #c6f19d;
-    color: #0f1f10;
+    background: #c9a45a;
+    color: #0c0a08;
     font-size: 13px;
     font-weight: 500;
   }
-  .d-rows { display: grid; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+  .d-rows { display: grid; border-top: 1px solid rgba(255, 255, 255, 0.09); }
   .d-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 12px;
     padding: 7px 2px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
     font-size: 13px;
   }
   .d-row b { font-weight: 500; color: #ffffff; display: block; }
-  .d-row small { color: #b7c3b7; font-size: 13px; display: block; }
-  .d-row .num { font-family: var(--font-mono); color: #c6f19d; font-variant-numeric: tabular-nums; }
+  .d-row small { color: #c8c2ba; font-size: 13px; display: block; }
+  .d-row .num { font-family: var(--font-mono); color: #e0be75; font-variant-numeric: tabular-nums; }
   .d-chip {
     display: inline-flex;
     align-items: center;
     height: 22px;
     padding: 0 8px;
     border-radius: var(--r-sm);
-    background: rgba(198, 241, 157, 0.14);
-    color: #c6f19d;
+    background: rgba(201, 164, 90, 0.16);
+    color: #e0be75;
     font-size: 13px;
     font-family: var(--font-mono);
   }
@@ -230,139 +269,19 @@ let htmlContent = `<!DOCTYPE html>
     .hero__window .d-side, .hero__window .d-win__bar .sp ~ span, .hero__window .d-pill { display: none; }
   }
 
-  /* Features band with shader CSS fallback + 3-up cards */
-  .stat-cards .card { --c-text: var(--muted); }
-  .stat-cards strong {
-    display: block;
-    font: var(--display-weight) var(--t-stat)/1.05 var(--font-display);
-    letter-spacing: var(--display-tracking);
-    font-stretch: var(--display-stretch);
-  }
-  .stat-cards .card > p { margin-top: var(--s-2); }
-  .stat-cards .panel {
-    --p-h: 232px;
-    border-radius: var(--r-md);
-    background:
-      radial-gradient(110% 75% at 78% 14%, rgba(198, 241, 157, 0.28) 0 42%, transparent 68%),
-      radial-gradient(90% 60% at 16% 88%, rgba(108, 142, 99, 0.45) 0 46%, transparent 72%),
-      linear-gradient(160deg, #1b311d 0%, #335134 55%, #849c7e 100%);
-  }
-  .stat-cards .panel::before { display: none; }
-  .stat-cards .stage > .at-rise { --ax: 18px; --ay: 24px; --fit-max: 300px; }
-  .d-pane {
-    background: #101d11;
-    color: #ffffff;
-    border-radius: var(--r-md);
-    padding: 14px 16px;
-    font: 400 13px/1.4 var(--font-text);
-    box-shadow: 0 0 0 1px rgba(198, 241, 157, 0.16), 0 18px 40px -20px rgba(0, 0, 0, 0.72);
-  }
-  .d-pane h5 { margin: 0 0 10px; font: 500 13px/1.3 var(--font-text); color: #b7c3b7; }
-  .d-split { display: flex; height: 8px; border-radius: var(--r-sm); overflow: hidden; gap: 2px; margin-bottom: 12px; }
-  .d-split i { display: block; height: 100%; }
-  .d-times { display: grid; }
-  .d-times span {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 13px;
-  }
-  .d-times span:first-child { border-top: 0; }
-  .d-times b { font-weight: 500; color: #c6f19d; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-  .stat-cards > .card { grid-column: 1 / -1; }
-  @media (min-width: 1024px) { .stat-cards > .card { grid-column: auto / span 4; } }
-  @media (min-width: 640px) and (max-width: 1023px) {
-    .stat-cards > .card {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      grid-auto-rows: min-content;
-      column-gap: var(--s-6);
-      align-content: start;
-    }
-    .stat-cards > .card > :not(.panel) { grid-column: 1; }
-    .stat-cards > .card > .panel {
-      grid-column: 2;
-      grid-row: 1 / span 4;
-      --p-h: 204px;
-      margin: calc(var(--c-gap) - var(--c-pad)) calc(var(--c-gap) - var(--c-pad)) calc(var(--c-gap) - var(--c-pad)) 0;
-      border-radius: var(--r-sm);
-    }
-  }
-  @media (max-width: 639px) {
-    #features .section-head { margin-bottom: var(--s-4); }
-    .stat-cards { gap: 10px; }
-    .stat-cards > .card { padding: 12px 14px; }
-    .stat-cards strong { font-size: 22px; line-height: 1.1; }
-    .stat-cards .card > p { line-height: 1.35; margin-top: 2px; }
-    .stat-cards .card > .panel { --p-h: 92px; min-height: 92px; margin-top: 8px; }
-    .stat-cards .stage > .at-rise { --ay: 8px; --ay-sm: 8px; }
-    .stat-cards .d-pane { padding: 8px 10px; }
-    .stat-cards .d-pane h5 { margin-bottom: 4px; }
-    .stat-cards .d-split { margin-bottom: 4px; }
-    .stat-cards .d-times span:nth-child(n+2) { display: none; }
-  }
-
-  /* Liquid-type moment band */
-  #moment > .wrap {
-    display: grid;
-    gap: var(--s-5);
-    align-content: start;
-    flex: 1 1 auto;
-  }
-  #moment .mo-lt__type {
-    font-size: var(--t-h1);
-    line-height: 1.02;
-    max-width: 18ch;
-  }
-  #moment .t-lead { color: #dce5dc; }
-
-  /* FAQ architecture panel + desktop/tablet full-height distribution + phone height fit */
-  #faq > .wrap { display: flex; flex-direction: column; flex: 1 1 auto; }
-  #faq > .wrap > .grid { flex: 1 1 auto; grid-template-rows: minmax(0, 1fr); align-content: stretch; }
-  .faq-col-left { display: flex; flex-direction: column; gap: var(--s-5); height: 100%; }
-  .faq-col-left .section-head { margin-bottom: 0; }
-  .ui-faq-arch {
-    flex: 1 1 auto;
-    min-height: 220px;
-    padding: 20px;
-    border-radius: var(--r-md);
-    border: 1px solid var(--border-color);
-    background: #101d11;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .ui-faq-arch svg { width: 100%; height: auto; display: block; }
-  @media (min-width: 640px) {
-    #faq .span-7 { display: flex; flex-direction: column; min-height: 0; }
-    #faq .span-7 .faq { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: space-between; }
-    #faq .faq > .faq__item { padding: var(--s-4) 0; }
-    footer.closing.footer--statement { padding-block: var(--s-8) var(--padb); }
-    footer.closing > .wrap { row-gap: var(--s-5); }
-    footer.closing .closing__cta { gap: var(--s-4); }
-    footer.closing .closing__links { gap: var(--s-5); }
-    footer.closing .close__word { font-size: clamp(36px, 10.8vw, 148px); }
-  }
+  /* Footer closing spacing, summary facts, off-grid mark fix, and phone height fit */
+  .closing__lead { max-width: 58ch; color: var(--muted); }
+  .closing__facts { border-top: 0; padding-top: 0; }
   @media (max-width: 1023px) {
-    #faq > .wrap > .grid { grid-template-rows: auto minmax(0, 1fr); row-gap: var(--s-4); }
-    .faq-col-left { gap: var(--s-3); height: auto; }
-    .ui-faq-arch { min-height: 0; padding: 12px; flex: 0 0 auto; }
-    .ui-faq-arch svg { max-height: 112px; }
-    #faq .faq > .faq__item { padding: 12px 0; }
+    .closing__facts > div { grid-column: auto / span 6; }
   }
-  @media (max-width: 639px) {
-    #faq > .wrap { flex: 0 1 auto; }
-    #faq > .wrap > .grid { flex: 0 1 auto; grid-template-rows: auto auto; row-gap: 12px; }
-    #faq .span-7 .faq { justify-content: flex-start; }
-    #faq .section-head { margin-bottom: 0; }
-    .ui-faq-arch { padding: 8px; }
-    .ui-faq-arch svg { max-height: 68px; }
-    #faq .faq > .faq__item { padding: 8px 0; gap: 4px; }
-    #faq .faq p { line-height: 1.4; }
+  @media (min-width: 640px) {
+    footer.closing { padding-block: var(--s-8) var(--padb); }
+    footer.closing > .wrap { row-gap: var(--s-6); }
+    footer.closing .closing__cta { gap: var(--s-5); }
+    footer.closing .closing__links { gap: var(--s-5); }
+    footer.closing .close__word { font-size: clamp(44px, 11.2vw, 148px); margin-top: auto; }
   }
-
-  /* Footer closing word overflow, off-grid mark fix, and phone wrap containment */
   .footer__mark .mark.mark--initial { width: 28px; height: 28px; font-size: 16px; margin-right: 8px; }
   .close__word {
     font-size: clamp(38px, 12vw, 184px);
@@ -373,14 +292,16 @@ let htmlContent = `<!DOCTYPE html>
   }
   footer.closing .wrap, footer.closing .closing__cta { min-width: 0; max-width: 100%; }
   @media (max-width: 639px) {
-    footer.closing.footer--statement { padding-block: 48px 36px; }
-    footer.closing > .wrap { row-gap: var(--s-3); }
-    footer.closing .closing__cta { gap: var(--s-3); }
+    footer.closing { padding-block: var(--s-7) var(--padb); }
+    footer.closing > .wrap { row-gap: var(--s-4); }
+    footer.closing .closing__cta { gap: var(--s-4); }
+    .closing__facts { display: none; }
+    .closing__lead { font-size: 16px; line-height: 1.45; }
     footer.closing .closing__links { gap: var(--s-3); }
     footer.closing .closing__links > .grid { row-gap: var(--s-3); }
     footer.closing .footer__legal { margin-top: var(--s-2); padding-top: var(--s-3); }
     footer.closing .btn--primary { max-width: 100%; }
-    footer.closing .close__word { font-size: clamp(34px, 10.8vw, 72px); }
+    footer.closing .close__word { font-size: clamp(36px, 11vw, 64px); margin-top: var(--s-3); }
   }
 
   /* Studio Workbench Shell (ui-studio marks internal UI layout as product interface) */
@@ -644,11 +565,11 @@ let htmlContent = `<!DOCTYPE html>
     transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
     white-space: nowrap;
   }
-  .tab-btn:hover { color: var(--text-primary); background: rgba(198, 241, 157, 0.04); }
+  .tab-btn:hover { color: var(--text-primary); background: rgba(201, 164, 90, 0.06); }
   .tab-btn.active {
     color: var(--accent-sand);
     border-bottom-color: var(--accent-sand);
-    background: rgba(198, 241, 157, 0.08);
+    background: rgba(201, 164, 90, 0.12);
   }
   .tab-badge {
     background: var(--bg-input);
@@ -1096,7 +1017,7 @@ let htmlContent = `<!DOCTYPE html>
 </style>
 </head>
 <body>
-<!-- type: software | deal: hero centred, nav nav-mega, close close-word, footer footer-statement, rhythm surface-pairs, buttons arrow, mark initial, ground sage, palette forest-pale-lime (dark forest green and pale lime fits a developer modding studio), type instrument, hero fx silk-folds, card fx grain-gradient, backgrounds studio:surface features:bg-mist moment:plain faq:bg-dots, moments liquid-type -->
+<!-- type: software | deal: hero centred, nav nav-mega, close close-word, footer footer-dark, rhythm surface-pairs, mark initial, ground sand, palette warm-black-gold (shadcn dark neutral and warm gold fits a clean 2-mode save and database workbench), type instrument, hero fx silk-folds, backgrounds studio:surface, moments cursor-spotlight -->
 
 <header class="nav">
   <a class="skip-link" href="#top">Skip to content</a>
@@ -1107,17 +1028,16 @@ let htmlContent = `<!DOCTYPE html>
         <a class="nav__link" href="#studio">Workbench <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <div class="nav__menu">
           <div class="wrap grid">
-            <div class="menu-col span-3"><p class="t-label">Editors</p><a href="#studio">Save and database workbench<span>Stats, inventory, switches, gold, and JSON tables</span></a><a href="#features">Engine codecs and table diffs<span>RMZ, MV, VX Ace, VX, XP, and Naninovel</span></a></div>
-            <div class="menu-col span-3"><p class="t-label">Architecture</p><a href="#moment">Local memory engine<span>Zero server uploads inside browser tab</span></a><a href="#faq">Questions and compatibility<span>Supported formats and revert workflow</span></a></div>
+            <div class="menu-col span-3"><p class="t-label">Modes</p><a href="#studio" data-open-mode="save">Save Editor<span>Edit stats, party, inventory, switches, and gold</span></a><a href="#studio" data-open-mode="db">Database Modder<span>Edit Weapons, Armors, Items, Skills, Enemies, and Actors JSON</span></a></div>
+            <div class="menu-col span-3"><p class="t-label">Project</p><a href="privacy.html">Local privacy<span>All parsing stays in browser memory</span></a><a href="terms.html">Backup guidelines<span>Keep original save copies before exporting</span></a></div>
           </div>
         </div>
       </div>
-      <div class="nav__item"><a class="nav__link" href="#features">Codecs</a></div>
-      <div class="nav__item"><a class="nav__link" href="#moment">Memory</a></div>
-      <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
+      <div class="nav__item"><a class="nav__link" href="#studio" data-open-mode="save">Save Editor</a></div>
+      <div class="nav__item"><a class="nav__link" href="#studio" data-open-mode="db">Database Modder</a></div>
     </nav>
     <div class="nav__actions">
-      <a class="btn btn--primary" href="#studio">Open save file</a>
+      <a class="btn btn--primary" href="#studio" data-open-mode="save">Open save file</a>
     </div>
     <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
   </div>
@@ -1127,22 +1047,22 @@ let htmlContent = `<!DOCTYPE html>
   <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text">
       <div class="hero__c">
-        <p class="hero__kicker"><span class="dot" aria-hidden="true"></span><span>Browser Workbench · 6 Engines</span></p>
+        <p class="hero__kicker">2 Modes · 6 Engines</p>
         <h1 id="hero-h">Edit RPG Maker saves locally</h1>
         <p class="hero__lead">Edit 6 save formats (.rmmzsave, .rpgsave, .rvdata2, .rvdata, .rxdata, .sav) and 7 JSON database tables directly inside your browser.</p>
-        <div class="btn-row"><a class="btn btn--primary" href="#studio">Open save file</a><a class="btn btn--secondary" href="#features">Inspect supported formats</a></div>
+        <div class="btn-row"><a class="btn btn--primary" href="#studio" data-open-mode="save">Open save file</a><a class="btn btn--secondary" href="#studio" data-open-mode="db">Open database JSON</a></div>
       </div>
-      <div class="hero__window" data-fx="silk-folds" data-fx-seed="7" data-visual role="img" aria-label="Save Studio inspector showing savegame.rmmzsave party metrics and modified fields">
+      <div class="hero__window" data-fx="silk-folds" data-fx-seed="7" data-moment="cursor-spotlight" data-moment-opts='{"rest":[0.72,0.28],"radius":420}' data-visual role="img" aria-label="Save Studio workspace preview showing Save Editor and Database Modder modes">
         <div class="ly-piece ui d-win d-win--dark" aria-hidden="true">
-          <div class="d-win__bar"><span class="d-win__dots"><i></i><i></i><i></i></span><span><b>savegame.rmmzsave</b> · MZ Archive</span><span class="sp"></span><span>Client Memory</span></div>
+          <div class="d-win__bar"><span class="d-win__dots"><i></i><i></i><i></i></span><span><b>savegame.rmmzsave</b> · MZ Archive</span><span class="sp"></span><span>Local Memory</span></div>
           <div class="d-win__body">
             <div class="d-side">
-              <span class="is-on">Party<em>4</em></span>
-              <span>Inventory<em>64</em></span>
-              <span>Weapons<em>28</em></span>
+              <span class="is-on">Save Editor<em>6 fmt</em></span>
+              <span>Database<em>7 tbl</em></span>
+              <span>Field Diff<em>Ready</em></span>
             </div>
             <div class="d-main">
-              <div class="d-main__head"><h4>Party Inspector</h4><span class="d-pill">Download Save</span></div>
+              <div class="d-main__head"><h4>Party &amp; Table Inspector</h4><span class="d-pill">Export Clean File</span></div>
               <div class="d-rows">
                 <div class="d-row"><div><b>Harold</b><small>Actor #001 · Lv 42</small></div><span class="num">HP 9,999</span><span class="d-chip">Modified</span></div>
                 <div class="d-row"><div><b>Party Gold</b><small>System wallet</small></div><span class="num">999,999</span><span class="d-chip">+950K</span></div>
@@ -1157,7 +1077,7 @@ let htmlContent = `<!DOCTYPE html>
   <section class="section ground-surface studio-section" id="studio" aria-labelledby="studio-h">
     <div class="wrap">
       <div class="section-head">
-        <h2 id="studio-h">Workbench. <span class="muted">Edit saves and JSON tables.</span></h2>
+        <h2 id="studio-h">Workbench. <span class="muted">Save Editor and Database Modder.</span></h2>
       </div>
 
       <div class="studio-shell ui ui-studio" data-visual>
@@ -1165,10 +1085,10 @@ let htmlContent = `<!DOCTYPE html>
           <div class="logo-wrap">
             <div class="logo-icon" aria-hidden="true" style="padding:2px; background:transparent; border:none;">
               <svg viewBox="0 0 64 64" style="width:100%; height:100%; display:block;">
-                <rect x="2" y="2" width="60" height="60" rx="8" fill="#0f1f10" stroke="#c6f19d" stroke-width="2.5"/>
-                <path d="M18 15h22l8 8v26a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V15z" fill="#162a17" stroke="#5c8a5e" stroke-width="1.8" stroke-linejoin="round"/>
-                <rect x="24" y="15" width="14" height="10" rx="1" fill="#c6f19d"/>
-                <rect x="23" y="33" width="18" height="11" rx="1.5" fill="#c6f19d" opacity="0.28" stroke="#c6f19d" stroke-width="1.5"/>
+                <rect x="2" y="2" width="60" height="60" rx="8" fill="#0c0a08" stroke="#c9a45a" stroke-width="2.5"/>
+                <path d="M18 15h22l8 8v26a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V15z" fill="#181512" stroke="#8a7240" stroke-width="1.8" stroke-linejoin="round"/>
+                <rect x="24" y="15" width="14" height="10" rx="1" fill="#c9a45a"/>
+                <rect x="23" y="33" width="18" height="11" rx="1.5" fill="#c9a45a" opacity="0.28" stroke="#c9a45a" stroke-width="1.5"/>
               </svg>
             </div>
             <div>
@@ -1239,7 +1159,7 @@ let htmlContent = `<!DOCTYPE html>
       <div style="font-size:1.125rem; font-weight:500; color:var(--text-primary); letter-spacing:-0.01em;">
         Drop a save archive or JSON database table
       </div>
-      <div style="color:#dce5dc; font-size:0.9375rem; max-width:68ch; line-height:1.5;">
+      <div style="color:#e2ddd6; font-size:0.9375rem; max-width:68ch; line-height:1.5;">
         Reads <code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>, and RPG Maker JSON tables inside local memory.
       </div>
       <input type="file" id="file-input" multiple style="display:none;">
@@ -1601,126 +1521,29 @@ let htmlContent = `<!DOCTYPE html>
       <div class="toast" id="toast" role="status" aria-live="polite">Notification</div>
     </div>
   </section>
-
-  <section class="section bg-mist" id="features" aria-labelledby="features-h">
-    <div class="wrap">
-      <div class="section-head section-head--center">
-        <h2 id="features-h">Engine codecs. <span class="muted">Binary saves and JSON tables.</span></h2>
-      </div>
-      <div class="grid stat-cards">
-        <article class="card card--row">
-          <strong>6 engines</strong>
-          <p>Read MZ, MV, VX Ace, VX, XP, and Naninovel save archives.</p>
-          <div class="panel panel--inset" data-fx="grain-gradient" data-fx-params='{"drift":0}' data-fx-seed="11" role="img" aria-label="Binary and text codec breakdown across MZ deflate, MV LZString, and Ruby Marshal">
-            <div class="stage"><div class="at-rise fit"><div class="d-pane" aria-hidden="true">
-              <h5>Supported save formats</h5>
-              <div class="d-split"><i style="width:45%; background:#c6f19d"></i><i style="width:35%; background:#74a876"></i><i style="width:20%; background:#48694a"></i></div>
-              <div class="d-times"><span>.rmmzsave<b>Deflate</b></span><span>.rpgsave<b>LZString</b></span><span>.rvdata2<b>Marshal 4.8</b></span><span>.sav<b>Naninovel</b></span></div>
-            </div></div></div>
-          </div>
-        </article>
-        <article class="card card--row">
-          <strong>7 tables</strong>
-          <p>Edit weapons, armors, items, skills, enemies, classes, and actors.</p>
-          <div class="panel panel--inset" data-fx="grain-gradient" data-fx-params='{"drift":0}' data-fx-seed="23" role="img" aria-label="Seven database JSON table slots loaded simultaneously for cross-referenced lookups">
-            <div class="stage"><div class="at-rise fit"><div class="d-pane" aria-hidden="true">
-              <h5>Database slots loaded</h5>
-              <div class="d-times"><span>Weapons.json<b>142 rows</b></span><span>Armors.json<b>118 rows</b></span><span>Items.json<b>204 rows</b></span><span>Skills.json<b>310 rows</b></span></div>
-            </div></div></div>
-          </div>
-        </article>
-        <article class="card card--row">
-          <strong>Zero server</strong>
-          <p>Revert individual fields or export raw backups before saving.</p>
-          <div class="panel panel--inset" data-fx="grain-gradient" data-fx-params='{"drift":0}' data-fx-seed="37" role="img" aria-label="Modified save fields queued with original baseline rollback values">
-            <div class="stage"><div class="at-rise fit"><div class="d-pane" aria-hidden="true">
-              <h5>Queued save diff</h5>
-              <div class="d-times"><span>Party Gold<b>+500,000</b></span><span>Actor #1 HP<b>9,999</b></span><span>Switch #014<b>TRUE</b></span><span>Original .bak<b>Ready</b></span></div>
-            </div></div></div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section statement" id="moment" data-moment="liquid-type" aria-labelledby="moment-h">
-    <div class="wrap">
-      <h2 class="mo-lt__type" id="moment-h">Save Studio runs in local memory.</h2>
-      <p class="t-lead">Decompress archives, patch actor stats, inspect changes, and export clean save files directly inside this browser tab.</p>
-    </div>
-  </section>
-
-  <section class="section ground-surface bg-dots" id="faq" aria-labelledby="faq-h">
-    <div class="wrap">
-      <div class="grid">
-        <div class="span-5 faq-col-left">
-          <div class="section-head">
-            <h2 id="faq-h">Questions. <span class="muted">How local editing works.</span></h2>
-          </div>
-          <div class="ui ui-faq-arch" data-visual role="img" aria-label="Local browser parsing pipeline from save archive through codec decoders to clean file download">
-            <svg viewBox="0 0 420 260" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect x="6" y="14" width="112" height="58" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.22)"/>
-              <text x="62" y="40" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500" text-anchor="middle">Save Archive</text>
-              <text x="62" y="58" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13" text-anchor="middle">.rmmzsave</text>
-              <line x1="118" y1="43" x2="148" y2="43" stroke="#c6f19d" stroke-width="1.5"/>
-              <rect x="148" y="14" width="124" height="58" rx="4" fill="#1d351e" stroke="#c6f19d"/>
-              <text x="210" y="40" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500" text-anchor="middle">Local Codec</text>
-              <text x="210" y="58" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13" text-anchor="middle">Pako / LZStr</text>
-              <line x1="272" y1="43" x2="302" y2="43" stroke="#c6f19d" stroke-width="1.5"/>
-              <rect x="302" y="14" width="112" height="58" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.22)"/>
-              <text x="358" y="40" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500" text-anchor="middle">Clean Export</text>
-              <text x="358" y="58" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13" text-anchor="middle">Diff + .bak</text>
-              <rect x="6" y="94" width="408" height="72" rx="4" fill="#122413" stroke="rgba(255,255,255,0.14)"/>
-              <text x="22" y="122" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500">Zero external uploads inside browser tab memory</text>
-              <text x="22" y="146" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13">6 Codecs · 7 JSON Tables · Field Revert</text>
-              <rect x="6" y="184" width="198" height="62" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.14)"/>
-              <text x="22" y="210" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13">MZ · MV · VX Ace</text>
-              <text x="22" y="232" fill="#dce5dc" font-family="Instrument Sans, sans-serif" font-size="13">Instant round-trip check</text>
-              <rect x="216" y="184" width="198" height="62" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.14)"/>
-              <text x="232" y="210" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13">Weapons · Items</text>
-              <text x="232" y="232" fill="#dce5dc" font-family="Instrument Sans, sans-serif" font-size="13">Live cross-table labels</text>
-            </svg>
-          </div>
-        </div>
-        <div class="span-7">
-          <div class="faq">
-            <div class="faq__item">
-              <h3>Which save formats can Save Studio parse?</h3>
-              <p>MZ (.rmmzsave), MV (.rpgsave), VX Ace (.rvdata2), VX (.rvdata), XP (.rxdata), and Naninovel (.sav).</p>
-            </div>
-            <div class="faq__item">
-              <h3>Does Save Studio send files to any server?</h3>
-              <p>No; Pako, LZString, and Ruby Marshal decoding run inside local browser memory.</p>
-            </div>
-            <div class="faq__item">
-              <h3>How do JSON tables label numeric save IDs?</h3>
-              <p>Load Weapons.json, Items.json, Armors.json, or Skills.json to map IDs to item names.</p>
-            </div>
-            <div class="faq__item">
-              <h3>Can Save Studio restore fields before export?</h3>
-              <p>Yes; every modified field supports single-record revert, full reset, and raw .bak export.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 </main>
 
-<footer class="footer closing footer--statement" aria-labelledby="close-h">
+<footer class="footer closing footer--dark" aria-labelledby="close-h">
   <div class="wrap">
     <div class="closing__cta close--word">
       <div class="section-head section-head--split">
         <h2 id="close-h">Open a save file now.</h2>
-        <a class="btn btn--primary" href="#studio">Open save file</a>
+        <a class="btn btn--primary" href="#studio" data-open-mode="save">Open save file</a>
       </div>
+      <p class="hero__lead closing__lead">Switch directly between the Save Editor and Database Modder inside this browser tab with zero remote uploads.</p>
+      <dl class="hero__facts closing__facts">
+        <div><dt>Save formats</dt><dd>MZ, MV, VX Ace, VX, XP, Naninovel</dd></div>
+        <div><dt>Database tables</dt><dd>7 RPG Maker JSON tables</dd></div>
+        <div><dt>Safety controls</dt><dd>Per-field revert and raw .bak</dd></div>
+        <div><dt>Execution</dt><dd>100% offline browser memory</dd></div>
+      </dl>
       <div class="close__word" aria-hidden="true">SaveStudio</div>
     </div>
     <div class="closing__links">
       <div class="grid">
         <div class="span-6 stack-5"><a class="footer__mark" href="#top"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a></div>
-        <div class="span-3 start-7 footer__col"><h3>Workspace</h3><ul><li><a href="#studio">Save Editor</a></li><li><a href="#studio">Database Modder</a></li><li><a href="#features">Supported Formats</a></li></ul></div>
-        <div class="span-3 footer__col"><h3>Project</h3><ul><li><a href="#faq">Questions</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
+        <div class="span-3 start-7 footer__col"><h3>Workspace</h3><ul><li><a href="#studio" data-open-mode="save">Save Editor</a></li><li><a href="#studio" data-open-mode="db">Database Modder</a></li></ul></div>
+        <div class="span-3 footer__col"><h3>Legal</h3><ul><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
       </div>
       <div class="footer__legal"><span>Save Studio local workbench</span><span><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></span></div>
     </div>
@@ -1971,6 +1794,14 @@ let htmlContent = `<!DOCTYPE html>
 
   btnModeSave.onclick = () => switchAppMode('save');
   btnModeDb.onclick = () => switchAppMode('database');
+  if (typeof document.querySelectorAll === 'function') {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-open-mode]'), function(link) {
+      link.onclick = function() {
+        var targetMode = link.getAttribute('data-open-mode');
+        switchAppMode(targetMode === 'db' ? 'database' : 'save');
+      };
+    });
+  }
   const btnSelectSave = document.getElementById('btn-select-save-file');
   if (btnSelectSave) btnSelectSave.onclick = () => fileInput.click();
   document.getElementById('btn-quick-open-db').onclick = () => {

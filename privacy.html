@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-type="software" data-radius="sharp" data-ground="sage" data-buttons="arrow">
+<html lang="en" data-type="software" data-radius="sharp" data-ground="sand">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,10 +15,10 @@
 <link rel="stylesheet" href="assets/layout/layout.css">
 <style>
 :root {
-  --p-bg: #0f1f10; --p-surface: #162a17; --p-ink: #ffffff; --p-muted: #9aa39a;
-  --p-accent: #c6f19d; --p-accent-ink: #0f1f10; --p-action: #c6f19d; --p-action-ink: #0f1f10;
-  --p-inv-bg: #ffffff; --p-inv-surface: #ecedec; --p-inv-ink: #0f1f10; --p-inv-muted: #606c60;
-  --p-inv-accent: #0f1f10; --p-inv-accent-ink: #ffffff; --p-inv-action: #0f1f10; --p-inv-action-ink: #ffffff;
+  --p-bg: #0c0a08; --p-surface: #181512; --p-ink: #ffffff; --p-muted: #9f9a93;
+  --p-accent: #c9a45a; --p-accent-ink: #0c0a08; --p-action: #c9a45a; --p-action-ink: #0c0a08;
+  --p-inv-bg: #ffffff; --p-inv-surface: #ecedec; --p-inv-ink: #0c0a08; --p-inv-muted: #66615b;
+  --p-inv-accent: #0c0a08; --p-inv-accent-ink: #ffffff; --p-inv-action: #0c0a08; --p-inv-action-ink: #ffffff;
   --font-display: "Instrument Sans", system-ui, sans-serif;
   --font-text: "Instrument Sans", system-ui, sans-serif;
   --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -30,6 +30,7 @@
 }
 .legal-copy { max-width: 66ch; display: grid; gap: var(--s-5); }
 .legal-copy h2 { font-size: var(--t-h3); margin-top: var(--s-4); }
+.footer__mark .mark.mark--initial { width: 28px; height: 28px; font-size: 16px; margin-right: 8px; }
 </style>
 </head>
 <body>
@@ -37,9 +38,8 @@
   <div class="wrap nav__bar">
     <a class="nav__logo" href="index.html"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a>
     <nav class="nav__links" aria-label="Main">
-      <div class="nav__item"><a class="nav__link" href="index.html#studio">Editor</a></div>
-      <div class="nav__item"><a class="nav__link" href="index.html#features">Formats</a></div>
-      <div class="nav__item"><a class="nav__link" href="index.html#faq">Questions</a></div>
+      <div class="nav__item"><a class="nav__link" href="index.html#studio">Save Editor</a></div>
+      <div class="nav__item"><a class="nav__link" href="index.html#studio">Database Modder</a></div>
     </nav>
     <div class="nav__actions">
       <a class="btn btn--primary" href="index.html#studio">Open save file</a>
@@ -66,7 +66,7 @@
   </section>
 </main>
 
-<footer class="footer closing footer--statement" aria-labelledby="close-h">
+<footer class="footer closing footer--dark" aria-labelledby="close-h">
   <div class="wrap">
     <div class="closing__cta close--word">
       <div class="section-head section-head--split">
@@ -78,8 +78,8 @@
     <div class="closing__links">
       <div class="grid">
         <div class="span-6 stack-5"><a class="footer__mark" href="index.html#top"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a></div>
-        <div class="span-3 start-7 footer__col"><h4>Workspace</h4><ul><li><a href="index.html#studio">Save Editor</a></li><li><a href="index.html#studio">Database Modder</a></li><li><a href="index.html#features">Supported Engines</a></li></ul></div>
-        <div class="span-3 footer__col"><h4>Project</h4><ul><li><a href="index.html#faq">FAQ</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
+        <div class="span-3 start-7 footer__col"><h3>Workspace</h3><ul><li><a href="index.html#studio">Save Editor</a></li><li><a href="index.html#studio">Database Modder</a></li></ul></div>
+        <div class="span-3 footer__col"><h3>Legal</h3><ul><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
       </div>
       <div class="footer__legal"><span>Save Studio local workbench</span><span><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></span></div>
     </div>
