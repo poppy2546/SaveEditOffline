@@ -347,11 +347,32 @@ let htmlContent = `<!DOCTYPE html>
     background: var(--bg-header);
     border-bottom: 1px solid var(--border-color);
     padding: 12px 18px;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
+  }
+  .studio-header .logo-wrap { grid-column: 1; justify-self: start; }
+  .studio-header .mode-switch-bar { grid-column: 2; justify-self: center; justify-content: center; }
+  #header-save-actions, #header-db-actions {
+    grid-column: 3;
+    justify-self: end;
+    justify-content: flex-end;
     flex-wrap: wrap;
+  }
+  @media (max-width: 1199px) {
+    .studio-header {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+    .studio-header .logo-wrap,
+    .studio-header .mode-switch-bar,
+    #header-save-actions,
+    #header-db-actions {
+      grid-column: 1;
+      justify-self: center;
+      justify-content: center;
+    }
   }
   .logo-wrap { display: flex; align-items: center; gap: 10px; }
   .logo-icon {
@@ -393,6 +414,7 @@ let htmlContent = `<!DOCTYPE html>
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    justify-content: center;
   }
   .mode-btn {
     height: 44px;
@@ -440,9 +462,9 @@ let htmlContent = `<!DOCTYPE html>
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    text-align: left;
+    text-align: center;
     gap: 12px;
     transition: border-color 0.15s ease, background 0.15s ease;
   }
@@ -454,6 +476,7 @@ let htmlContent = `<!DOCTYPE html>
     width: 100%;
     margin-top: 14px;
     align-items: center;
+    justify-content: center;
   }
   .studio-codec-tag {
     font-family: var(--font-mono);
@@ -940,7 +963,11 @@ let htmlContent = `<!DOCTYPE html>
   @media (max-width: 900px) {
     .db-slot-grid { grid-template-columns: repeat(2, 1fr); }
   }
+  @media (max-width: 520px) {
+    .db-slot-grid { grid-template-columns: 1fr; }
+  }
   .db-cat-btn {
+    min-width: 0;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -967,16 +994,20 @@ let htmlContent = `<!DOCTYPE html>
   }
   .db-slot-top {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    gap: 2px 6px;
     width: 100%;
     font-weight: 600;
     font-size: 0.86rem;
   }
   .db-slot-sub {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    gap: 2px 6px;
     width: 100%;
     font-size: 0.74rem;
     color: var(--text-secondary);
@@ -1151,7 +1182,7 @@ let htmlContent = `<!DOCTYPE html>
   <!-- ========================================================= -->
   <!-- 1. WELCOME / DROPZONE SCREEN                             -->
   <!-- ========================================================= -->
-  <div id="upload-section" style="display:flex; flex-direction:column; align-items:stretch; flex:1 1 auto; width:100%; text-align:left;">
+  <div id="upload-section" style="display:flex; flex-direction:column; align-items:stretch; flex:1 1 auto; width:100%; text-align:center;">
     <div class="studio-dropzone" id="dropzone">
       <div style="color:var(--accent-sand);" aria-hidden="true">
         <svg class="ico ico-xl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1163,7 +1194,7 @@ let htmlContent = `<!DOCTYPE html>
         Reads <code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>, and RPG Maker JSON tables inside local memory.
       </div>
       <input type="file" id="file-input" multiple style="display:none;">
-      <div style="display:flex; gap:10px; margin-top:4px; flex-wrap:wrap; justify-content:flex-start;">
+      <div style="display:flex; gap:10px; margin-top:4px; flex-wrap:wrap; justify-content:center;">
         <button class="btn btn-primary" type="button" id="btn-select-save-file">Select Save File</button>
         <button class="btn btn-secondary" type="button" id="btn-quick-open-db">Open Database JSON</button>
       </div>
