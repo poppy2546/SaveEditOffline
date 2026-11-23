@@ -133,7 +133,7 @@ const server = http.createServer((req, res) => {
   const secHeaders = (lowerPath === '/index.html' || lowerPath === '/privacy.html' || lowerPath === '/terms.html')
     ? {
         ...baseSecHeaders,
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-w9/LsIJNZznKXgHK7mnTDdoZHNvCBPWzmc29v5oQ9q4=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-SEOHjacjmOpGTgSHaRddD56AELjVmHYcFXW+ZSf4HUk=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
       }
     : baseSecHeaders;
 

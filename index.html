@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="page-type" content="software">
 <meta name="site-kind" content="software">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-w9/LsIJNZznKXgHK7mnTDdoZHNvCBPWzmc29v5oQ9q4=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action 'none';">
-<title>Save Studio: Universal RPG Maker Save Editor</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-SEOHjacjmOpGTgSHaRddD56AELjVmHYcFXW+ZSf4HUk=' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action 'none';">
+<title>Universal RPG Maker Save Editor</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23181512'/%3E%3Cstop%20offset='100%25'%20stop-color='%230c0a08'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='gold'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23f2dfb6'/%3E%3Cstop%20offset='100%25'%20stop-color='%23c9a45a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='8'%20fill='url(%23bg)'%20stroke='url(%23gold)'%20stroke-width='2.5'/%3E%3Cpath%20d='M18%2015h22l8%208v26a2%202%200%200%201-2%202H20a2%202%200%200%201-2-2V15z'%20fill='%2312100e'%20stroke='%238a7240'%20stroke-width='1.8'/%3E%3Crect%20x='24'%20y='15'%20width='14'%20height='10'%20rx='1'%20fill='url(%23gold)'/%3E%3Crect%20x='23'%20y='33'%20width='18'%20height='11'%20rx='1.5'%20fill='%23c9a45a'%20opacity='0.24'%20stroke='%23c9a45a'%20stroke-width='1.5'/%3E%3C/svg%3E">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="theme-color" content="#0c0a08">
@@ -14,7 +14,7 @@
 <meta name="keywords" content="RPG Maker save editor, rmmzsave editor, rpgsave editor, rvdata2 editor, RPG Maker database modder, RPG save editor online">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://universal-rpg-save-editor.pages.dev/">
-<meta property="og:title" content="Save Studio: Universal RPG Maker Save Editor">
+<meta property="og:title" content="Universal RPG Maker Save Editor">
 <meta property="og:description" content="Universal RPG Maker Save Editor and Database Modder running locally in browser memory.">
 <meta property="og:url" content="https://universal-rpg-save-editor.pages.dev/">
 <meta property="og:type" content="website">
@@ -32,7 +32,7 @@
 <link rel="stylesheet" href="assets/icons/icon.css">
 <style>
   :root {
-    --p-bg: #0c0a08; --p-surface: #181512; --p-ink: #ffffff; --p-muted: #9f9a93;
+    --p-bg: #0c0a08; --p-surface: #181512; --p-ink: #ffffff; --p-muted: #b8b2aa;
     --p-accent: #c9a45a; --p-accent-ink: #0c0a08; --p-action: #c9a45a; --p-action-ink: #0c0a08;
     --p-inv-bg: #ffffff; --p-inv-surface: #ecedec; --p-inv-ink: #0c0a08; --p-inv-muted: #66615b;
     --p-inv-accent: #0c0a08; --p-inv-accent-ink: #ffffff; --p-inv-action: #0c0a08; --p-inv-action-ink: #ffffff;
@@ -52,12 +52,12 @@
     --bg-card-hover: #211d19;
     --bg-elevated: #28231e;
     --bg-input: #090806;
-    --border-color: rgba(255, 255, 255, 0.15);
-    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.16);
+    --border-subtle: rgba(255, 255, 255, 0.09);
     --border-focus: #c9a45a;
     --text-primary: #ffffff;
-    --text-secondary: #c8c2ba;
-    --text-muted: #9f9a93;
+    --text-secondary: #d4cec6;
+    --text-muted: #b8b2aa;
     --accent-sand: #c9a45a;
     --accent-sand-hover: #dbb86e;
     --accent-sand-text: #0c0a08;
@@ -74,7 +74,16 @@
     --radius-lg: var(--r-lg);
   }
 
-  ::placeholder { color: var(--text-muted); opacity: 0.9; }
+  ::placeholder { color: var(--text-muted); opacity: 0.95; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent-sand, #c9a45a);
+    outline-offset: 2px;
+  }
+
+  #studio, #top, main section[id] {
+    scroll-margin-top: calc(var(--nav, 72px) + 12px);
+  }
 
   /* Skip link and responsive nav safeguards */
   .skip-link {
@@ -89,15 +98,30 @@
     font: 500 14px/1 var(--font-text);
   }
   .skip-link:focus { top: 12px; }
-  .nav__logo { margin-left: 0; padding-left: 0; }
-  @media (max-width: 420px) {
-    .nav:not(.is-open) .nav__actions { display: none; }
-    .nav:not(.is-open) .nav__actions + .nav__toggle { margin-left: auto; }
+  .nav__logo { margin-left: 0; padding-left: 0; font-size: 18px; }
+  @media (max-width: 1279px) and (min-width: 1024px) {
+    .nav__logo { font-size: 16px; }
+  }
+  @media (max-width: 639px) {
+    .nav__logo {
+      font-size: 13px;
+      line-height: 1.15;
+      white-space: normal;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .nav:not(.is-open) .nav__actions .btn {
+      height: 40px;
+      min-height: 40px;
+      padding-inline: 10px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
   }
 
   /* Restore 1-screen section rhythm */
   main > section.section.studio-section {
-    padding: var(--padt) 0 calc(var(--padb) + var(--bar)) !important;
+    padding: calc(var(--nav, 56px) + 20px) 0 calc(var(--padb) + var(--bar)) !important;
     height: auto;
     min-height: calc(var(--hm, var(--h, 1)) * 100vh) !important;
     min-height: calc(var(--hm, var(--h, 1)) * 100lvh) !important;
@@ -107,16 +131,16 @@
   }
   @media (min-width: 640px) {
     main > section.section.studio-section {
-      --padt: 80px;
-      height: calc(var(--h, 1) * 100vh) !important;
-      height: calc(var(--h, 1) * 100lvh) !important;
+      --padt: 84px;
+      padding: var(--padt) 0 calc(var(--padb) + var(--bar)) !important;
+      height: auto !important;
       min-height: calc(var(--h, 1) * 100vh) !important;
     }
   }
   @media (min-width: 1280px) {
     main > section.section.studio-section {
-      --padt: 80px;
-      height: calc(var(--h, 1) * 100svh) !important;
+      --padt: 84px;
+      min-height: calc(var(--h, 1) * 100svh) !important;
     }
   }
   main > section.section > .wrap { flex: 1 1 auto; }
@@ -204,7 +228,7 @@
     align-content: start;
     gap: 2px;
     font-size: 13px;
-    color: #b7b0a7;
+    color: #d4cec6;
   }
   .d-side > span {
     display: flex;
@@ -262,38 +286,42 @@
   }
 
   /* Footer closing spacing, summary facts, off-grid mark fix, and phone height fit */
+  footer.closing {
+    height: auto !important;
+    min-height: 0 !important;
+    padding-block: var(--s-7) var(--s-6) !important;
+  }
+  footer.closing > .wrap {
+    grid-template-rows: auto auto !important;
+    row-gap: var(--s-5) !important;
+    min-width: 0;
+    max-width: 100%;
+  }
   .closing__lead { max-width: 58ch; color: var(--muted); }
   .closing__facts { border-top: 0; padding-top: 0; }
   @media (max-width: 1023px) {
     .closing__facts > div { grid-column: auto / span 6; }
   }
   @media (min-width: 640px) {
-    footer.closing { padding-block: var(--s-8) var(--padb); }
-    footer.closing > .wrap { row-gap: var(--s-6); }
-    footer.closing .closing__cta { gap: var(--s-5); }
+    footer.closing { padding-block: var(--s-8) var(--s-7) !important; }
+    footer.closing > .wrap { row-gap: var(--s-6) !important; }
+    footer.closing .closing__cta { gap: var(--s-4); }
     footer.closing .closing__links { gap: var(--s-5); }
-    footer.closing .close__word { font-size: clamp(44px, 11.2vw, 148px); margin-top: auto; }
   }
   .footer__mark .mark.mark--initial { width: 28px; height: 28px; font-size: 16px; margin-right: 8px; }
-  .close__word {
-    font-size: clamp(38px, 12vw, 184px);
-    line-height: 1.04;
-    padding-top: 0.04em;
-    overflow: visible;
-    max-width: 100%;
-  }
-  footer.closing .wrap, footer.closing .closing__cta { min-width: 0; max-width: 100%; }
+  footer.closing .closing__cta { min-width: 0; max-width: 100%; }
   @media (max-width: 639px) {
-    footer.closing { padding-block: var(--s-7) var(--padb); }
-    footer.closing > .wrap { row-gap: var(--s-4); }
-    footer.closing .closing__cta { gap: var(--s-4); }
-    .closing__facts { display: none; }
-    .closing__lead { font-size: 16px; line-height: 1.45; }
+    footer.closing { padding-block: var(--s-6) var(--s-5) !important; }
+    footer.closing > .wrap { row-gap: var(--s-4) !important; }
+    footer.closing .closing__cta { gap: var(--s-3); }
+    .closing__facts { gap: var(--s-3); }
+    .closing__lead { font-size: 15px; line-height: 1.45; }
     footer.closing .closing__links { gap: var(--s-3); }
     footer.closing .closing__links > .grid { row-gap: var(--s-3); }
     footer.closing .footer__legal { margin-top: var(--s-2); padding-top: var(--s-3); }
-    footer.closing .btn--primary { max-width: 100%; }
-    footer.closing .close__word { font-size: clamp(36px, 11vw, 64px); margin-top: var(--s-3); }
+  }
+  @media (max-width: 1023px), (pointer: coarse) {
+    .hero--centred .hero__window > button.loop-pause { width: 40px; height: 40px; min-width: 40px; min-height: 40px; }
   }
 
   /* Studio Workbench Shell (ui-studio marks internal UI layout as product interface) */
@@ -301,13 +329,13 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--s-6);
+    gap: var(--s-5);
     height: 100%;
+    min-width: 0;
   }
-  @media (min-width: 640px) and (max-width: 1023px) { #studio > .wrap { gap: var(--s-7); } }
+  @media (min-width: 640px) and (max-width: 1023px) { #studio > .wrap { gap: var(--s-6); } }
   @media (max-width: 639px) {
-    #studio > .wrap { gap: var(--s-6); height: 100%; }
-    #studio .badge-offline, #studio .studio-codec-bar { display: none; }
+    #studio > .wrap { gap: var(--s-4); height: 100%; }
   }
   #studio .section-head { margin-bottom: 0; }
   .studio-shell {
@@ -319,6 +347,8 @@
     flex-direction: column;
     flex: 1 1 auto;
     min-height: 440px;
+    min-width: 0;
+    max-width: 100%;
   }
   @media (max-width: 639px) { .studio-shell { min-height: 0; flex: 1 1 auto; } }
   .studio-shell * { box-sizing: border-box; }
@@ -339,41 +369,29 @@
     background: var(--bg-header);
     border-bottom: 1px solid var(--border-color);
     padding: 12px 18px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
   }
-  .studio-header .logo-wrap { grid-column: 1; grid-row: 1; justify-self: start; }
-  .studio-header .mode-switch-bar { grid-column: 2; grid-row: 1; justify-self: center; justify-content: center; }
-  #header-save-actions, #header-db-actions {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  #header-db-actions {
     width: 100%;
-    justify-self: stretch;
     justify-content: center;
     flex-wrap: wrap;
     padding-top: 10px;
     border-top: 1px solid var(--border-subtle);
   }
-  @media (max-width: 1199px) {
+  @media (max-width: 900px) {
     .studio-header {
-      grid-template-columns: 1fr;
-      justify-items: center;
-    }
-    .studio-header .logo-wrap,
-    .studio-header .mode-switch-bar,
-    #header-save-actions,
-    #header-db-actions {
-      grid-column: 1;
-      grid-row: auto;
-      justify-self: center;
       justify-content: center;
+      text-align: center;
     }
+    .studio-header .logo-wrap { justify-content: center; }
   }
-  .logo-wrap { display: flex; align-items: center; gap: 10px; }
+  .logo-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
   .logo-icon {
-    width: 30px; height: 30px;
+    width: 30px; height: 30px; flex-shrink: 0;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -381,7 +399,7 @@
     color: var(--accent-sand);
   }
   .brand-title {
-    font-size: 1rem;
+    font-size: 0.98rem;
     font-weight: 500;
     letter-spacing: -0.02em;
     color: var(--text-primary);
@@ -395,6 +413,7 @@
     padding: 3px 8px;
     border-radius: var(--radius-sm);
     margin-left: 8px;
+    white-space: nowrap;
   }
   .badge-promax {
     background: var(--bg-elevated);
@@ -405,6 +424,13 @@
     background: var(--accent-sage-bg);
     color: var(--accent-sage-bright);
     border: 1px solid var(--accent-sage);
+  }
+  @media (max-width: 639px) {
+    .badge-offline {
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      margin-left: 0;
+    }
   }
 
   .mode-switch-bar {
@@ -466,12 +492,17 @@
     transition: border-color 0.15s ease, background 0.15s ease;
   }
   .studio-dropzone:hover { border-color: var(--accent-sand); background: var(--bg-card-hover); }
+  .drop-label-mobile { display: none; }
+  @media (hover: none), (max-width: 639px) {
+    .drop-label-desktop { display: none; }
+    .drop-label-mobile { display: inline; }
+  }
   .studio-codec-bar {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     width: 100%;
-    margin-top: 14px;
+    margin-top: 10px;
     align-items: center;
     justify-content: center;
   }
@@ -504,20 +535,21 @@
     border: 1px solid var(--border-color);
     background: var(--bg-card);
     color: var(--text-primary);
-    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease;
     user-select: none;
     white-space: nowrap;
   }
   #studio .btn::after { display: none; content: none; }
-  #studio .btn:hover { background: var(--bg-card-hover); border-color: var(--text-secondary); }
-  #studio .btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+  #studio .btn:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--text-secondary); }
+  #studio .btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+  #studio .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
   #studio .btn-primary, #studio .btn-blue {
     background: var(--accent-sand);
     color: var(--accent-sand-text);
     border-color: transparent;
-    font-weight: 500;
+    font-weight: 600;
   }
-  #studio .btn-primary:hover, #studio .btn-blue:hover {
+  #studio .btn-primary:hover:not(:disabled), #studio .btn-blue:hover:not(:disabled) {
     background: var(--accent-sand-hover);
     border-color: transparent;
     color: var(--accent-sand-text);
@@ -527,32 +559,170 @@
     color: var(--text-primary);
     border-color: var(--border-color);
   }
-  #studio .btn-secondary:hover, #studio .btn-purple:hover {
+  #studio .btn-secondary:hover:not(:disabled), #studio .btn-purple:hover:not(:disabled) {
     background: var(--bg-card-hover);
     border-color: var(--text-secondary);
   }
-  #studio .btn-gold, #studio .btn-secret {
-    background: var(--accent-amber-bg);
+  #studio .btn-gold, #studio .btn-secret, #studio .btn-warn {
+    background: var(--bg-header);
     color: #f3d284;
-    border-color: #796531;
+    border-color: #8a6c2d;
   }
-  #studio .btn-gold:hover, #studio .btn-secret:hover {
-    background: #3a341e;
+  #studio .btn-gold:hover:not(:disabled), #studio .btn-secret:hover:not(:disabled), #studio .btn-warn:hover:not(:disabled) {
+    background: #2c2415;
     border-color: var(--accent-amber);
   }
   #studio .btn-danger {
     background: var(--accent-terra-bg);
-    color: #f1a08d;
-    border-color: #7d3e2d;
+    color: #f4aca0;
+    border-color: #8a4332;
   }
-  #studio .btn-danger:hover {
+  #studio .btn-danger:hover:not(:disabled) {
     background: #3f241f;
     border-color: var(--accent-terra);
   }
   #studio .studio-header .btn-sm { height: 44px; min-height: 44px; padding: 0 16px; font-size: 15px; border-radius: var(--r-btn); }
   #studio .section-panel .btn-sm,
   #studio #save-editor-screen .btn-sm,
-  #studio #db-modder-screen .btn-sm { height: auto; min-height: 32px; padding: 5px 11px; font-size: 0.8125rem; border-radius: var(--r-sm); }
+  #studio #db-modder-screen .btn-sm { height: auto; min-height: 34px; padding: 6px 12px; font-size: 0.8125rem; border-radius: var(--r-sm); }
+
+  /* Loaded-File Bar, More Menu, Gold Row, Change Pill */
+  .loaded-file-bar, .quick-actions-bar {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .loaded-file-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+    flex: 1 1 240px;
+  }
+  #label-filename {
+    font-weight: 500;
+    font-size: 0.96rem;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    word-break: break-word;
+    min-width: 0;
+  }
+  .loaded-file-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
+  .change-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  }
+  .change-pill:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+  .change-pill.has-changes {
+    background: rgba(201, 164, 90, 0.18);
+    border-color: var(--accent-sand);
+    color: #f3d284;
+    font-weight: 600;
+  }
+  .unsaved-dot {
+    display: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0c0a08;
+    box-shadow: 0 0 0 2px #f3d284;
+    flex-shrink: 0;
+  }
+  #btn-review-download.has-unsaved .unsaved-dot { display: inline-block; }
+
+  .more-menu-wrap { position: relative; }
+  .more-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    min-width: 196px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 40;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  }
+  .more-menu.open { display: flex; }
+  #studio .more-menu .more-menu-item {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .more-menu-sep { height: 1px; background: var(--border-subtle); margin: 2px 4px; }
+
+  .gold-bar {
+    background: var(--bg-header);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .gold-input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: 120px;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1 1 96px;
+    padding: 6px 8px;
+  }
+  .char-select {
+    min-width: 0;
+    flex: 1 1 200px;
+    max-width: 100%;
+  }
+  .empty-state {
+    grid-column: 1 / -1;
+    background: var(--bg-header);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
   @media (max-width: 639px) {
     #studio .studio-header { padding: 10px 12px; gap: 8px; }
     #studio .studio-container { padding: 12px; }
@@ -560,15 +730,46 @@
     #studio .mode-btn, #studio .studio-header .btn, #studio #btn-select-save-file, #studio #btn-quick-open-db {
       padding: 0 12px; font-size: 14px;
     }
+    .loaded-file-bar, .quick-actions-bar { padding: 10px 12px; gap: 10px; }
+    .loaded-file-actions { width: 100%; justify-content: flex-start; margin-left: 0; }
+    .gold-bar { width: 100%; }
+    #studio .section-panel .btn-sm,
+    #studio #save-editor-screen .btn-sm,
+    #studio #db-modder-screen .btn-sm,
+    #studio .tab-btn,
+    #studio .revert-btn,
+    #studio .change-pill {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    .studio-codec-tag { padding: 6px 10px; }
   }
 
   /* Workbench Section Tabs */
   .nav-tabs {
     display: flex;
     flex-wrap: wrap;
+    align-items: stretch;
     gap: 4px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0;
+  }
+  .tab-divider {
+    width: 1px;
+    align-self: stretch;
+    margin: 6px 4px 6px auto;
+    background: var(--border-color);
+    flex: none;
+  }
+  @media (max-width: 1023px) {
+    .nav-tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      max-width: 100%;
+    }
+    .tab-divider { margin-left: 4px; }
   }
   .tab-btn {
     padding: 9px 12px;
@@ -584,6 +785,7 @@
     border-bottom: 2px solid transparent;
     transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .tab-btn:hover { color: var(--text-primary); background: rgba(201, 164, 90, 0.06); }
   .tab-btn.active {
@@ -629,7 +831,7 @@
     font-family: var(--font-mono);
     letter-spacing: 0.02em;
   }
-  .stat-desc { font-size: 0.74rem; color: var(--text-secondary); }
+  .stat-desc { font-size: 0.78rem; color: var(--text-secondary); }
   .stat-input {
     flex: 1;
     width: 100%;
@@ -815,7 +1017,7 @@
     font-weight: 700;
   }
   .db-row-id {
-    font-size: 0.74rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
     font-family: var(--font-mono);
     min-width: 30px;
@@ -1006,7 +1208,7 @@
     justify-content: space-between;
     gap: 2px 6px;
     width: 100%;
-    font-size: 0.74rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
   }
 
@@ -1020,11 +1222,54 @@
     color: var(--text-secondary);
   }
 
-  /* Toast scoped inside #studio */
+  /* Confirm Modal & Toast scoped inside #studio */
+  .confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 7, 5, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 1200;
+  }
+  .confirm-dialog {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-card);
+    border: 1px solid var(--accent-sand);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+  }
+  .confirm-dialog h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .confirm-dialog p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  .confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
   .toast {
     position: fixed;
     bottom: 24px;
     right: 24px;
+    max-width: calc(100vw - 32px);
     background: var(--bg-elevated);
     color: var(--text-primary);
     border: 1px solid var(--accent-sand);
@@ -1037,8 +1282,36 @@
     transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 1100;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow-wrap: anywhere;
   }
-  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .toast-undo {
+    background: var(--bg-card);
+    color: #f3d284;
+    border: 1px solid #8a6c2d;
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 30px;
+    flex-shrink: 0;
+  }
+  @media (max-width: 639px) {
+    .toast {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      max-width: none;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      word-break: break-word;
+    }
+  }
+  .toast-undo:hover { background: #3a341e; border-color: var(--accent-amber); }
   .toast.success { border-color: var(--accent-sage-bright); background: var(--accent-sage-bg); color: var(--text-primary); }
   .toast.warn { border-color: var(--accent-amber); background: var(--accent-amber-bg); }
   .toast.error, .toast.danger { border-color: var(--accent-terra); background: var(--accent-terra-bg); }
@@ -1050,7 +1323,7 @@
 <header class="nav">
   <a class="skip-link" href="#top">Skip to content</a>
   <div class="wrap nav__bar">
-    <a class="nav__logo" href="#top"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a>
+    <a class="nav__logo" href="#top"><span class="mark mark--initial" aria-hidden="true">U</span>Universal RPG Maker Save Editor</a>
     <nav class="nav__links" aria-label="Main">
       <div class="nav__item">
         <a class="nav__link" href="#studio">Workbench <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -1061,11 +1334,11 @@
           </div>
         </div>
       </div>
-      <div class="nav__item"><a class="nav__link" href="#studio" data-open-mode="save">Save Editor</a></div>
+      <div class="nav__item"><a class="nav__link" href="#studio" data-open-mode="save" aria-current="page">Save Editor</a></div>
       <div class="nav__item"><a class="nav__link" href="#studio" data-open-mode="db">Database Modder</a></div>
     </nav>
     <div class="nav__actions">
-      <a class="btn btn--primary" href="#studio" data-open-mode="save">Open save file</a>
+      <a class="btn btn--primary" id="nav-primary-cta" href="#studio" data-open-mode="save">Open save file</a>
     </div>
     <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
   </div>
@@ -1080,7 +1353,7 @@
         <p class="hero__lead">Edit 6 save formats (.rmmzsave, .rpgsave, .rvdata2, .rvdata, .rxdata, .sav) and 7 JSON database tables directly inside your browser.</p>
         <div class="btn-row"><a class="btn btn--primary" href="#studio" data-open-mode="save">Open save file</a><a class="btn btn--secondary" href="#studio" data-open-mode="db">Open database JSON</a></div>
       </div>
-      <div class="hero__window" data-fx="silk-folds" data-fx-seed="7" data-moment="cursor-spotlight" data-moment-opts='{"rest":[0.72,0.28],"radius":420}' data-visual role="img" aria-label="Save Studio workspace preview showing Save Editor and Database Modder modes">
+      <div class="hero__window" data-fx="silk-folds" data-fx-seed="7" data-moment="cursor-spotlight" data-moment-opts='{"rest":[0.72,0.28],"radius":420}' data-visual role="img" aria-label="Universal RPG Maker Save Editor workspace preview showing Save Editor and Database Modder modes">
         <div class="ly-piece ui d-win d-win--dark" aria-hidden="true">
           <div class="d-win__bar"><span class="d-win__dots"><i></i><i></i><i></i></span><span><b>savegame.rmmzsave</b> · MZ Archive</span><span class="sp"></span><span>Local Memory</span></div>
           <div class="d-win__body">
@@ -1120,8 +1393,8 @@
               </svg>
             </div>
             <div>
-              <div style="display:flex; align-items:center; flex-wrap:wrap;">
-                <span class="brand-title">Save &amp; DB Studio</span>
+              <div style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                <span class="brand-title">Universal RPG Maker Save Editor</span>
                 <span class="badge-offline">Local Memory Only</span>
               </div>
             </div>
@@ -1136,23 +1409,6 @@
             <button class="mode-btn" id="btn-mode-db" type="button">
               <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
               Database Modder
-            </button>
-          </div>
-
-          <!-- Save Editor Header Actions -->
-          <div style="display:flex; align-items:center; gap:8px;" id="header-save-actions">
-            <button class="btn btn-secondary btn-sm" id="btn-change-file" type="button">
-              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-              Open Save
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-clear-save" type="button" title="Close and clear current save file">
-              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              Clear File
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-revert-save" type="button" title="Revert all edits back to the original loaded save file">Revert All</button>
-            <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
-              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download Save
             </button>
           </div>
 
@@ -1185,24 +1441,25 @@
         <svg class="ico ico-xl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </div>
       <div style="font-size:1.125rem; font-weight:500; color:var(--text-primary); letter-spacing:-0.01em;">
-        Drop a save archive or JSON database table
+        <span class="drop-label-desktop">Drop a save archive or JSON database table</span>
+        <span class="drop-label-mobile">Choose a save archive or JSON database table</span>
       </div>
       <div style="color:#e2ddd6; font-size:0.9375rem; max-width:68ch; line-height:1.5;">
         Reads <code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>, and RPG Maker JSON tables inside local memory.
       </div>
       <input type="file" id="file-input" multiple style="display:none;">
       <div style="display:flex; gap:10px; margin-top:4px; flex-wrap:wrap; justify-content:center;">
-        <button class="btn btn-primary" type="button" id="btn-select-save-file">Select Save File</button>
-        <button class="btn btn-secondary" type="button" id="btn-quick-open-db">Open Database JSON</button>
+        <button class="btn btn-primary" type="button" id="btn-select-save-file">Open save file</button>
+        <button class="btn btn-secondary" type="button" id="btn-quick-open-db">Open database JSON</button>
       </div>
-      <div class="studio-codec-bar" aria-hidden="true">
+      <div class="studio-codec-bar" aria-label="Supported formats">
         <span class="studio-codec-tag">.rmmzsave</span>
         <span class="studio-codec-tag">.rpgsave</span>
         <span class="studio-codec-tag">.rvdata2</span>
+        <span class="studio-codec-tag">.rvdata</span>
         <span class="studio-codec-tag">.rxdata</span>
-        <span class="studio-codec-tag">Weapons.json</span>
-        <span class="studio-codec-tag">Items.json</span>
-        <span class="studio-codec-tag">Actors.json</span>
+        <span class="studio-codec-tag">.sav</span>
+        <span class="studio-codec-tag">+ JSON tables</span>
       </div>
     </div>
   </div>
@@ -1211,33 +1468,49 @@
   <!-- 2. GAME SAVE EDITOR SCREEN                                -->
   <!-- ========================================================= -->
   <div id="save-editor-screen" style="display:none; flex-direction:column; gap:16px; width:100%;">
-    <!-- Top Quick Bar -->
-    <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:12px 18px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <span style="font-weight:500; font-size:0.98rem; color:var(--text-primary); font-family:var(--font-mono);" id="label-filename">savegame.rpgsave</span>
+    <!-- Merged Loaded-File Bar -->
+    <div class="loaded-file-bar">
+      <div class="loaded-file-meta">
+        <span id="label-filename">savegame.rpgsave</span>
         <span class="meta-pill" id="label-format">FORMAT</span>
         <span class="meta-pill" id="label-size">0 KB</span>
-        <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage); cursor:pointer;" id="label-changes" title="Click to inspect changes" tabindex="0" role="button">0 CHANGES</span>
-        <button class="btn btn-secondary btn-sm" id="btn-export-json" type="button">Export JSON</button>
-        <button class="btn btn-secondary btn-sm" id="btn-backup-raw" type="button" title="Download original unmodified save file (.bak)">Backup (.bak)</button>
       </div>
-
-      <!-- Quick Gold Edit & Max Preset -->
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <div style="background:var(--bg-header); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:5px 12px; display:flex; align-items:center; gap:8px;">
-          <span style="font-weight:500; color:var(--accent-sand); font-size:0.8125rem; text-transform:uppercase; letter-spacing:0.03em;">Gold</span>
-          <input type="number" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-family:var(--font-mono); font-size:0.9rem; font-weight:500; width:115px; padding:4px 8px;" id="quick-gold-input" value="0" aria-label="Party Gold">
-          <button class="revert-btn" id="gold-revert-btn" title="Revert Gold to original value" type="button">Revert</button>
-          <button class="btn btn-secondary btn-sm" id="btn-gold-add-10k" type="button">+10K</button>
-          <button class="btn btn-secondary btn-sm" id="btn-gold-add-100k" type="button">+100K</button>
-          <button class="btn btn-gold btn-sm" id="btn-gold-max" type="button">Max 9.9M</button>
-        </div>
-        <button class="btn btn-secret btn-sm" id="btn-secret-godmode" type="button" title="Max Gold (9.9M), Full HP/MP, All Stats 9999, and 99x Owned Items (Shortcut: Ctrl+Shift+G)">
-          Max All Party &amp; Inventory
+      <div class="loaded-file-actions">
+        <button class="change-pill" id="label-changes" title="Click to inspect changes" type="button" aria-expanded="false">0 CHANGES</button>
+        <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
+          <span class="unsaved-dot" aria-hidden="true"></span>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download save
         </button>
+        <div class="more-menu-wrap">
+          <button class="btn btn-secondary btn-sm" id="btn-more-actions" type="button" aria-haspopup="menu" aria-expanded="false">More &#9662;</button>
+          <div class="more-menu" id="more-actions-menu" role="menu">
+            <button class="btn btn-secondary btn-sm more-menu-item" id="btn-export-json" type="button" role="menuitem">Export JSON</button>
+            <button class="btn btn-secondary btn-sm more-menu-item" id="btn-backup-raw" type="button" role="menuitem" title="Download original unmodified save file (.bak)">Backup (.bak)</button>
+            <button class="btn btn-secondary btn-sm more-menu-item" id="btn-change-file" type="button" role="menuitem">Open another file</button>
+            <div class="more-menu-sep" role="separator"></div>
+            <button class="btn btn-warn btn-sm more-menu-item" id="btn-revert-save" type="button" role="menuitem" title="Revert all edits back to the original loaded save file">Revert All</button>
+            <button class="btn btn-danger btn-sm more-menu-item" id="btn-clear-save" type="button" role="menuitem" title="Close and clear current save file">Clear file</button>
+          </div>
+        </div>
       </div>
     </div>
     <div id="save-changes-drawer" style="display:none; background:var(--bg-card); border:1px solid var(--accent-sage); border-radius:var(--radius-md); padding:10px 14px; flex-wrap:wrap; align-items:center; gap:6px;"></div>
+
+    <!-- Quick Gold Edit & Max Preset -->
+    <div class="quick-actions-bar">
+      <div class="gold-bar">
+        <span style="font-weight:500; color:var(--accent-sand); font-size:0.8125rem; text-transform:uppercase; letter-spacing:0.03em;">Gold</span>
+        <input type="number" class="gold-input" id="quick-gold-input" value="0" aria-label="Party Gold">
+        <button class="revert-btn" id="gold-revert-btn" title="Revert Gold to original value" type="button">Revert</button>
+        <button class="btn btn-secondary btn-sm" id="btn-gold-add-10k" type="button">+10K</button>
+        <button class="btn btn-secondary btn-sm" id="btn-gold-add-100k" type="button">+100K</button>
+        <button class="btn btn-warn btn-sm" id="btn-gold-max" type="button">Max 9.9M</button>
+      </div>
+      <button class="btn btn-warn btn-sm" id="btn-secret-godmode" type="button" title="Max Gold (9.9M), Full HP/MP, All Stats 9999, and 99x Owned Items (Shortcut: Ctrl+Shift+G)">
+        Max All Party &amp; Inventory
+      </button>
+    </div>
 
     <!-- Navigation Tabs -->
     <div class="nav-tabs" id="main-nav-tabs" role="group" aria-label="Save Editor Sections">
@@ -1247,6 +1520,7 @@
       <button class="tab-btn" data-tab="tab-armors" type="button">Armors <span class="tab-badge" id="badge-armor-count">0</span></button>
       <button class="tab-btn" data-tab="tab-variables" type="button">Variables <span class="tab-badge" id="badge-var-count">0</span></button>
       <button class="tab-btn" data-tab="tab-switches" type="button">Switches <span class="tab-badge" id="badge-switch-count">0</span></button>
+      <span class="tab-divider" aria-hidden="true"></span>
       <button class="tab-btn" data-tab="tab-datafiles" type="button">Data Files (.json)</button>
       <button class="tab-btn" data-tab="tab-raw" type="button">Raw Tree</button>
     </div>
@@ -1255,11 +1529,11 @@
     <div class="section-panel active" id="tab-characters">
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--bg-card); padding:12px 16px; border-radius:var(--radius-md); border:1px solid var(--border-color);">
         <label for="char-dropdown" style="font-weight:600; color:var(--text-secondary); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.03em;">Character</label>
-        <select class="char-select" id="char-dropdown" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.88rem; font-weight:500; min-width:250px;"></select>
+        <select class="char-select" id="char-dropdown" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.88rem; font-weight:500;"></select>
         <div style="display:flex; gap:8px; margin-left:auto; flex-wrap:wrap;">
           <button class="btn btn-secondary btn-sm" id="btn-char-cure-states" type="button" title="Clear poison, death, and negative status effects">Cure States</button>
           <button class="btn btn-secondary btn-sm" id="btn-char-full-heal" type="button">Full Restore (HP/MP)</button>
-          <button class="btn btn-gold btn-sm" id="btn-char-max-stats" type="button">Max All Stats (9999)</button>
+          <button class="btn btn-warn btn-sm" id="btn-char-max-stats" type="button">Max All Stats (9999)</button>
         </div>
       </div>
       <div id="qol-system-bar" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px;"></div>
@@ -1270,16 +1544,16 @@
     <!-- TAB 2: INVENTORY -->
     <div class="section-panel" id="tab-inventory">
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
-        <div style="flex:1; min-width:220px;">
-          <input type="text" id="inventory-search" placeholder="Filter by item ID or name..." style="width:100%; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <div style="flex:1 1 200px; min-width:0;">
+          <input type="text" id="inventory-search" placeholder="Filter by item ID or name..." style="width:100%; min-width:0; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         </div>
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
             <input type="checkbox" id="inventory-owned-only" checked> Owned only (&gt;0)
           </label>
-          <select id="inventory-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <select id="inventory-picker-select" style="display:none; height:34px; line-height:1.2; min-width:0; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-items-set-all-99" type="button">Set All Owned to 99</button>
-          <button class="btn btn-gold btn-sm" id="btn-items-unlock-safe" type="button" title="Grant all regular items from Items.json while skipping Key Items (itypeId=2) to protect story quests">Add All Regular Items</button>
+          <button class="btn btn-warn btn-sm" id="btn-items-unlock-safe" type="button" title="Grant all regular items from Items.json while skipping Key Items (itypeId=2) to protect story quests">Add All Regular Items</button>
           <input type="number" id="inventory-add-id" placeholder="ID" min="1" aria-label="Item ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <input type="number" id="inventory-add-qty" value="99" min="1" title="Quantity" aria-label="Item quantity to add" style="width:64px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-item-dialog" type="button">+ Add Item</button>
@@ -1291,14 +1565,14 @@
     <!-- TAB 3: WEAPONS -->
     <div class="section-panel" id="tab-weapons">
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
-        <input type="text" id="weapons-search" placeholder="Filter by weapon ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <input type="text" id="weapons-search" placeholder="Filter by weapon ID or name..." style="flex:1 1 200px; min-width:0; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
             <input type="checkbox" id="weapons-owned-only" checked> Owned only (&gt;0)
           </label>
-          <select id="weapons-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <select id="weapons-picker-select" style="display:none; height:34px; line-height:1.2; min-width:0; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-weapons-set-all-99" type="button">Set Owned to 99</button>
-          <button class="btn btn-gold btn-sm" id="btn-weapons-unlock-all" type="button">Grant All DB Weapons</button>
+          <button class="btn btn-warn btn-sm" id="btn-weapons-unlock-all" type="button">Grant All DB Weapons</button>
           <input type="number" id="weapons-add-id" placeholder="ID" min="1" aria-label="Weapon ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-weapon-dialog" type="button">+ Add Weapon</button>
         </div>
@@ -1309,14 +1583,14 @@
     <!-- TAB 4: ARMORS -->
     <div class="section-panel" id="tab-armors">
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
-        <input type="text" id="armors-search" placeholder="Filter by armor ID or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <input type="text" id="armors-search" placeholder="Filter by armor ID or name..." style="flex:1 1 200px; min-width:0; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
             <input type="checkbox" id="armors-owned-only" checked> Owned only (&gt;0)
           </label>
-          <select id="armors-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
+          <select id="armors-picker-select" style="display:none; height:34px; line-height:1.2; min-width:0; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-armors-set-all-99" type="button">Set Owned to 99</button>
-          <button class="btn btn-gold btn-sm" id="btn-armors-unlock-all" type="button">Grant All DB Armors</button>
+          <button class="btn btn-warn btn-sm" id="btn-armors-unlock-all" type="button">Grant All DB Armors</button>
           <input type="number" id="armors-add-id" placeholder="ID" min="1" aria-label="Armor ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-armor-dialog" type="button">+ Add Armor</button>
         </div>
@@ -1327,7 +1601,7 @@
     <!-- TAB 5: VARIABLES -->
     <div class="section-panel" id="tab-variables">
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
-        <input type="text" id="variables-search" placeholder="Filter by variable ID (#1-9999), name, or value..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <input type="text" id="variables-search" placeholder="Filter by variable ID (#1-9999), name, or value..." style="flex:1 1 200px; min-width:0; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <label style="font-size:0.82rem; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px;">
             <input type="checkbox" id="vars-nonzero-only" checked> Non-zero only
@@ -1344,7 +1618,7 @@
     <!-- TAB 6: SWITCHES -->
     <div class="section-panel" id="tab-switches">
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px 16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px;">
-        <input type="text" id="switches-search" placeholder="Filter by switch ID (#1-9999) or name..." style="flex:1; min-width:220px; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+        <input type="text" id="switches-search" placeholder="Filter by switch ID (#1-9999) or name..." style="flex:1 1 200px; min-width:0; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <select id="switches-filter" style="padding:6px 12px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
           <option value="all">All Switches</option>
           <option value="on">ON Only</option>
@@ -1379,12 +1653,12 @@
 
     <!-- TAB 8: RAW TREE -->
     <div class="section-panel" id="tab-raw">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; gap:10px; align-items:center;">
-        <input type="text" id="raw-search-input" placeholder="Search property path or value..." style="flex:1; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <input type="text" id="raw-search-input" placeholder="Search property path or value..." style="flex:1 1 180px; min-width:0; padding:7px 11px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.84rem;">
         <span id="raw-showing-label" class="meta-pill">0 entries</span>
       </div>
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+      <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); overflow-x:auto; max-width:100%;">
+        <table style="width:100%; min-width:560px; border-collapse:collapse; font-size:0.82rem;">
           <thead>
             <tr style="background:var(--bg-header); text-align:left; color:var(--text-secondary); border-bottom:1px solid var(--border-color);">
               <th style="padding:10px 14px; width:35%;">Property Path</th>
@@ -1425,7 +1699,7 @@
       <button class="db-cat-btn active" data-cat="weapons" id="slot-btn-weapons" type="button">
         <div class="db-slot-top">
           <span>Weapons</span>
-          <span id="db-slot-file-weapons" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Weapons.json</span>
+          <span id="db-slot-file-weapons" style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-secondary);">Weapons.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-weapons">Not loaded</span>
@@ -1436,7 +1710,7 @@
       <button class="db-cat-btn" data-cat="armors" id="slot-btn-armors" type="button">
         <div class="db-slot-top">
           <span>Armors</span>
-          <span id="db-slot-file-armors" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Armors.json</span>
+          <span id="db-slot-file-armors" style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-secondary);">Armors.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-armors">Not loaded</span>
@@ -1447,7 +1721,7 @@
       <button class="db-cat-btn" data-cat="items" id="slot-btn-items" type="button">
         <div class="db-slot-top">
           <span>Items</span>
-          <span id="db-slot-file-items" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Items.json</span>
+          <span id="db-slot-file-items" style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-secondary);">Items.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-items">Not loaded</span>
@@ -1458,7 +1732,7 @@
       <button class="db-cat-btn" data-cat="skills" id="slot-btn-skills" type="button">
         <div class="db-slot-top">
           <span>Skills</span>
-          <span id="db-slot-file-skills" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Skills.json</span>
+          <span id="db-slot-file-skills" style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-secondary);">Skills.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-skills">Not loaded</span>
@@ -1469,7 +1743,7 @@
       <button class="db-cat-btn" data-cat="enemies" id="slot-btn-enemies" type="button">
         <div class="db-slot-top">
           <span>Enemies</span>
-          <span id="db-slot-file-enemies" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Enemies.json</span>
+          <span id="db-slot-file-enemies" style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-secondary);">Enemies.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-enemies">Not loaded</span>
@@ -1480,7 +1754,7 @@
       <button class="db-cat-btn" data-cat="classes" id="slot-btn-classes" type="button">
         <div class="db-slot-top">
           <span>Classes</span>
-          <span id="db-slot-file-classes" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Classes.json</span>
+          <span id="db-slot-file-classes" style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-secondary);">Classes.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-classes">Not loaded</span>
@@ -1491,7 +1765,7 @@
       <button class="db-cat-btn" data-cat="actors" id="slot-btn-actors" type="button">
         <div class="db-slot-top">
           <span>Actors</span>
-          <span id="db-slot-file-actors" style="font-size:0.72rem; font-family:var(--font-mono); color:var(--text-secondary);">Actors.json</span>
+          <span id="db-slot-file-actors" style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-secondary);">Actors.json</span>
         </div>
         <div class="db-slot-sub">
           <span id="db-slot-status-actors">Not loaded</span>
@@ -1546,6 +1820,16 @@
 
         </div>
       </div>
+      <div id="studio-confirm-modal" class="confirm-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-msg">
+        <div class="confirm-dialog">
+          <h3 id="confirm-modal-title">Confirm Action</h3>
+          <p id="confirm-modal-msg"></p>
+          <div class="confirm-actions">
+            <button class="btn btn-secondary btn-sm" id="btn-confirm-cancel" type="button">Cancel</button>
+            <button class="btn btn-danger btn-sm" id="btn-confirm-ok" type="button">Confirm</button>
+          </div>
+        </div>
+      </div>
       <div class="toast" id="toast" role="status" aria-live="polite">Notification</div>
     </div>
   </section>
@@ -1553,11 +1837,8 @@
 
 <footer class="footer closing footer--dark" aria-labelledby="close-h">
   <div class="wrap">
-    <div class="closing__cta close--word">
-      <div class="section-head section-head--split">
-        <h2 id="close-h">Open a save file now.</h2>
-        <a class="btn btn--primary" href="#studio" data-open-mode="save">Open save file</a>
-      </div>
+    <div class="closing__cta">
+      <h2 id="close-h" class="t-h3">100% local RPG Maker save &amp; database editing</h2>
       <p class="hero__lead closing__lead">Switch directly between the Save Editor and Database Modder inside this browser tab with zero remote uploads.</p>
       <dl class="hero__facts closing__facts">
         <div><dt>Save formats</dt><dd>MZ, MV, VX Ace, VX, XP, Naninovel</dd></div>
@@ -1565,15 +1846,13 @@
         <div><dt>Safety controls</dt><dd>Per-field revert and raw .bak</dd></div>
         <div><dt>Execution</dt><dd>100% offline browser memory</dd></div>
       </dl>
-      <div class="close__word" aria-hidden="true">SaveStudio</div>
     </div>
     <div class="closing__links">
       <div class="grid">
-        <div class="span-6 stack-5"><a class="footer__mark" href="#top"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a></div>
-        <div class="span-3 start-7 footer__col"><h3>Workspace</h3><ul><li><a href="#studio" data-open-mode="save">Save Editor</a></li><li><a href="#studio" data-open-mode="db">Database Modder</a></li></ul></div>
-        <div class="span-3 footer__col"><h3>Legal</h3><ul><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
+        <div class="span-6 stack-5"><a class="footer__mark" href="#top"><span class="mark mark--initial" aria-hidden="true">U</span>Universal RPG Maker Save Editor</a></div>
+        <div class="span-6 footer__col"><h3>Workspace</h3><ul><li><a href="#studio" data-open-mode="save">Save Editor</a></li><li><a href="#studio" data-open-mode="db">Database Modder</a></li></ul></div>
       </div>
-      <div class="footer__legal"><span>Save Studio local workbench</span><span><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></span></div>
+      <div class="footer__legal"><span>Universal RPG Maker Save Editor · Local workbench</span><span><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></span></div>
     </div>
   </div>
 </footer>
@@ -2273,25 +2552,13 @@ if (typeof module !== 'undefined') {
     document.documentElement.classList.add('m-enter');
     setTimeout(function() { document.documentElement.classList.add('m-enter-done'); }, 700);
   }
-  if (typeof IntersectionObserver !== 'undefined' && typeof document.querySelectorAll === 'function') {
-    var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav__links .nav__link[href^="#"]'));
-    var secTargets = navLinks.map(function(a) {
-      var id = a.getAttribute('href').slice(1);
-      return { link: a, el: document.getElementById(id) };
-    }).filter(function(item) { return !!item.el; });
-    if (secTargets.length) {
-      var navObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            secTargets.forEach(function(t) {
-              if (t.el === entry.target) t.link.setAttribute('aria-current', 'page');
-              else t.link.removeAttribute('aria-current');
-            });
-          }
-        });
-      }, { rootMargin: '-35% 0px -55% 0px', threshold: 0 });
-      secTargets.forEach(function(t) { navObserver.observe(t.el); });
-    }
+  function syncTopNavActive(mode) {
+    if (typeof document === 'undefined' || typeof document.querySelectorAll !== 'function') return;
+    const targetAttr = mode === 'database' ? 'db' : 'save';
+    Array.prototype.forEach.call(document.querySelectorAll('.nav__links .nav__link'), function(a) {
+      if (a.getAttribute('data-open-mode') === targetAttr) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
   }
   // App Mode State: 'save' or 'database'
   let currentAppMode = 'save';
@@ -2337,7 +2604,6 @@ if (typeof module !== 'undefined') {
   // DOM Elements
   const btnModeSave = document.getElementById('btn-mode-save');
   const btnModeDb = document.getElementById('btn-mode-db');
-  const headerSaveActions = document.getElementById('header-save-actions');
   const headerDbActions = document.getElementById('header-db-actions');
   const appBadgeMode = document.getElementById('app-badge-mode');
 
@@ -2351,14 +2617,91 @@ if (typeof module !== 'undefined') {
   const labelChanges = document.getElementById('label-changes');
 
   let toastTimer = null;
-  function showToast(msg, type = 'info') {
+  function showToast(msg, type = 'info', undoFn = null) {
     const t = document.getElementById('toast');
     if (!t) return;
-    t.textContent = msg;
-    t.className = 'toast show ' + type;
     if (toastTimer) clearTimeout(toastTimer);
-    const duration = (type === 'danger' || type === 'error') ? 4500 : (type === 'warn' ? 3500 : 2600);
+    if (typeof undoFn === 'function' && typeof document.createElement === 'function') {
+      t.textContent = '';
+      const span = document.createElement('span');
+      span.textContent = msg;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toast-undo';
+      btn.textContent = 'Undo';
+      btn.onclick = () => {
+        if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+        t.className = 'toast';
+        undoFn();
+      };
+      t.appendChild(span);
+      t.appendChild(btn);
+    } else {
+      t.textContent = msg;
+    }
+    t.className = 'toast show ' + type;
+    const duration = undoFn ? 6000 : ((type === 'danger' || type === 'error') ? 4500 : (type === 'warn' ? 3500 : 2600));
     toastTimer = setTimeout(() => { t.className = 'toast'; toastTimer = null; }, duration);
+  }
+
+  function openConfirmDialog({ title, message, confirmLabel = 'Confirm', danger = true, onConfirm }) {
+    const modal = document.getElementById('studio-confirm-modal');
+    if (!modal || typeof document.addEventListener !== 'function') {
+      return typeof onConfirm === 'function' ? onConfirm() : undefined;
+    }
+    const titleEl = document.getElementById('confirm-modal-title');
+    const msgEl = document.getElementById('confirm-modal-msg');
+    const btnOk = document.getElementById('btn-confirm-ok');
+    const btnCancel = document.getElementById('btn-confirm-cancel');
+    const prevFocus = document.activeElement;
+
+    if (titleEl) titleEl.textContent = title || 'Confirm Action';
+    if (msgEl) msgEl.textContent = message || '';
+    if (btnOk) {
+      btnOk.textContent = confirmLabel;
+      btnOk.className = 'btn btn-sm ' + (danger ? 'btn-danger' : 'btn-warn');
+    }
+
+    modal.style.display = 'flex';
+    const close = (confirmed) => {
+      modal.style.display = 'none';
+      document.removeEventListener('keydown', onKey);
+      if (btnCancel) btnCancel.onclick = null;
+      if (btnOk) btnOk.onclick = null;
+      modal.onclick = null;
+      if (prevFocus && typeof prevFocus.focus === 'function') prevFocus.focus();
+      if (confirmed && typeof onConfirm === 'function') onConfirm();
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close(false);
+        return;
+      }
+      if (e.key === 'Tab') {
+        const focusables = modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (!focusables || focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (e.shiftKey) {
+          if (active === first || !modal.contains(active)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (active === last || !modal.contains(active)) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    if (btnCancel) btnCancel.onclick = () => close(false);
+    if (btnOk) btnOk.onclick = () => close(true);
+    modal.onclick = (e) => { if (e.target === modal) close(false); };
+    if (btnCancel && typeof btnCancel.focus === 'function') btnCancel.focus();
   }
 
   function formatBytes(b) {
@@ -2453,6 +2796,22 @@ if (typeof module !== 'undefined') {
     return partyObj[targetKey];
   }
 
+  function updateNavPrimaryCta() {
+    const navCta = document.getElementById('nav-primary-cta');
+    if (!navCta) return;
+    if (currentAppMode === 'database') {
+      const hasCurrentDb = Boolean(currentDb && currentDb.items && currentDb.items.length > 0);
+      navCta.textContent = hasCurrentDb ? 'Download .json' : 'Open database JSON';
+      navCta.setAttribute('data-action', hasCurrentDb ? 'download-db' : 'open-db');
+      navCta.setAttribute('data-open-mode', 'db');
+      return;
+    }
+    const hasSave = Boolean(currentFile && currentFile.parsedRoot);
+    navCta.textContent = hasSave ? 'Download save' : 'Open save file';
+    navCta.setAttribute('data-action', hasSave ? 'download' : 'open');
+    navCta.setAttribute('data-open-mode', 'save');
+  }
+
   function updateSaveHeaderButtons() {
     const hasSave = Boolean(currentFile && currentFile.parsedRoot);
     const ids = ['btn-clear-save', 'btn-revert-save', 'btn-review-download'];
@@ -2460,11 +2819,25 @@ if (typeof module !== 'undefined') {
       const el = document.getElementById(id);
       if (el) el.style.display = hasSave ? '' : 'none';
     });
+    updateNavPrimaryCta();
+  }
+
+  function updateDbHeaderButtons() {
+    const hasAnyDb = Object.keys(dbStore).some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
+    const hasCurrentDb = Boolean(currentDb && currentDb.items && currentDb.items.length > 0);
+    ['btn-clear-db-header', 'btn-db-download-all'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = hasAnyDb ? '' : 'none';
+    });
+    const dlBtn = document.getElementById('btn-db-download');
+    if (dlBtn) dlBtn.style.display = hasCurrentDb ? '' : 'none';
+    updateNavPrimaryCta();
   }
 
   // Switch App Modes
   function switchAppMode(mode) {
     currentAppMode = mode;
+    syncTopNavActive(mode);
     if (mode === 'save') {
       btnModeSave.className = 'mode-btn active';
       btnModeDb.className = 'mode-btn';
@@ -2472,8 +2845,7 @@ if (typeof module !== 'undefined') {
         appBadgeMode.textContent = 'SAVE EDITOR';
         appBadgeMode.className = 'badge-promax';
       }
-      headerSaveActions.style.display = 'flex';
-      headerDbActions.style.display = 'none';
+      if (headerDbActions) headerDbActions.style.display = 'none';
       updateSaveHeaderButtons();
       if (currentFile.parsedRoot) {
         uploadSection.style.display = 'none';
@@ -2491,8 +2863,7 @@ if (typeof module !== 'undefined') {
         appBadgeMode.textContent = 'DB MODDER';
         appBadgeMode.className = 'badge-promax';
       }
-      headerSaveActions.style.display = 'none';
-      headerDbActions.style.display = 'flex';
+      if (headerDbActions) headerDbActions.style.display = 'flex';
       uploadSection.style.display = 'none';
       saveEditorScreen.style.display = 'none';
       dbModderScreen.style.display = 'flex';
@@ -2502,16 +2873,62 @@ if (typeof module !== 'undefined') {
     }
   }
   updateSaveHeaderButtons();
+  updateDbHeaderButtons();
+  syncTopNavActive('save');
 
   btnModeSave.onclick = () => switchAppMode('save');
   btnModeDb.onclick = () => switchAppMode('database');
   if (typeof document.querySelectorAll === 'function') {
     Array.prototype.forEach.call(document.querySelectorAll('[data-open-mode]'), function(link) {
-      link.onclick = function() {
+      link.onclick = function(e) {
+        if (link.id === 'nav-primary-cta') {
+          if (currentAppMode === 'save' && currentFile && currentFile.parsedRoot) {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            downloadEditedSave();
+            return;
+          }
+          if (currentAppMode === 'database' && currentDb && currentDb.items && currentDb.items.length > 0) {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            downloadDatabaseFile();
+            return;
+          }
+        }
         var targetMode = link.getAttribute('data-open-mode');
         switchAppMode(targetMode === 'db' ? 'database' : 'save');
       };
     });
+  }
+  const btnMoreActions = document.getElementById('btn-more-actions');
+  const moreActionsMenu = document.getElementById('more-actions-menu');
+  function closeMoreActionsMenu() {
+    if (moreActionsMenu) moreActionsMenu.classList.remove('open');
+    if (btnMoreActions) btnMoreActions.setAttribute('aria-expanded', 'false');
+  }
+  if (btnMoreActions && moreActionsMenu) {
+    btnMoreActions.onclick = (e) => {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+      const willOpen = !moreActionsMenu.classList.contains('open');
+      moreActionsMenu.classList.toggle('open', willOpen);
+      btnMoreActions.setAttribute('aria-expanded', String(willOpen));
+    };
+    moreActionsMenu.onclick = (e) => {
+      if (e && e.target && e.target.tagName === 'BUTTON') closeMoreActionsMenu();
+    };
+    if (typeof document.addEventListener === 'function') {
+      document.addEventListener('click', (e) => {
+        if (!moreActionsMenu.classList.contains('open')) return;
+        const wrap = btnMoreActions.parentElement;
+        if (wrap && typeof wrap.contains === 'function' && !wrap.contains(e.target)) {
+          closeMoreActionsMenu();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && moreActionsMenu.classList.contains('open')) {
+          closeMoreActionsMenu();
+          if (typeof btnMoreActions.focus === 'function') btnMoreActions.focus();
+        }
+      });
+    }
   }
   const btnSelectSave = document.getElementById('btn-select-save-file');
   if (btnSelectSave) btnSelectSave.onclick = () => fileInput.click();
@@ -2803,26 +3220,8 @@ if (typeof module !== 'undefined') {
     return (saveChanges && saveChanges.size > 0) || hasUnsavedDbChanges();
   }
 
-  function confirmDiscardChanges(message) {
-    if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
-      return window.confirm(message);
-    }
-    return true;
-  }
-
-  function clearAllDatabaseFiles() {
+  function performClearAllDatabaseFiles() {
     const allCats = ['weapons', 'armors', 'items', 'skills', 'enemies', 'classes', 'actors'];
-    const loaded = allCats.some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
-    if (!loaded) {
-      showToast('No database files are currently loaded.', 'info');
-      return;
-    }
-    if (hasUnsavedDbChanges()) {
-      const modCount = allCats.reduce((sum, c) => sum + (dbStore[c] && dbStore[c].modifiedIds ? dbStore[c].modifiedIds.size : 0), 0);
-      if (!confirmDiscardChanges(`You have ${modCount} unsaved database modification(s). Clear all loaded database files anyway?`)) {
-        return;
-      }
-    }
     allCats.forEach(c => {
       dbStore[c] = null;
       if (gameData && gameData[c]) {
@@ -2837,6 +3236,25 @@ if (typeof module !== 'undefined') {
     renderDbMasterList();
     if (dbMultiFileInput) dbMultiFileInput.value = '';
     showToast('All database files cleared.', 'info');
+  }
+
+  function clearAllDatabaseFiles() {
+    const allCats = ['weapons', 'armors', 'items', 'skills', 'enemies', 'classes', 'actors'];
+    const loaded = allCats.some(c => dbStore[c] && dbStore[c].items && dbStore[c].items.length > 0);
+    if (!loaded) {
+      showToast('No database files are currently loaded.', 'info');
+      return;
+    }
+    const modCount = allCats.reduce((sum, c) => sum + (dbStore[c] && dbStore[c].modifiedIds ? dbStore[c].modifiedIds.size : 0), 0);
+    openConfirmDialog({
+      title: 'Clear all database files?',
+      message: modCount > 0
+        ? `You have ${modCount} unsaved database modification(s). Clear all loaded database files anyway?`
+        : 'Clear all loaded database files from browser memory?',
+      confirmLabel: 'Clear all',
+      danger: modCount > 0,
+      onConfirm: performClearAllDatabaseFiles
+    });
   }
 
   function updateDbSlotBadges() {
@@ -2874,6 +3292,7 @@ if (typeof module !== 'undefined') {
       modBadge.style.display = modCount > 0 ? 'inline-block' : 'none';
       modBadge.textContent = `${modCount} MODIFIED`;
     }
+    updateDbHeaderButtons();
   }
 
   function updateDbCategoryButtons(cat) {
@@ -2922,29 +3341,29 @@ if (typeof module !== 'undefined') {
       `;
     } else if (cat === 'items') {
       buttonsHtml += `
-        <button class="btn btn-primary btn-sm" id="btn-bulk-infinite-all" type="button">All Non-Consumable</button>
+        <button class="btn btn-warn btn-sm" id="btn-bulk-infinite-all" type="button">All Non-Consumable</button>
         <button class="btn btn-secondary btn-sm" id="btn-bulk-free-all" type="button">All Price 0</button>
         <button class="btn btn-secondary btn-sm" id="btn-bulk-zero-weight-all" type="button">All Zero Weight [0W]</button>
       `;
     } else if (cat === 'skills') {
       buttonsHtml += `
-        <button class="btn btn-primary btn-sm" id="btn-bulk-free-mp-all" type="button">All 0 MP/TP Cost</button>
+        <button class="btn btn-warn btn-sm" id="btn-bulk-free-mp-all" type="button">All 0 MP/TP Cost</button>
       `;
     } else if (cat === 'enemies') {
       buttonsHtml += `
         <button class="btn btn-gold btn-sm" id="btn-bulk-enemy-drops" type="button">All 100% Drop Rate</button>
-        <button class="btn btn-primary btn-sm" id="btn-bulk-enemy-rewards" type="button">All EXP/Gold x5</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-enemy-rewards" type="button">All EXP/Gold x5</button>
         <button class="btn btn-secondary btn-sm" id="btn-bulk-enemy-1hp" type="button">All 1 HP (Easy Win)</button>
       `;
     } else if (cat === 'classes') {
       buttonsHtml += `
         <button class="btn btn-gold btn-sm" id="btn-bulk-class-fast-exp" type="button">All Fast EXP Curve</button>
-        <button class="btn btn-primary btn-sm" id="btn-bulk-class-lv1-skills" type="button">All Skills at Lv 1</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-class-lv1-skills" type="button">All Skills at Lv 1</button>
       `;
     } else if (cat === 'actors') {
       buttonsHtml += `
         <button class="btn btn-gold btn-sm" id="btn-bulk-actor-maxlv" type="button">All Max Level 999</button>
-        <button class="btn btn-primary btn-sm" id="btn-bulk-actor-initlv" type="button">All Initial Level 99</button>
+        <button class="btn btn-secondary btn-sm" id="btn-bulk-actor-initlv" type="button">All Initial Level 99</button>
       `;
     }
     buttonsHtml += `
@@ -2957,36 +3376,44 @@ if (typeof module !== 'undefined') {
     const btnSecretDb = document.getElementById('btn-secret-db-god');
     if (btnSecretDb) {
       btnSecretDb.onclick = () => {
-        validItems.forEach(it => {
-          if (cat === 'weapons') {
-            if (!it.params) it.params = [0,0,0,0,0,0,0,0];
-            it.params[2] = 9999; it.params[4] = 9999;
-            if (it.price !== undefined) it.price = 0;
-          } else if (cat === 'armors') {
-            if (!it.params) it.params = [0,0,0,0,0,0,0,0];
-            it.params[3] = 9999; it.params[5] = 9999;
-            if (it.price !== undefined) it.price = 0;
-          } else if (cat === 'items') {
-            if (it.consumable !== undefined) it.consumable = false;
-            if (it.price !== undefined) it.price = 0;
-            zeroItemWeight(it);
-          } else if (cat === 'skills') {
-            if (it.mpCost !== undefined) it.mpCost = 0;
-            if (it.tpCost !== undefined) it.tpCost = 0;
-          } else if (cat === 'enemies') {
-            if (Array.isArray(it.dropItems)) it.dropItems.forEach(d => { if (d && d.kind > 0) d.denominator = 1; });
-            if (typeof it.exp === 'number') it.exp = Math.max(100, it.exp * 10);
-            if (typeof it.gold === 'number') it.gold = Math.max(100, it.gold * 10);
-          } else if (cat === 'classes') {
-            it.expParams = [10, 0, 0, 0];
-            if (Array.isArray(it.learnings)) it.learnings.forEach(l => { if (l) l.level = 1; });
-          } else if (cat === 'actors') {
-            it.maxLevel = 999;
-            it.initialLevel = 99;
+        openConfirmDialog({
+          title: 'Apply Max Table Preset?',
+          message: `Apply max parameters and zero cost across all ${validItems.length} entries in ${currentDb.fileName}?`,
+          confirmLabel: 'Apply preset',
+          danger: false,
+          onConfirm: () => {
+            validItems.forEach(it => {
+              if (cat === 'weapons') {
+                if (!it.params) it.params = [0,0,0,0,0,0,0,0];
+                it.params[2] = 9999; it.params[4] = 9999;
+                if (it.price !== undefined) it.price = 0;
+              } else if (cat === 'armors') {
+                if (!it.params) it.params = [0,0,0,0,0,0,0,0];
+                it.params[3] = 9999; it.params[5] = 9999;
+                if (it.price !== undefined) it.price = 0;
+              } else if (cat === 'items') {
+                if (it.consumable !== undefined) it.consumable = false;
+                if (it.price !== undefined) it.price = 0;
+                zeroItemWeight(it);
+              } else if (cat === 'skills') {
+                if (it.mpCost !== undefined) it.mpCost = 0;
+                if (it.tpCost !== undefined) it.tpCost = 0;
+              } else if (cat === 'enemies') {
+                if (Array.isArray(it.dropItems)) it.dropItems.forEach(d => { if (d && d.kind > 0) d.denominator = 1; });
+                if (typeof it.exp === 'number') it.exp = Math.max(100, it.exp * 10);
+                if (typeof it.gold === 'number') it.gold = Math.max(100, it.gold * 10);
+              } else if (cat === 'classes') {
+                it.expParams = [10, 0, 0, 0];
+                if (Array.isArray(it.learnings)) it.learnings.forEach(l => { if (l) l.level = 1; });
+              } else if (cat === 'actors') {
+                it.maxLevel = 999;
+                it.initialLevel = 99;
+              }
+              currentDb.modifiedIds.add(it.id);
+            });
+            finishBulkAction('Applied Max Table Preset to all entries.');
           }
-          currentDb.modifiedIds.add(it.id);
         });
-        finishBulkAction('Applied Max Table Preset to all entries.');
       };
     }
 
@@ -3120,24 +3547,43 @@ if (typeof module !== 'undefined') {
     if (btnBulkRev) {
       btnBulkRev.onclick = () => {
         if (!currentDb.origItemsJson) return;
-        currentDb.items = JSON.parse(currentDb.origItemsJson);
-        currentDb.modifiedIds.clear();
-        if (dbStore[cat]) {
-          dbStore[cat].items = currentDb.items;
-        }
-        if (gameData[cat]) {
-          syncGameDataFromArray(cat, currentDb.items);
-          renderDataFilesStatus();
-        }
-        updateDbSlotBadges();
-        renderDbBulkActions();
-        renderDbMasterList();
-        showToast('Reverted all entries in file to original state.', 'info');
+        openConfirmDialog({
+          title: 'Revert database file?',
+          message: `Restore all entries in ${currentDb.fileName} back to their originally loaded values?`,
+          confirmLabel: 'Revert file',
+          danger: true,
+          onConfirm: () => {
+            currentDb.items = JSON.parse(currentDb.origItemsJson);
+            currentDb.modifiedIds.clear();
+            if (dbStore[cat]) {
+              dbStore[cat].items = currentDb.items;
+            }
+            if (gameData[cat]) {
+              syncGameDataFromArray(cat, currentDb.items);
+              renderDataFilesStatus();
+            }
+            updateDbSlotBadges();
+            renderDbBulkActions();
+            renderDbMasterList();
+            showToast('Reverted all entries in file to original state.', 'info');
+          }
+        });
       };
     }
     const btnBulkClear = document.getElementById('btn-bulk-clear-file');
     if (btnBulkClear) {
-      btnBulkClear.onclick = () => clearDatabaseCategory(cat);
+      btnBulkClear.onclick = () => {
+        const modCount = currentDb.modifiedIds ? currentDb.modifiedIds.size : 0;
+        openConfirmDialog({
+          title: 'Clear database file?',
+          message: modCount > 0
+            ? `You have ${modCount} unsaved modification(s) in ${currentDb.fileName}. Clear this file anyway?`
+            : `Clear ${currentDb.fileName} from browser memory?`,
+          confirmLabel: 'Clear file',
+          danger: modCount > 0,
+          onConfirm: () => clearDatabaseCategory(cat)
+        });
+      };
     }
   }
 
@@ -3238,7 +3684,7 @@ if (typeof module !== 'undefined') {
           <span class="db-row-id">#${escapeHtml(item.id)}</span>
           <span class="db-row-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
         </div>
-        <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono); white-space:nowrap;">${escapeHtml(getQuickPreviewBadge(item))}</span>
+        <span style="font-size:0.78rem; color:var(--text-secondary); font-family:var(--font-mono); white-space:nowrap;">${escapeHtml(getQuickPreviewBadge(item))}</span>
       `;
 
       row.onclick = () => {
@@ -4068,6 +4514,11 @@ if (typeof module !== 'undefined') {
         resetSaveModified();
         setupVisualEditor();
         renderRawTable();
+        const studioEl = document.getElementById('studio');
+        if (studioEl && typeof studioEl.scrollIntoView === 'function') {
+          const reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          studioEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        }
         showToast(`Loaded ${file.name}`, 'success');
       } catch(err) {
         showToast(`Failed to parse ${file.name}: ${err.message}`, 'danger');
@@ -4195,12 +4646,21 @@ if (typeof module !== 'undefined') {
     }
     drawer.style.display = 'flex';
     const items = Array.from(saveChanges).map(c => `<span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage);">${escapeHtml(c)}</span>`).join('');
-    drawer.innerHTML = `<span style="font-size:0.76rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; margin-right:4px;">Modified:</span>${items}`;
+    drawer.innerHTML = `<span style="font-size:0.78rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; margin-right:4px;">Modified:</span>${items}<button type="button" class="btn btn-warn btn-sm" id="btn-drawer-revert-all" style="margin-left:auto;">Revert All</button>`;
+    const drawerRevBtn = document.getElementById('btn-drawer-revert-all');
+    if (drawerRevBtn) drawerRevBtn.onclick = revertAllSaveChanges;
   }
 
   function updateSaveChangesBadge() {
     const badge = document.getElementById('label-changes');
-    if (badge) badge.textContent = saveChanges.size + ' CHANGES';
+    if (badge) {
+      const count = saveChanges.size;
+      badge.textContent = count === 0 ? '0 CHANGES' : (count === 1 ? '1 change' : count + ' changes');
+      badge.classList.toggle('has-changes', count > 0);
+      badge.setAttribute('aria-expanded', String(Boolean(saveChangesDrawerOpen && count > 0)));
+    }
+    const dlBtn = document.getElementById('btn-review-download');
+    if (dlBtn) dlBtn.classList.toggle('has-unsaved', saveChanges.size > 0);
     renderSaveChangesDrawer();
   }
 
@@ -4253,7 +4713,7 @@ if (typeof module !== 'undefined') {
         ? `<span style="color:var(--accent-sage-bright); font-family:var(--font-mono); font-size:0.78rem;">${count} names</span>`
         : `<span style="color:var(--text-secondary); font-size:0.78rem;">Not loaded</span>`;
       const clearBtn = count > 0
-        ? `<button type="button" class="btn btn-secondary btn-sm btn-clear-ref" data-ref="${key}" style="padding:3px 8px; font-size:0.74rem;">Clear</button>`
+        ? `<button type="button" class="btn btn-secondary btn-sm btn-clear-ref" data-ref="${key}" style="padding:3px 8px; font-size:0.78rem;">Clear</button>`
         : '';
       return `
         <div style="background:var(--bg-header); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
@@ -4346,8 +4806,16 @@ if (typeof module !== 'undefined') {
       showToast('+100,000 Gold added.', 'success');
     };
     document.getElementById('btn-gold-max').onclick = () => {
+      const prevGold = (goldParty && goldKey) ? Number(goldParty[goldKey]) || 0 : (parseInt(goldInput.value, 10) || 0);
+      const hadGoldMod = saveChanges.has('Gold');
       applyGold(9999999, true);
-      showToast('Gold set to 9,999,999.', 'success');
+      showToast('Gold set to 9,999,999.', 'success', () => {
+        applyGold(prevGold, true);
+        if (!hadGoldMod && prevGold === originalGold) {
+          saveChanges.delete('Gold');
+          updateSaveChangesBadge();
+        }
+      });
     };
     if (revBtn) {
       revBtn.onclick = () => {
@@ -4401,10 +4869,19 @@ if (typeof module !== 'undefined') {
     }
 
     const btnSecretGod = document.getElementById('btn-secret-godmode');
+    const confirmGodMode = () => {
+      openConfirmDialog({
+        title: 'Max All Party & Inventory?',
+        message: 'Sets Gold to 9,999,999, all party members to Lv 99 with 9999 stats, and owned regular items, weapons, and armors to 99x.',
+        confirmLabel: 'Apply Max Preset',
+        danger: false,
+        onConfirm: triggerSuperGodMode
+      });
+    };
     if (btnSecretGod) {
-      btnSecretGod.onclick = triggerSuperGodMode;
+      btnSecretGod.onclick = confirmGodMode;
     }
-    currentGodModeHandler = triggerSuperGodMode;
+    currentGodModeHandler = confirmGodMode;
 
     document.getElementById('inventory-search').oninput = () => renderInventoryTab(adapt.party);
     document.getElementById('inventory-owned-only').onchange = () => renderInventoryTab(adapt.party);
@@ -4526,8 +5003,26 @@ if (typeof module !== 'undefined') {
     container.innerHTML = '';
     const skillsPanel = document.getElementById('char-skills-panel');
     if (skillsPanel) skillsPanel.innerHTML = '';
-    if (!actorsObj) {
+    const btnFullHeal = document.getElementById('btn-char-full-heal');
+    const btnCureStates = document.getElementById('btn-char-cure-states');
+    const btnMaxStats = document.getElementById('btn-char-max-stats');
+
+    const setEmptyCharState = () => {
       document.getElementById('badge-char-count').textContent = '0';
+      const emptyOpt = document.createElement('option');
+      emptyOpt.value = '';
+      emptyOpt.textContent = 'No party members';
+      charDropdown.appendChild(emptyOpt);
+      charDropdown.disabled = true;
+      [btnCureStates, btnFullHeal, btnMaxStats].forEach(b => {
+        if (b) { b.disabled = true; b.onclick = null; }
+      });
+      container.innerHTML = '<div class="empty-state">No party members in this save.</div>';
+      if (skillsPanel) skillsPanel.style.display = 'none';
+    };
+
+    if (!actorsObj) {
+      setEmptyCharState();
       return;
     }
 
@@ -4539,8 +5034,17 @@ if (typeof module !== 'undefined') {
       }
     });
 
+    if (validActors.length === 0) {
+      setEmptyCharState();
+      return;
+    }
+
     document.getElementById('badge-char-count').textContent = validActors.length;
-    if (validActors.length === 0) return;
+    charDropdown.disabled = false;
+    [btnCureStates, btnFullHeal, btnMaxStats].forEach(b => {
+      if (b) b.disabled = false;
+    });
+    if (skillsPanel) skillsPanel.style.display = '';
 
     validActors.forEach(item => {
       const opt = document.createElement('option');
@@ -4560,20 +5064,21 @@ if (typeof module !== 'undefined') {
     };
     renderCharacterStats(actorsData[activeCharacterIndex]);
 
-    document.getElementById('btn-char-full-heal').onclick = () => {
-      const actor = actorsData[activeCharacterIndex];
-      if (!actor) return;
-      if (actor._hp !== undefined) actor._hp = 9999;
-      if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
-      if (actor._mp !== undefined) actor._mp = 9999;
-      if (actor['@mp'] !== undefined) actor['@mp'] = 9999;
-      if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
-      renderCharacterStats(actor);
-      markSaveModified('Full Heal');
-      showToast('Full HP/MP restore applied.', 'success');
-    };
+    if (btnFullHeal) {
+      btnFullHeal.onclick = () => {
+        const actor = actorsData[activeCharacterIndex];
+        if (!actor) return;
+        if (actor._hp !== undefined) actor._hp = 9999;
+        if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
+        if (actor._mp !== undefined) actor._mp = 9999;
+        if (actor['@mp'] !== undefined) actor['@mp'] = 9999;
+        if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
+        renderCharacterStats(actor);
+        markSaveModified('Full Heal');
+        showToast('Full HP/MP restore applied.', 'success');
+      };
+    }
 
-    const btnCureStates = document.getElementById('btn-char-cure-states');
     if (btnCureStates) {
       btnCureStates.onclick = () => {
         const actor = actorsData[activeCharacterIndex];
@@ -4589,29 +5094,66 @@ if (typeof module !== 'undefined') {
       };
     }
 
-    document.getElementById('btn-char-max-stats').onclick = () => {
-      const actor = actorsData[activeCharacterIndex];
-      if (!actor) return;
-      if (actor._level !== undefined) actor._level = 99;
-      if (actor['@level'] !== undefined) actor['@level'] = 99;
-      if (getActorExp(actor) < 999999) setActorExp(actor, 9999999);
-      if (actor._hp !== undefined) actor._hp = 9999;
-      if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
-      if (actor._mp !== undefined) actor._mp = 9999;
-      if (actor['@mp'] !== undefined) actor['@mp'] = 9999;
-      if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
-      const paramPlus = actor._paramPlus || actor['@param_plus'];
-      if (paramPlus) {
-        const p = getJsonExArray(paramPlus);
-        for (let i = 0; i < 8; i++) p[i] = 9999;
-      }
-      ['@maxhp_plus', '@maxsp_plus', '@str_plus', '@dex_plus', '@agi_plus', '@int_plus'].forEach(k => {
-        if (actor[k] !== undefined) actor[k] = 9999;
-      });
-      renderCharacterStats(actor);
-      markSaveModified('Max Stats');
-      showToast('All character stats and bonuses set to 9999.', 'success');
-    };
+    if (btnMaxStats) {
+      btnMaxStats.onclick = () => {
+        const actor = actorsData[activeCharacterIndex];
+        if (!actor) return;
+        const paramPlus = actor._paramPlus || actor['@param_plus'];
+        const pArr = paramPlus ? getJsonExArray(paramPlus) : null;
+        const prev = {
+          level: actor._level,
+          rubyLevel: actor['@level'],
+          exp: getActorExp(actor),
+          hp: actor._hp,
+          rubyHp: actor['@hp'],
+          mp: actor._mp,
+          rubyMp: actor['@mp'],
+          sp: actor['@sp'],
+          paramPlus: pArr ? pArr.slice() : null,
+          plusProps: {}
+        };
+        ['@maxhp_plus', '@maxsp_plus', '@str_plus', '@dex_plus', '@agi_plus', '@int_plus'].forEach(k => {
+          if (actor[k] !== undefined) prev.plusProps[k] = actor[k];
+        });
+        const hadMaxMod = saveChanges.has('Max Stats');
+
+        if (actor._level !== undefined) actor._level = 99;
+        if (actor['@level'] !== undefined) actor['@level'] = 99;
+        if (getActorExp(actor) < 999999) setActorExp(actor, 9999999);
+        if (actor._hp !== undefined) actor._hp = 9999;
+        if (actor['@hp'] !== undefined) actor['@hp'] = 9999;
+        if (actor._mp !== undefined) actor._mp = 9999;
+        if (actor['@mp'] !== undefined) actor['@mp'] = 9999;
+        if (actor['@sp'] !== undefined) actor['@sp'] = 9999;
+        if (pArr) {
+          for (let i = 0; i < 8; i++) pArr[i] = 9999;
+        }
+        Object.keys(prev.plusProps).forEach(k => {
+          actor[k] = 9999;
+        });
+        renderCharacterStats(actor);
+        markSaveModified('Max Stats');
+        showToast('All character stats and bonuses set to 9999.', 'success', () => {
+          if (prev.level !== undefined) actor._level = prev.level;
+          if (prev.rubyLevel !== undefined) actor['@level'] = prev.rubyLevel;
+          setActorExp(actor, prev.exp);
+          if (prev.hp !== undefined) actor._hp = prev.hp;
+          if (prev.rubyHp !== undefined) actor['@hp'] = prev.rubyHp;
+          if (prev.mp !== undefined) actor._mp = prev.mp;
+          if (prev.rubyMp !== undefined) actor['@mp'] = prev.rubyMp;
+          if (prev.sp !== undefined) actor['@sp'] = prev.sp;
+          if (pArr && prev.paramPlus) {
+            for (let i = 0; i < prev.paramPlus.length; i++) pArr[i] = prev.paramPlus[i];
+          }
+          Object.keys(prev.plusProps).forEach(k => { actor[k] = prev.plusProps[k]; });
+          if (!hadMaxMod) {
+            saveChanges.delete('Max Stats');
+            updateSaveChangesBadge();
+          }
+          renderCharacterStats(actor);
+        });
+      };
+    }
   }
 
   function getActorExp(actor) {
@@ -5497,10 +6039,10 @@ if (typeof module !== 'undefined') {
     if (!meta || (!meta.badgeText && !meta.cleanDesc)) return '';
     const color = meta.isDummy ? 'var(--accent-amber)' : 'var(--accent-sage-bright)';
     const badge = meta.badgeText
-      ? `<div style="font-size:0.72rem; color:${color}; font-family:var(--font-mono); font-weight:600; line-height:1.35;">${escapeHtml(meta.badgeText)}</div>`
+      ? `<div style="font-size:0.78rem; color:${color}; font-family:var(--font-mono); font-weight:600; line-height:1.35;">${escapeHtml(meta.badgeText)}</div>`
       : '';
     const descPreview = meta.cleanDesc
-      ? `<div style="font-size:0.72rem; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(meta.cleanDesc)}">${escapeHtml(meta.cleanDesc)}</div>`
+      ? `<div style="font-size:0.78rem; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(meta.cleanDesc)}">${escapeHtml(meta.cleanDesc)}</div>`
       : '';
     return badge + descPreview;
   }
@@ -5528,7 +6070,7 @@ if (typeof module !== 'undefined') {
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <span style="font-weight:600; font-size:0.86rem; color:var(--text-primary);" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
-        <span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#${escapeHtml(id)}</span>
+        <span style="font-size:0.78rem; color:var(--text-secondary); font-family:var(--font-mono);">#${escapeHtml(id)}</span>
       </div>
       ${renderBagCardMetaHtml(meta)}
       <div style="display:flex; align-items:center; gap:4px;">
@@ -5643,14 +6185,24 @@ if (typeof module !== 'undefined') {
     const ownedEl = document.getElementById(cfg.ownedOnlyId);
     const ownedOnly = ownedEl ? ownedEl.checked : false;
 
+    let renderedBagCount = 0;
     ids.forEach(id => {
       const count = bagObj[id];
       if (ownedOnly && count <= 0) return;
       const name = dict[id] || `${cfg.labelSingular} #${id}`;
       const meta = metaMap ? metaMap[id] : null;
       if (q && !id.includes(q) && !name.toLowerCase().includes(q) && !(meta && meta.searchBlob.includes(q))) return;
+      renderedBagCount++;
       appendBagEntityCard(container, bagObj, id, count, name, meta, cfg.labelSingular + ' #');
     });
+    if (renderedBagCount === 0) {
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'empty-state';
+      emptyEl.textContent = ids.length === 0
+        ? `No ${cfg.labelLower} in this save.`
+        : `No matching ${cfg.labelLower}. Try clearing filters or unchecking 'Owned only'.`;
+      container.appendChild(emptyEl);
+    }
   }
 
   function renderInventoryTab(partyObj) {
@@ -5719,12 +6271,12 @@ if (typeof module !== 'undefined') {
       if (rendered >= varsRenderLimit) continue;
       rendered++;
 
-      const diffSub = compareBaseline ? ` <span style="color:var(--accent-sand); font-size:0.72rem;">(Was: ${escapeHtml(String(baseVal ?? 0))})</span>` : '';
-      const hintSub = hasAsciiHint ? `<div style="font-size:0.72rem; color:var(--accent-sage-bright);">${escapeHtml(enHint)}</div>` : '';
+      const diffSub = compareBaseline ? ` <span style="color:var(--accent-sand); font-size:0.78rem;">(Was: ${escapeHtml(String(baseVal ?? 0))})</span>` : '';
+      const hintSub = hasAsciiHint ? `<div style="font-size:0.78rem; color:var(--accent-sage-bright);">${escapeHtml(enHint)}</div>` : '';
       const card = document.createElement('div');
       card.className = 'item-card';
       card.innerHTML = `
-        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="${escapeHtml(vName)}">${escapeHtml(vName)}${diffSub}</span><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono);">#${escapeHtml(id)}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-primary); font-weight:600;" title="${escapeHtml(vName)}">${escapeHtml(vName)}${diffSub}</span><span style="font-size:0.78rem; color:var(--text-secondary); font-family:var(--font-mono);">#${escapeHtml(id)}</span></div>
         ${hintSub}
         <input type="text" class="stat-input" value="${escapeHtml(val ?? 0)}" style="padding:5px 8px;">
       `;
@@ -5758,6 +6310,14 @@ if (typeof module !== 'undefined') {
       }
     }
     document.getElementById('badge-var-count').textContent = count;
+    if (count === 0) {
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'empty-state';
+      emptyEl.textContent = varsArr.length <= 1
+        ? 'No variables in this save.'
+        : "No matching variables. Try clearing your search or unchecking 'Non-zero only'.";
+      container.appendChild(emptyEl);
+    }
   }
 
   function renderSwitchesTab(swObj) {
@@ -5792,11 +6352,11 @@ if (typeof module !== 'undefined') {
       if (rendered >= switchesRenderLimit) continue;
       rendered++;
 
-      const hintSub = hasAsciiHint ? `<div style="font-size:0.72rem; color:var(--accent-sage-bright);">${escapeHtml(enHint)}</div>` : '';
+      const hintSub = hasAsciiHint ? `<div style="font-size:0.78rem; color:var(--accent-sage-bright);">${escapeHtml(enHint)}</div>` : '';
       const card = document.createElement('div');
       card.style.cssText = 'background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:8px;';
       card.innerHTML = `
-        <div style="min-width:0;"><span style="font-size:0.74rem; color:var(--text-secondary); font-family:var(--font-mono); margin-right:6px;">#${escapeHtml(id)}</span><span style="color:var(--text-primary); font-weight:500; font-size:0.84rem;" title="${escapeHtml(name)}">${escapeHtml(name)}</span>${hintSub}</div>
+        <div style="min-width:0;"><span style="font-size:0.78rem; color:var(--text-secondary); font-family:var(--font-mono); margin-right:6px;">#${escapeHtml(id)}</span><span style="color:var(--text-primary); font-weight:500; font-size:0.84rem;" title="${escapeHtml(name)}">${escapeHtml(name)}</span>${hintSub}</div>
         <label class="toggle-switch"><input type="checkbox" ${val?'checked':''}><span class="slider"></span></label>
       `;
       card.querySelector('input').onchange = (e) => {
@@ -5818,6 +6378,14 @@ if (typeof module !== 'undefined') {
       container.appendChild(moreBtn);
     }
     document.getElementById('badge-switch-count').textContent = trueCount;
+    if (matchCount === 0) {
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'empty-state';
+      emptyEl.textContent = swArr.length <= 1
+        ? 'No switches in this save.'
+        : 'No matching switches for the current filter.';
+      container.appendChild(emptyEl);
+    }
   }
 
   function setByTokens(obj, tokens, val) {
@@ -6056,18 +6624,7 @@ if (typeof module !== 'undefined') {
     showToast('Original backup (.bak) downloaded.', 'success');
   }
 
-  async function revertAllSaveChanges() {
-    if (!currentFile || !currentFile.rawBytes) {
-      showToast('No save file loaded.', 'warn');
-      return;
-    }
-    if (saveChanges.size === 0) {
-      showToast('No save changes to revert.', 'info');
-      return;
-    }
-    if (!confirmDiscardChanges(`Revert all ${saveChanges.size} change(s) back to the original loaded file?`)) {
-      return;
-    }
+  async function performRevertAllSaveChanges() {
     try {
       const parsed = await parseSaveData(currentFile.rawBytes, currentFile.name);
       currentFile.parsedRoot = parsed.root;
@@ -6079,6 +6636,24 @@ if (typeof module !== 'undefined') {
     } catch (err) {
       showToast('Revert failed: ' + err.message, 'danger');
     }
+  }
+
+  function revertAllSaveChanges() {
+    if (!currentFile || !currentFile.rawBytes) {
+      showToast('No save file loaded.', 'warn');
+      return;
+    }
+    if (saveChanges.size === 0) {
+      showToast('No save changes to revert.', 'info');
+      return;
+    }
+    return openConfirmDialog({
+      title: 'Revert all save changes?',
+      message: `Discard ${saveChanges.size} unsaved change(s) and reload the original file from memory?`,
+      confirmLabel: 'Revert All',
+      danger: true,
+      onConfirm: performRevertAllSaveChanges
+    });
   }
 
   const btnRevDl = document.getElementById('btn-review-download');
@@ -6107,14 +6682,7 @@ if (typeof module !== 'undefined') {
     };
   }
 
-  function clearSaveFile() {
-    if (!currentFile || (!currentFile.name && !currentFile.parsedRoot)) {
-      showToast('No save file currently open.', 'info');
-      return;
-    }
-    if (saveChanges.size > 0 && !confirmDiscardChanges(`You have ${saveChanges.size} unsaved save change(s). Close and discard them?`)) {
-      return;
-    }
+  function performClearSaveFile() {
     currentFile = {
       name: null, size: 0, rawBytes: null,
       format: null, formatLabel: null,
@@ -6140,6 +6708,23 @@ if (typeof module !== 'undefined') {
     saveEditorScreen.style.display = 'none';
     updateSaveHeaderButtons();
     showToast('Save file cleared.', 'info');
+  }
+
+  function clearSaveFile() {
+    if (!currentFile || (!currentFile.name && !currentFile.parsedRoot)) {
+      showToast('No save file currently open.', 'info');
+      return;
+    }
+    const msg = saveChanges.size > 0
+      ? `You have ${saveChanges.size} unsaved save change(s). Close and clear this file from browser memory?`
+      : `Close ${currentFile.name || 'this save file'} and return to the dropzone?`;
+    openConfirmDialog({
+      title: 'Clear loaded save file?',
+      message: msg,
+      confirmLabel: 'Clear file',
+      danger: saveChanges.size > 0,
+      onConfirm: performClearSaveFile
+    });
   }
 
   const btnChangeFile = document.getElementById('btn-change-file');
