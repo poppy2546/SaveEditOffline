@@ -9,10 +9,13 @@ const HOST = '127.0.0.1';
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.xml': 'application/xml; charset=utf-8',
@@ -31,6 +34,9 @@ const BLOCKED_FILES = new Set([
 
 const ALLOWED_PUBLIC_FILES = new Set([
   '/index.html',
+  '/privacy.html',
+  '/terms.html',
+  '/share.jpg',
   '/pako.min.js',
   '/ruby_marshal.js',
   '/favicon.svg',
@@ -43,6 +49,16 @@ const ALLOWED_PUBLIC_FILES = new Set([
   '/sample/test_save.rpgsave',
   '/sample/readme.md'
 ]);
+
+const ALLOWED_ASSET_EXTS = new Set(['.js', '.mjs', '.css', '.svg', '.json', '.png', '.jpg', '.webp', '.woff2']);
+function isAllowedPublicPath(lowerPath) {
+  if (ALLOWED_PUBLIC_FILES.has(lowerPath)) return true;
+  if (lowerPath.startsWith('/assets/')) {
+    const ext = path.posix.extname(lowerPath);
+    return ALLOWED_ASSET_EXTS.has(ext);
+  }
+  return false;
+}
 
 const WIN_RESERVED_DEVICE_RE = /(^|\/)(con|prn|aux|nul|com[1-9]|lpt[1-9])(\.|$)/i;
 
@@ -107,17 +123,17 @@ const server = http.createServer((req, res) => {
     WIN_RESERVED_DEVICE_RE.test(normalizedUrlPath) ||
     lowerPath.includes('/.') ||
     BLOCKED_FILES.has(lowerPath) ||
-    !ALLOWED_PUBLIC_FILES.has(lowerPath)
+    !isAllowedPublicPath(lowerPath)
   ) {
     res.writeHead(403, { ...baseSecHeaders, 'Content-Type': 'text/plain' });
     res.end('403 Forbidden');
     return;
   }
 
-  const secHeaders = lowerPath === '/index.html'
+  const secHeaders = (lowerPath === '/index.html' || lowerPath === '/privacy.html' || lowerPath === '/terms.html')
     ? {
         ...baseSecHeaders,
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-VNorUfRGZA650EDKnSQ3pHe/3QsGEZv5oHyXfLPLjJQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-I302cqZoZ8RyltD5BzY9ol/e68LuZSwMWTPLrzi4KhQ='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';"
       }
     : baseSecHeaders;
 

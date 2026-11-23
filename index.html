@@ -1,75 +1,407 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-type="software" data-radius="sharp" data-ground="sage" data-buttons="arrow" data-motion>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-VNorUfRGZA650EDKnSQ3pHe/3QsGEZv5oHyXfLPLjJQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
-<title>Universal RPG Maker Save Editor</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23242933'/%3E%3Cstop%20offset='100%25'%20stop-color='%2314161B'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='gold'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23FFF2D6'/%3E%3Cstop%20offset='40%25'%20stop-color='%23E2B86B'/%3E%3Cstop%20offset='100%25'%20stop-color='%23B88028'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='crystal'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23C2F0BC'/%3E%3Cstop%20offset='60%25'%20stop-color='%2373A86E'/%3E%3Cstop%20offset='100%25'%20stop-color='%233B6338'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='14'%20fill='url(%23bg)'%20stroke='url(%23gold)'%20stroke-width='2.5'/%3E%3Cpath%20d='M16%2013h24l9%209v27a2%202%200%200%201-2%202H18a2%202%200%200%201-2-2V13z'%20fill='%231C2028'%20stroke='%23444B57'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3Cpath%20d='M22%2013h18v12a1%201%200%200%201-1%201H23a1%201%200%200%201-1-1V13z'%20fill='url(%23gold)'/%3E%3Crect%20x='26'%20y='16'%20width='3.5'%20height='6'%20rx='1'%20fill='%2314161B'/%3E%3Cpolygon%20points='32,29%2042,39%2032,49%2022,39'%20fill='url(%23crystal)'%20stroke='%23A2C79D'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3Cpolygon%20points='32,32%2039,39%2032,46%2025,39'%20fill='%23E8FCE4'%20opacity='0.35'/%3E%3Ccircle%20cx='32'%20cy='39'%20r='2.2'%20fill='%23FFFFFF'/%3E%3C/svg%3E">
+<meta name="page-type" content="software">
+<meta name="site-kind" content="software">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Nf/ToRlTE5WHAcUup/HoO1NKmlo9aYGuTrhXerS4M3Y=' 'sha256-lfTRy/CZ9XFhtmS8BIQm7D35JjeAGkx5EW6DMVqnh+c=' 'sha256-xQZAj9rVbrV+EE+JMPh07uSg8FVGGAYIKzb0h2NmJ94=' 'sha256-I302cqZoZ8RyltD5BzY9ol/e68LuZSwMWTPLrzi4KhQ='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none';">
+<title>Save Studio: Universal RPG Maker Save Editor</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23162a17'/%3E%3Cstop%20offset='100%25'%20stop-color='%230f1f10'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='lime'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23daf7be'/%3E%3Cstop%20offset='100%25'%20stop-color='%23c6f19d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x='2'%20y='2'%20width='60'%20height='60'%20rx='8'%20fill='url(%23bg)'%20stroke='url(%23lime)'%20stroke-width='2.5'/%3E%3Cpath%20d='M18%2015h22l8%208v26a2%202%200%200%201-2%202H20a2%202%200%200%201-2-2V15z'%20fill='%23112212'%20stroke='%23588157'%20stroke-width='1.8'/%3E%3Crect%20x='24'%20y='15'%20width='14'%20height='10'%20rx='1'%20fill='url(%23lime)'/%3E%3Crect%20x='23'%20y='33'%20width='18'%20height='11'%20rx='1.5'%20fill='%23c6f19d'%20opacity='0.24'%20stroke='%23c6f19d'%20stroke-width='1.5'/%3E%3C/svg%3E">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta name="theme-color" content="#16181D">
-<meta name="description" content="Universal RPG Maker Save Editor &amp; Database Modder — Free, 100% private, client-side web utility for RPG Maker MZ, MV, VX Ace, XP, and WOLF RPG save files and JSON databases.">
+<meta name="theme-color" content="#0f1f10">
+<meta name="description" content="Universal RPG Maker Save Editor and JSON Database Modder running locally in browser memory for MZ, MV, VX Ace, VX, XP, and Naninovel save archives.">
 <meta name="keywords" content="RPG Maker save editor, rmmzsave editor, rpgsave editor, rvdata2 editor, RPG Maker database modder, RPG save editor online">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://universal-rpg-save-editor.pages.dev/">
-<meta property="og:title" content="Universal RPG Maker Save Editor">
-<meta property="og:description" content="Universal RPG Maker Save Editor &amp; Database Modder — 100% Client-side and private.">
+<meta property="og:title" content="Save Studio: Universal RPG Maker Save Editor">
+<meta property="og:description" content="Universal RPG Maker Save Editor and Database Modder running locally in browser memory.">
 <meta property="og:url" content="https://universal-rpg-save-editor.pages.dev/">
 <meta property="og:type" content="website">
+<meta property="og:image" content="share.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="share.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
 <style>
-  /* Color Hunt Palette Adaptation (High Contrast Tactile Studio):
-     Primary Curated Palette: Crisp Parchment, Warm Sand & Deep Charcoal
-     Secondary Earth Accents: Sage Green, Ochre Amber & Terracotta */
   :root {
-    --bg-main: #16181D;
-    --bg-header: #1C1F26;
-    --bg-card: #22262E;
-    --bg-card-hover: #2C323D;
-    --bg-elevated: #303744;
-    --bg-input: #121418;
-    --border-color: #444B57;
-    --border-subtle: #333944;
-    --border-focus: #F0E6D2;
-    --text-primary: #F7F3EB;
-    --text-secondary: #C8BFB2;
-    --text-muted: #9C9588;
-    --accent-sand: #E6D8C3;
-    --accent-sand-hover: #F7EDE1;
-    --accent-sand-text: #181B20;
-    --accent-sage: #607D5B;
-    --accent-sage-bright: #A2C79D;
-    --accent-sage-bg: #1F2E1E;
-    --accent-amber: #D9A85B;
-    --accent-amber-bg: #302617;
-    --accent-terra: #C9674D;
-    --accent-terra-bg: #331E18;
-    --font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --radius-sm: 4px;
-    --radius-md: 6px;
-    --radius-lg: 8px;
+    --p-bg: #0f1f10; --p-surface: #162a17; --p-ink: #ffffff; --p-muted: #9aa39a;
+    --p-accent: #c6f19d; --p-accent-ink: #0f1f10; --p-action: #c6f19d; --p-action-ink: #0f1f10;
+    --p-inv-bg: #ffffff; --p-inv-surface: #ecedec; --p-inv-ink: #0f1f10; --p-inv-muted: #606c60;
+    --p-inv-accent: #0f1f10; --p-inv-accent-ink: #ffffff; --p-inv-action: #0f1f10; --p-inv-action-ink: #ffffff;
+    --font-display: "Instrument Sans", system-ui, sans-serif;
+    --font-text: "Instrument Sans", system-ui, sans-serif;
+    --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --display-weight: 500;
+    --display-tracking: -0.028em;
+    --display-tracking-xl: -0.036em;
+    --display-stretch: 96%;
+    --ly-scale: 1.04;
+
+    /* Workbench surface & ink tokens mapped to forest-pale-lime */
+    --bg-main: var(--p-bg);
+    --bg-header: #122413;
+    --bg-card: #162a17;
+    --bg-card-hover: #1d361f;
+    --bg-elevated: #224024;
+    --bg-input: #0a160b;
+    --border-color: rgba(255, 255, 255, 0.16);
+    --border-subtle: rgba(255, 255, 255, 0.09);
+    --border-focus: #c6f19d;
+    --text-primary: #ffffff;
+    --text-secondary: #bcc7bc;
+    --text-muted: #9aa39a;
+    --accent-sand: #c6f19d;
+    --accent-sand-hover: #daf8be;
+    --accent-sand-text: #0f1f10;
+    --accent-sage: #5c8a5e;
+    --accent-sage-bright: #c6f19d;
+    --accent-sage-bg: #1d351e;
+    --accent-amber: #e9c46a;
+    --accent-amber-bg: #2c2817;
+    --accent-terra: #e28570;
+    --accent-terra-bg: #321d18;
+    --font-sans: var(--font-text);
+    --radius-sm: var(--r-sm);
+    --radius-md: var(--r-md);
+    --radius-lg: var(--r-lg);
   }
 
-  ::placeholder {
-    color: var(--text-muted);
-    opacity: 0.85;
+  ::placeholder { color: var(--text-muted); opacity: 0.9; }
+
+  /* Skip link and responsive nav safeguards */
+  .skip-link {
+    position: fixed;
+    left: 12px;
+    top: -120px;
+    z-index: 200;
+    padding: 10px 14px;
+    border-radius: var(--r-btn);
+    background: var(--action);
+    color: var(--action-ink);
+    font: 500 14px/1 var(--font-text);
+  }
+  .skip-link:focus { top: 12px; }
+  .nav__logo { margin-left: 0; padding-left: 0; }
+  @media (max-width: 420px) {
+    .nav:not(.is-open) .nav__actions { display: none; }
+    .nav:not(.is-open) .nav__actions + .nav__toggle { margin-left: auto; }
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
+  /* Restore 1-screen section rhythm over backgrounds.css defaults */
+  main > section.section:is(.bg-mist, .bg-dots, .studio-section, #moment),
+  main > section.section:is(.bg-mist, .bg-dots):last-of-type {
+    padding: var(--padt) 0 calc(var(--padb) + var(--bar)) !important;
+    height: auto;
+    min-height: calc(var(--hm, var(--h, 1)) * 100vh) !important;
+    min-height: calc(var(--hm, var(--h, 1)) * 100lvh) !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  @media (min-width: 640px) {
+    main > section.section:is(.studio-section, #moment, #faq) {
+      height: calc(var(--h, 1) * 100vh) !important;
+      height: calc(var(--h, 1) * 100lvh) !important;
+      min-height: calc(var(--h, 1) * 100vh) !important;
+    }
+  }
+  @media (min-width: 1280px) {
+    main > section.section:is(.bg-mist, .bg-dots, .studio-section, #moment),
+    main > section.section:is(.bg-mist, .bg-dots):last-of-type {
+      height: calc(var(--h, 1) * 100svh) !important;
+    }
+  }
+  main > section.section > .wrap { flex: 1 1 auto; }
+  .hero--centred .hero__kicker { justify-content: center; color: #dce5dc; font-size: 14px; }
+
+  /* Hero CSS fallback + high-contrast lead + workbench preview window */
+  .hero--centred .hero__lead { color: #dce5dc; }
+  @media (max-width: 1279px) { .hero--centred .hero__window { margin-top: var(--s-4); } }
+  .hero__window {
+    background:
+      radial-gradient(115% 70% at 78% 16%, rgba(198, 241, 157, 0.34) 0 42%, transparent 66%),
+      radial-gradient(95% 65% at 14% 86%, rgba(92, 138, 94, 0.48) 0 44%, transparent 72%),
+      linear-gradient(155deg, #213721 0%, #3d593b 50%, #9eb095 100%);
+  }
+  .d-win {
+    background: #ffffff;
+    color: #0f1f10;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    font: 400 14px/1.4 var(--font-text);
+    box-shadow: 0 0 0 1px rgba(15, 31, 16, 0.12), 0 28px 64px -26px rgba(0, 0, 0, 0.65);
+    text-align: left;
+  }
+  .d-win--dark {
+    background: #101d11;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(198, 241, 157, 0.18), 0 30px 70px -28px rgba(0, 0, 0, 0.85);
+  }
+  .d-win__bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    padding: 0 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    color: #b7c3b7;
+  }
+  .d-win__bar b { font-weight: 500; color: #ffffff; }
+  .d-win__bar .sp { flex: 1; }
+  .d-win__dots { display: flex; gap: 6px; }
+  .d-win__dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.24); }
+  .d-win__body { display: grid; grid-template-columns: 170px 1fr; min-height: 184px; }
+  .d-side {
+    padding: 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    font-size: 13px;
+    color: #a6b2a6;
+  }
+  .d-side > span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    padding: 0 9px;
+    border-radius: var(--r-sm);
+  }
+  .d-side > span.is-on { background: rgba(198, 241, 157, 0.14); color: #c6f19d; font-weight: 500; }
+  .d-side > span em { font-style: normal; font-family: var(--font-mono); font-size: 13px; opacity: 0.85; }
+  .d-main { padding: 12px 16px; display: grid; align-content: start; gap: 8px; min-width: 0; }
+  .d-main__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .d-main__head h4 { font: 500 15px/1.2 var(--font-text); margin: 0; color: #ffffff; }
+  .d-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 11px;
+    border-radius: var(--r-btn);
+    background: #c6f19d;
+    color: #0f1f10;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .d-rows { display: grid; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+  .d-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+  }
+  .d-row b { font-weight: 500; color: #ffffff; display: block; }
+  .d-row small { color: #b7c3b7; font-size: 13px; display: block; }
+  .d-row .num { font-family: var(--font-mono); color: #c6f19d; font-variant-numeric: tabular-nums; }
+  .d-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: var(--r-sm);
+    background: rgba(198, 241, 157, 0.14);
+    color: #c6f19d;
+    font-size: 13px;
+    font-family: var(--font-mono);
+  }
+  @media (max-width: 639px) {
+    .hero__window .d-win__body { grid-template-columns: 1fr; min-height: 156px; }
+    .hero__window .d-side, .hero__window .d-win__bar .sp ~ span, .hero__window .d-pill { display: none; }
+  }
+
+  /* Features band with shader CSS fallback + 3-up cards */
+  .stat-cards .card { --c-text: var(--muted); }
+  .stat-cards strong {
+    display: block;
+    font: var(--display-weight) var(--t-stat)/1.05 var(--font-display);
+    letter-spacing: var(--display-tracking);
+    font-stretch: var(--display-stretch);
+  }
+  .stat-cards .card > p { margin-top: var(--s-2); }
+  .stat-cards .panel {
+    --p-h: 232px;
+    border-radius: var(--r-md);
+    background:
+      radial-gradient(110% 75% at 78% 14%, rgba(198, 241, 157, 0.28) 0 42%, transparent 68%),
+      radial-gradient(90% 60% at 16% 88%, rgba(108, 142, 99, 0.45) 0 46%, transparent 72%),
+      linear-gradient(160deg, #1b311d 0%, #335134 55%, #849c7e 100%);
+  }
+  .stat-cards .panel::before { display: none; }
+  .stat-cards .stage > .at-rise { --ax: 18px; --ay: 24px; --fit-max: 300px; }
+  .d-pane {
+    background: #101d11;
+    color: #ffffff;
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    font: 400 13px/1.4 var(--font-text);
+    box-shadow: 0 0 0 1px rgba(198, 241, 157, 0.16), 0 18px 40px -20px rgba(0, 0, 0, 0.72);
+  }
+  .d-pane h5 { margin: 0 0 10px; font: 500 13px/1.3 var(--font-text); color: #b7c3b7; }
+  .d-split { display: flex; height: 8px; border-radius: var(--r-sm); overflow: hidden; gap: 2px; margin-bottom: 12px; }
+  .d-split i { display: block; height: 100%; }
+  .d-times { display: grid; }
+  .d-times span {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+  }
+  .d-times span:first-child { border-top: 0; }
+  .d-times b { font-weight: 500; color: #c6f19d; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .stat-cards > .card { grid-column: 1 / -1; }
+  @media (min-width: 1024px) { .stat-cards > .card { grid-column: auto / span 4; } }
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .stat-cards > .card {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-auto-rows: min-content;
+      column-gap: var(--s-6);
+      align-content: start;
+    }
+    .stat-cards > .card > :not(.panel) { grid-column: 1; }
+    .stat-cards > .card > .panel {
+      grid-column: 2;
+      grid-row: 1 / span 4;
+      --p-h: 204px;
+      margin: calc(var(--c-gap) - var(--c-pad)) calc(var(--c-gap) - var(--c-pad)) calc(var(--c-gap) - var(--c-pad)) 0;
+      border-radius: var(--r-sm);
+    }
+  }
+  @media (max-width: 639px) {
+    #features .section-head { margin-bottom: var(--s-4); }
+    .stat-cards { gap: 10px; }
+    .stat-cards > .card { padding: 12px 14px; }
+    .stat-cards strong { font-size: 22px; line-height: 1.1; }
+    .stat-cards .card > p { line-height: 1.35; margin-top: 2px; }
+    .stat-cards .card > .panel { --p-h: 92px; min-height: 92px; margin-top: 8px; }
+    .stat-cards .stage > .at-rise { --ay: 8px; --ay-sm: 8px; }
+    .stat-cards .d-pane { padding: 8px 10px; }
+    .stat-cards .d-pane h5 { margin-bottom: 4px; }
+    .stat-cards .d-split { margin-bottom: 4px; }
+    .stat-cards .d-times span:nth-child(n+2) { display: none; }
+  }
+
+  /* Liquid-type moment band */
+  #moment > .wrap {
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+    flex: 1 1 auto;
+  }
+  #moment .mo-lt__type {
+    font-size: var(--t-h1);
+    line-height: 1.02;
+    max-width: 18ch;
+  }
+  #moment .t-lead { color: #dce5dc; }
+
+  /* FAQ architecture panel + desktop/tablet full-height distribution + phone height fit */
+  #faq > .wrap { display: flex; flex-direction: column; flex: 1 1 auto; }
+  #faq > .wrap > .grid { flex: 1 1 auto; grid-template-rows: minmax(0, 1fr); align-content: stretch; }
+  .faq-col-left { display: flex; flex-direction: column; gap: var(--s-5); height: 100%; }
+  .faq-col-left .section-head { margin-bottom: 0; }
+  .ui-faq-arch {
+    flex: 1 1 auto;
+    min-height: 220px;
+    padding: 20px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-color);
+    background: #101d11;
     display: flex;
     flex-direction: column;
-    -webkit-font-smoothing: antialiased;
+    justify-content: center;
+  }
+  .ui-faq-arch svg { width: 100%; height: auto; display: block; }
+  @media (min-width: 640px) {
+    #faq .span-7 { display: flex; flex-direction: column; min-height: 0; }
+    #faq .span-7 .faq { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: space-between; }
+    #faq .faq > .faq__item { padding: var(--s-4) 0; }
+    footer.closing.footer--statement { padding-block: var(--s-8) var(--padb); }
+    footer.closing > .wrap { row-gap: var(--s-5); }
+    footer.closing .closing__cta { gap: var(--s-4); }
+    footer.closing .closing__links { gap: var(--s-5); }
+    footer.closing .close__word { font-size: clamp(36px, 10.8vw, 148px); }
+  }
+  @media (max-width: 1023px) {
+    #faq > .wrap > .grid { grid-template-rows: auto minmax(0, 1fr); row-gap: var(--s-4); }
+    .faq-col-left { gap: var(--s-3); height: auto; }
+    .ui-faq-arch { min-height: 0; padding: 12px; flex: 0 0 auto; }
+    .ui-faq-arch svg { max-height: 112px; }
+    #faq .faq > .faq__item { padding: 12px 0; }
+  }
+  @media (max-width: 639px) {
+    #faq > .wrap { flex: 0 1 auto; }
+    #faq > .wrap > .grid { flex: 0 1 auto; grid-template-rows: auto auto; row-gap: 12px; }
+    #faq .span-7 .faq { justify-content: flex-start; }
+    #faq .section-head { margin-bottom: 0; }
+    .ui-faq-arch { padding: 8px; }
+    .ui-faq-arch svg { max-height: 68px; }
+    #faq .faq > .faq__item { padding: 8px 0; gap: 4px; }
+    #faq .faq p { line-height: 1.4; }
   }
 
-  /* SVG Icons */
-  .ico {
+  /* Footer closing word overflow, off-grid mark fix, and phone wrap containment */
+  .footer__mark .mark.mark--initial { width: 28px; height: 28px; font-size: 16px; margin-right: 8px; }
+  .close__word {
+    font-size: clamp(38px, 12vw, 184px);
+    line-height: 1.04;
+    padding-top: 0.04em;
+    overflow: visible;
+    max-width: 100%;
+  }
+  footer.closing .wrap, footer.closing .closing__cta { min-width: 0; max-width: 100%; }
+  @media (max-width: 639px) {
+    footer.closing.footer--statement { padding-block: 48px 36px; }
+    footer.closing > .wrap { row-gap: var(--s-3); }
+    footer.closing .closing__cta { gap: var(--s-3); }
+    footer.closing .closing__links { gap: var(--s-3); }
+    footer.closing .closing__links > .grid { row-gap: var(--s-3); }
+    footer.closing .footer__legal { margin-top: var(--s-2); padding-top: var(--s-3); }
+    footer.closing .btn--primary { max-width: 100%; }
+    footer.closing .close__word { font-size: clamp(34px, 10.8vw, 72px); }
+  }
+
+  /* Studio Workbench Shell (ui-studio marks internal UI layout as product interface) */
+  #studio > .wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+    height: 100%;
+  }
+  @media (min-width: 640px) and (max-width: 1023px) { #studio > .wrap { gap: var(--s-7); } }
+  @media (max-width: 639px) {
+    #studio > .wrap { gap: var(--s-6); height: 100%; }
+    #studio .badge-offline, #studio .studio-codec-bar { display: none; }
+  }
+  #studio .section-head { margin-bottom: 0; }
+  .studio-shell {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 440px;
+  }
+  @media (max-width: 639px) { .studio-shell { min-height: 0; flex: 1 1 auto; } }
+  .studio-shell * { box-sizing: border-box; }
+  #studio .ico {
     width: 15px;
     height: 15px;
     stroke: currentColor;
@@ -79,26 +411,22 @@
     fill: none;
     flex-shrink: 0;
   }
-  .ico-lg { width: 22px; height: 22px; stroke-width: 1.5; }
-  .ico-xl { width: 32px; height: 32px; stroke-width: 1.4; }
+  #studio .ico-lg { width: 22px; height: 22px; stroke-width: 1.5; }
+  #studio .ico-xl { width: 32px; height: 32px; stroke-width: 1.4; }
 
-  /* Header */
-  header {
+  .studio-header {
     background: var(--bg-header);
     border-bottom: 1px solid var(--border-color);
-    padding: 12px 24px;
+    padding: 12px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    gap: 12px;
     flex-wrap: wrap;
   }
-  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .logo-wrap { display: flex; align-items: center; gap: 10px; }
   .logo-icon {
-    width: 34px; height: 34px;
+    width: 30px; height: 30px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -107,19 +435,19 @@
   }
   .brand-title {
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: -0.02em;
     color: var(--text-primary);
+    margin: 0;
   }
   .badge-promax, .badge-offline {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 2px 7px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 3px 8px;
     border-radius: var(--radius-sm);
     margin-left: 8px;
-    text-transform: uppercase;
   }
   .badge-promax {
     background: var(--bg-elevated);
@@ -132,57 +460,97 @@
     border: 1px solid var(--accent-sage);
   }
 
-  /* Mode Switcher */
   .mode-switch-bar {
     display: flex;
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 3px;
-    gap: 3px;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   .mode-btn {
-    padding: 6px 14px;
-    border-radius: var(--radius-sm);
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 0.82rem;
-    font-weight: 600;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: var(--r-btn);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
     transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 7px;
   }
-  .mode-btn:hover { color: var(--text-primary); }
+  .mode-btn:hover { background: var(--bg-card-hover); border-color: var(--text-secondary); }
   .mode-btn.active, .mode-btn.active-db {
     background: var(--bg-card);
     color: var(--accent-sand);
     border-color: var(--border-color);
+    box-shadow: inset 0 -2px 0 var(--accent-sand);
   }
 
-  .container {
-    max-width: 1480px;
+  .studio-container {
+    max-width: none;
     width: 100%;
     margin: 0 auto;
-    padding: 20px 24px;
-    flex: 1;
+    padding: 18px 20px;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
   }
 
-  /* Buttons */
-  .btn {
+  .studio-dropzone {
+    width: 100%;
+    flex: 1 1 auto;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    padding: 32px 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
+    gap: 12px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .studio-dropzone:hover { border-color: var(--accent-sand); background: var(--bg-card-hover); }
+  .studio-codec-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    margin-top: 14px;
+    align-items: center;
+  }
+  .studio-codec-tag {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-sm);
+    padding: 4px 10px;
+  }
+
+  /* Scoped Workbench Buttons (standardized 44px controls matching system 2-style scale) */
+  #studio .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
-    padding: 7px 14px;
-    border-radius: var(--radius-md);
-    font-size: 0.82rem;
-    font-weight: 600;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: var(--r-btn);
+    font-size: 15px;
+    font-weight: 500;
     font-family: var(--font-sans);
+    letter-spacing: 0;
+    text-decoration: none;
     cursor: pointer;
     border: 1px solid var(--border-color);
     background: var(--bg-card);
@@ -191,60 +559,61 @@
     user-select: none;
     white-space: nowrap;
   }
-  .btn:hover {
-    background: var(--bg-card-hover);
-    border-color: var(--text-secondary);
-  }
-  .btn:focus-visible {
-    outline: 2px solid var(--border-focus);
-    outline-offset: 1px;
-  }
-  /* Warm Sand Primary CTA */
-  .btn-primary, .btn-blue {
+  #studio .btn::after { display: none; content: none; }
+  #studio .btn:hover { background: var(--bg-card-hover); border-color: var(--text-secondary); }
+  #studio .btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+  #studio .btn-primary, #studio .btn-blue {
     background: var(--accent-sand);
     color: var(--accent-sand-text);
-    border-color: var(--accent-sand);
-    font-weight: 700;
+    border-color: transparent;
+    font-weight: 500;
   }
-  .btn-primary:hover, .btn-blue:hover {
+  #studio .btn-primary:hover, #studio .btn-blue:hover {
     background: var(--accent-sand-hover);
-    border-color: var(--accent-sand-hover);
+    border-color: transparent;
     color: var(--accent-sand-text);
   }
-  /* Secondary Neutral */
-  .btn-secondary, .btn-purple {
-    background: var(--bg-elevated);
+  #studio .btn-secondary, #studio .btn-purple {
+    background: var(--bg-card);
     color: var(--text-primary);
     border-color: var(--border-color);
   }
-  .btn-secondary:hover, .btn-purple:hover {
-    background: #363D49;
+  #studio .btn-secondary:hover, #studio .btn-purple:hover {
+    background: var(--bg-card-hover);
     border-color: var(--text-secondary);
   }
-  /* Warm Ochre / Gold */
-  .btn-gold, .btn-secret {
+  #studio .btn-gold, #studio .btn-secret {
     background: var(--accent-amber-bg);
-    color: #E2B86B;
-    border-color: #6B532B;
+    color: #f3d284;
+    border-color: #796531;
   }
-  .btn-gold:hover, .btn-secret:hover {
-    background: #382E1E;
+  #studio .btn-gold:hover, #studio .btn-secret:hover {
+    background: #3a341e;
     border-color: var(--accent-amber);
-    color: #F2CE8A;
   }
-  /* Terracotta Danger */
-  .btn-danger {
+  #studio .btn-danger {
     background: var(--accent-terra-bg);
-    color: #E08268;
-    border-color: #6E3829;
+    color: #f1a08d;
+    border-color: #7d3e2d;
   }
-  .btn-danger:hover {
-    background: #3B241F;
+  #studio .btn-danger:hover {
+    background: #3f241f;
     border-color: var(--accent-terra);
   }
-  .btn-sm { padding: 5px 11px; font-size: 0.78rem; border-radius: var(--radius-sm); }
+  #studio .studio-header .btn-sm { height: 44px; min-height: 44px; padding: 0 16px; font-size: 15px; border-radius: var(--r-btn); }
+  #studio .section-panel .btn-sm,
+  #studio #save-editor-screen .btn-sm,
+  #studio #db-modder-screen .btn-sm { height: auto; min-height: 32px; padding: 5px 11px; font-size: 0.8125rem; border-radius: var(--r-sm); }
+  @media (max-width: 639px) {
+    #studio .studio-header { padding: 10px 12px; gap: 8px; }
+    #studio .studio-container { padding: 12px; }
+    #studio .studio-dropzone { padding: 18px 14px; gap: 10px; }
+    #studio .mode-btn, #studio .studio-header .btn, #studio #btn-select-save-file, #studio #btn-quick-open-db {
+      padding: 0 12px; font-size: 14px;
+    }
+  }
 
-  /* Navigation Tabs */
+  /* Workbench Section Tabs */
   .nav-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -257,8 +626,8 @@
     border: none;
     background: transparent;
     color: var(--text-secondary);
-    font-size: 0.84rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -267,21 +636,18 @@
     transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
     white-space: nowrap;
   }
-  .tab-btn:hover {
-    color: var(--text-primary);
-    background: rgba(223, 208, 184, 0.03);
-  }
+  .tab-btn:hover { color: var(--text-primary); background: rgba(198, 241, 157, 0.04); }
   .tab-btn.active {
     color: var(--accent-sand);
     border-bottom-color: var(--accent-sand);
-    background: rgba(223, 208, 184, 0.05);
+    background: rgba(198, 241, 157, 0.08);
   }
   .tab-badge {
     background: var(--bg-input);
     color: var(--text-secondary);
     padding: 1px 6px;
     border-radius: var(--radius-sm);
-    font-size: 0.7rem;
+    font-size: 0.8125rem;
     font-family: var(--font-mono);
     border: 1px solid var(--border-subtle);
   }
@@ -692,12 +1058,12 @@
     border: 1px solid var(--border-color);
     padding: 3px 9px;
     border-radius: var(--radius-sm);
-    font-size: 0.74rem;
+    font-size: 0.8125rem;
     font-family: var(--font-mono);
     color: var(--text-secondary);
   }
 
-  /* Toast */
+  /* Toast scoped inside #studio */
   .toast {
     position: fixed;
     bottom: 24px;
@@ -707,7 +1073,7 @@
     border: 1px solid var(--accent-sand);
     padding: 10px 16px;
     border-radius: var(--radius-md);
-    font-size: 0.84rem;
+    font-size: 0.875rem;
     font-weight: 500;
     opacity: 0;
     transform: translateY(8px);
@@ -722,129 +1088,165 @@
 </style>
 </head>
 <body>
+<!-- type: software | deal: hero centred, nav nav-mega, close close-word, footer footer-statement, rhythm surface-pairs, buttons arrow, mark initial, ground sage, palette forest-pale-lime (dark forest green and pale lime fits a developer modding studio), type instrument, hero fx silk-folds, card fx grain-gradient, backgrounds studio:surface features:bg-mist moment:plain faq:bg-dots, moments liquid-type -->
 
-<header>
-  <div class="logo-wrap">
-    <div class="logo-icon" aria-hidden="true" style="padding:2px; background:transparent; border:none;">
-      <svg viewBox="0 0 64 64" style="width:100%; height:100%; display:block;">
-        <defs>
-          <linearGradient id="header-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#242933"/>
-            <stop offset="100%" stop-color="#14161B"/>
-          </linearGradient>
-          <linearGradient id="header-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FFF2D6"/>
-            <stop offset="40%" stop-color="#E2B86B"/>
-            <stop offset="100%" stop-color="#B88028"/>
-          </linearGradient>
-          <linearGradient id="header-crystal" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#C2F0BC"/>
-            <stop offset="60%" stop-color="#73A86E"/>
-            <stop offset="100%" stop-color="#3B6338"/>
-          </linearGradient>
-        </defs>
-        <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#header-bg)" stroke="url(#header-gold)" stroke-width="2.5"/>
-        <path d="M16 13h24l9 9v27a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V13z" fill="#1C2028" stroke="#444B57" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M22 13h18v12a1 1 0 0 1-1 1H23a1 1 0 0 1-1-1V13z" fill="url(#header-gold)"/>
-        <rect x="26" y="16" width="3.5" height="6" rx="1" fill="#14161B"/>
-        <polygon points="32,29 42,39 32,49 22,39" fill="url(#header-crystal)" stroke="#A2C79D" stroke-width="1.5" stroke-linejoin="round"/>
-        <polygon points="32,32 39,39 32,46 25,39" fill="#E8FCE4" opacity="0.35"/>
-        <circle cx="32" cy="39" r="2.2" fill="#FFFFFF"/>
-      </svg>
-    </div>
-    <div>
-      <div style="display:flex; align-items:center;">
-        <h1 class="brand-title">Save &amp; DB Studio</h1>
-        <span class="badge-offline">CLIENT-SIDE / 100% PRIVATE</span>
+<header class="nav">
+  <a class="skip-link" href="#top">Skip to content</a>
+  <div class="wrap nav__bar">
+    <a class="nav__logo" href="#top"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item">
+        <a class="nav__link" href="#studio">Workbench <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav__menu">
+          <div class="wrap grid">
+            <div class="menu-col span-3"><p class="t-label">Editors</p><a href="#studio">Save and database workbench<span>Stats, inventory, switches, gold, and JSON tables</span></a><a href="#features">Engine codecs and table diffs<span>RMZ, MV, VX Ace, VX, XP, and Naninovel</span></a></div>
+            <div class="menu-col span-3"><p class="t-label">Architecture</p><a href="#moment">Local memory engine<span>Zero server uploads inside browser tab</span></a><a href="#faq">Questions and compatibility<span>Supported formats and revert workflow</span></a></div>
+          </div>
+        </div>
       </div>
-      <div style="font-size:0.74rem; color:var(--text-secondary);">
-        Universal RPG Maker Save Editor &amp; JSON Database Inspector
-      </div>
+      <div class="nav__item"><a class="nav__link" href="#features">Codecs</a></div>
+      <div class="nav__item"><a class="nav__link" href="#moment">Memory</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary" href="#studio">Open save file</a>
     </div>
-  </div>
-
-  <!-- Primary Mode Switcher -->
-  <div class="mode-switch-bar" role="tablist" aria-label="Workspace Mode">
-    <button class="mode-btn active" id="btn-mode-save" type="button">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Save Editor
-    </button>
-    <button class="mode-btn" id="btn-mode-db" type="button">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-      Database Modder
-    </button>
-  </div>
-
-  <!-- Save Editor Header Actions -->
-  <div style="display:flex; align-items:center; gap:8px;" id="header-save-actions">
-    <button class="btn btn-secondary btn-sm" id="btn-change-file" type="button">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      Open Save
-    </button>
-    <button class="btn btn-secondary btn-sm" id="btn-clear-save" type="button" title="Close and clear current save file">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      Clear File
-    </button>
-    <button class="btn btn-secondary btn-sm" id="btn-revert-save" type="button" title="Revert all edits back to the original loaded save file">Revert All</button>
-    <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download Save
-    </button>
-  </div>
-
-  <!-- Database Modder Header Actions -->
-  <div style="display:none; align-items:center; gap:8px;" id="header-db-actions">
-    <button class="btn btn-secondary btn-sm" id="btn-open-db-file" type="button">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      Open JSON File(s)
-    </button>
-    <button class="btn btn-secondary btn-sm" id="btn-clear-db-header" type="button" title="Clear all loaded database files">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      Clear Files
-    </button>
-    <button class="btn btn-primary btn-sm" id="btn-db-download" type="button">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download .json
-    </button>
-    <button class="btn btn-secondary btn-sm" id="btn-db-download-all" type="button" title="Download all modified database JSON files at once">Download All Modified</button>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
   </div>
 </header>
 
-<div class="container">
+<main id="top">
+  <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c">
+        <p class="hero__kicker"><span class="dot" aria-hidden="true"></span><span>Browser Workbench · 6 Engines</span></p>
+        <h1 id="hero-h">Edit RPG Maker saves locally</h1>
+        <p class="hero__lead">Edit 6 save formats (.rmmzsave, .rpgsave, .rvdata2, .rvdata, .rxdata, .sav) and 7 JSON database tables directly inside your browser.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="#studio">Open save file</a><a class="btn btn--secondary" href="#features">Inspect supported formats</a></div>
+      </div>
+      <div class="hero__window" data-fx="silk-folds" data-fx-seed="7" data-visual role="img" aria-label="Save Studio inspector showing savegame.rmmzsave party metrics and modified fields">
+        <div class="ly-piece ui d-win d-win--dark" aria-hidden="true">
+          <div class="d-win__bar"><span class="d-win__dots"><i></i><i></i><i></i></span><span><b>savegame.rmmzsave</b> · MZ Archive</span><span class="sp"></span><span>Client Memory</span></div>
+          <div class="d-win__body">
+            <div class="d-side">
+              <span class="is-on">Party<em>4</em></span>
+              <span>Inventory<em>64</em></span>
+              <span>Weapons<em>28</em></span>
+            </div>
+            <div class="d-main">
+              <div class="d-main__head"><h4>Party Inspector</h4><span class="d-pill">Download Save</span></div>
+              <div class="d-rows">
+                <div class="d-row"><div><b>Harold</b><small>Actor #001 · Lv 42</small></div><span class="num">HP 9,999</span><span class="d-chip">Modified</span></div>
+                <div class="d-row"><div><b>Party Gold</b><small>System wallet</small></div><span class="num">999,999</span><span class="d-chip">+950K</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="section ground-surface studio-section" id="studio" aria-labelledby="studio-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="studio-h">Workbench. <span class="muted">Edit saves and JSON tables.</span></h2>
+      </div>
+
+      <div class="studio-shell ui ui-studio" data-visual>
+        <div class="studio-header">
+          <div class="logo-wrap">
+            <div class="logo-icon" aria-hidden="true" style="padding:2px; background:transparent; border:none;">
+              <svg viewBox="0 0 64 64" style="width:100%; height:100%; display:block;">
+                <rect x="2" y="2" width="60" height="60" rx="8" fill="#0f1f10" stroke="#c6f19d" stroke-width="2.5"/>
+                <path d="M18 15h22l8 8v26a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V15z" fill="#162a17" stroke="#5c8a5e" stroke-width="1.8" stroke-linejoin="round"/>
+                <rect x="24" y="15" width="14" height="10" rx="1" fill="#c6f19d"/>
+                <rect x="23" y="33" width="18" height="11" rx="1.5" fill="#c6f19d" opacity="0.28" stroke="#c6f19d" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div>
+              <div style="display:flex; align-items:center; flex-wrap:wrap;">
+                <span class="brand-title">Save &amp; DB Studio</span>
+                <span class="badge-offline">Local Memory Only</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Primary Mode Switcher -->
+          <div class="mode-switch-bar" role="group" aria-label="Workspace Mode">
+            <button class="mode-btn active" id="btn-mode-save" type="button">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Editor
+            </button>
+            <button class="mode-btn" id="btn-mode-db" type="button">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              Database Modder
+            </button>
+          </div>
+
+          <!-- Save Editor Header Actions -->
+          <div style="display:flex; align-items:center; gap:8px;" id="header-save-actions">
+            <button class="btn btn-secondary btn-sm" id="btn-change-file" type="button">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Open Save
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-clear-save" type="button" title="Close and clear current save file">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              Clear File
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-revert-save" type="button" title="Revert all edits back to the original loaded save file">Revert All</button>
+            <button class="btn btn-primary btn-sm" id="btn-review-download" type="button">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Save
+            </button>
+          </div>
+
+          <!-- Database Modder Header Actions -->
+          <div style="display:none; align-items:center; gap:8px;" id="header-db-actions">
+            <button class="btn btn-secondary btn-sm" id="btn-open-db-file" type="button">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Open JSON File(s)
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-clear-db-header" type="button" title="Clear all loaded database files">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              Clear Files
+            </button>
+            <button class="btn btn-primary btn-sm" id="btn-db-download" type="button">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download .json
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-db-download-all" type="button" title="Download all modified database JSON files at once">Download All Modified</button>
+          </div>
+        </div>
+
+        <div class="container studio-container">
 
   <!-- ========================================================= -->
   <!-- 1. WELCOME / DROPZONE SCREEN                             -->
   <!-- ========================================================= -->
-  <div id="upload-section" style="display:flex; flex-direction:column; align-items:center; margin:32px auto; max-width:860px; width:100%; text-align:center;">
-    <div style="width:100%; border:1px dashed var(--text-secondary); border-radius:var(--radius-lg); background:var(--bg-card); padding:48px 32px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:14px; transition:border-color 0.15s ease;" id="dropzone">
+  <div id="upload-section" style="display:flex; flex-direction:column; align-items:stretch; flex:1 1 auto; width:100%; text-align:left;">
+    <div class="studio-dropzone" id="dropzone">
       <div style="color:var(--accent-sand);" aria-hidden="true">
         <svg class="ico ico-xl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </div>
-      <div style="font-size:1.2rem; font-weight:600; color:var(--text-primary); letter-spacing:-0.01em;">
-        Drop a Save File or Database JSON to begin
+      <div style="font-size:1.125rem; font-weight:500; color:var(--text-primary); letter-spacing:-0.01em;">
+        Drop a save archive or JSON database table
       </div>
-      <div style="color:var(--text-secondary); font-size:0.85rem; max-width:660px; line-height:1.6;">
-        Supports <b>Save Files</b> (<code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>) and <b>Database JSON</b> (<code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, <code>Skills.json</code>, <code>Enemies.json</code>, <code>Classes.json</code>, <code>Actors.json</code>, <code>System.json</code>)
+      <div style="color:#dce5dc; font-size:0.9375rem; max-width:68ch; line-height:1.5;">
+        Reads <code>.rmmzsave</code>, <code>.rpgsave</code>, <code>.rvdata2</code>, <code>.rvdata</code>, <code>.rxdata</code>, <code>.sav</code>, and RPG Maker JSON tables inside local memory.
       </div>
       <input type="file" id="file-input" multiple style="display:none;">
-      <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
+      <div style="display:flex; gap:10px; margin-top:4px; flex-wrap:wrap; justify-content:flex-start;">
         <button class="btn btn-primary" type="button" id="btn-select-save-file">Select Save File</button>
-        <button class="btn btn-secondary" type="button" id="btn-quick-open-db">Open Database JSON (data/*.json)</button>
+        <button class="btn btn-secondary" type="button" id="btn-quick-open-db">Open Database JSON</button>
       </div>
-    </div>
-
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px; width:100%; margin-top:24px; text-align:left;">
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:var(--radius-md);">
-        <div style="font-weight:600; color:var(--accent-sand); margin-bottom:6px; font-size:0.88rem;">Multi-Engine Save Support</div>
-        <p style="color:var(--text-secondary); font-size:0.8rem; line-height:1.5;">Read and write RPG Maker MZ, MV, VX Ace, VX, and XP files directly in your browser without uploading data.</p>
-      </div>
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:var(--radius-md);">
-        <div style="font-weight:600; color:var(--accent-sand); margin-bottom:6px; font-size:0.88rem;">Database Batch Modding</div>
-        <p style="color:var(--text-secondary); font-size:0.8rem; line-height:1.5;">Load multiple JSON tables at once. Edit parameters, recovery rates, skill costs, and item consumption rules.</p>
-      </div>
-      <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:16px; border-radius:var(--radius-md);">
-        <div style="font-weight:600; color:var(--accent-sand); margin-bottom:6px; font-size:0.88rem;">Non-Destructive Workflow</div>
-        <p style="color:var(--text-secondary); font-size:0.8rem; line-height:1.5;">Revert individual records or entire tables to their original state at any time before exporting.</p>
+      <div class="studio-codec-bar" aria-hidden="true">
+        <span class="studio-codec-tag">.rmmzsave</span>
+        <span class="studio-codec-tag">.rpgsave</span>
+        <span class="studio-codec-tag">.rvdata2</span>
+        <span class="studio-codec-tag">.rxdata</span>
+        <span class="studio-codec-tag">Weapons.json</span>
+        <span class="studio-codec-tag">Items.json</span>
+        <span class="studio-codec-tag">Actors.json</span>
       </div>
     </div>
   </div>
@@ -856,7 +1258,7 @@
     <!-- Top Quick Bar -->
     <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:12px 18px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <span style="font-weight:600; font-size:0.98rem; color:var(--text-primary); font-family:var(--font-mono);" id="label-filename">savegame.rpgsave</span>
+        <span style="font-weight:500; font-size:0.98rem; color:var(--text-primary); font-family:var(--font-mono);" id="label-filename">savegame.rpgsave</span>
         <span class="meta-pill" id="label-format">FORMAT</span>
         <span class="meta-pill" id="label-size">0 KB</span>
         <span class="meta-pill" style="color:var(--accent-sage-bright); border-color:var(--accent-sage); cursor:pointer;" id="label-changes" title="Click to inspect changes" tabindex="0" role="button">0 CHANGES</span>
@@ -867,8 +1269,8 @@
       <!-- Quick Gold Edit & Max Preset -->
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <div style="background:var(--bg-header); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:5px 12px; display:flex; align-items:center; gap:8px;">
-          <span style="font-weight:600; color:var(--accent-sand); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.03em;">Gold</span>
-          <input type="number" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-family:var(--font-mono); font-size:0.9rem; font-weight:600; width:115px; padding:4px 8px;" id="quick-gold-input" value="0" aria-label="Party Gold">
+          <span style="font-weight:500; color:var(--accent-sand); font-size:0.8125rem; text-transform:uppercase; letter-spacing:0.03em;">Gold</span>
+          <input type="number" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-family:var(--font-mono); font-size:0.9rem; font-weight:500; width:115px; padding:4px 8px;" id="quick-gold-input" value="0" aria-label="Party Gold">
           <button class="revert-btn" id="gold-revert-btn" title="Revert Gold to original value" type="button">Revert</button>
           <button class="btn btn-secondary btn-sm" id="btn-gold-add-10k" type="button">+10K</button>
           <button class="btn btn-secondary btn-sm" id="btn-gold-add-100k" type="button">+100K</button>
@@ -882,7 +1284,7 @@
     <div id="save-changes-drawer" style="display:none; background:var(--bg-card); border:1px solid var(--accent-sage); border-radius:var(--radius-md); padding:10px 14px; flex-wrap:wrap; align-items:center; gap:6px;"></div>
 
     <!-- Navigation Tabs -->
-    <div class="nav-tabs" id="main-nav-tabs" role="tablist">
+    <div class="nav-tabs" id="main-nav-tabs" role="group" aria-label="Save Editor Sections">
       <button class="tab-btn active" data-tab="tab-characters" type="button">Characters <span class="tab-badge" id="badge-char-count">0</span></button>
       <button class="tab-btn" data-tab="tab-inventory" type="button">Inventory <span class="tab-badge" id="badge-item-count">0</span></button>
       <button class="tab-btn" data-tab="tab-weapons" type="button">Weapons <span class="tab-badge" id="badge-weapon-count">0</span></button>
@@ -921,7 +1323,7 @@
           </label>
           <select id="inventory-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-items-set-all-99" type="button">Set All Owned to 99</button>
-          <button class="btn btn-gold btn-sm" id="btn-items-unlock-safe" type="button" title="Unlock all regular items from Items.json while skipping Key Items (itypeId=2) to protect story quests">Safe Unlock All (No Key Items)</button>
+          <button class="btn btn-gold btn-sm" id="btn-items-unlock-safe" type="button" title="Grant all regular items from Items.json while skipping Key Items (itypeId=2) to protect story quests">Add All Regular Items</button>
           <input type="number" id="inventory-add-id" placeholder="ID" min="1" aria-label="Item ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <input type="number" id="inventory-add-qty" value="99" min="1" title="Quantity" aria-label="Item quantity to add" style="width:64px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-item-dialog" type="button">+ Add Item</button>
@@ -940,7 +1342,7 @@
           </label>
           <select id="weapons-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-weapons-set-all-99" type="button">Set Owned to 99</button>
-          <button class="btn btn-gold btn-sm" id="btn-weapons-unlock-all" type="button">Unlock All DB Weapons</button>
+          <button class="btn btn-gold btn-sm" id="btn-weapons-unlock-all" type="button">Grant All DB Weapons</button>
           <input type="number" id="weapons-add-id" placeholder="ID" min="1" aria-label="Weapon ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-weapon-dialog" type="button">+ Add Weapon</button>
         </div>
@@ -958,7 +1360,7 @@
           </label>
           <select id="armors-picker-select" style="display:none; height:31px; line-height:1.2; min-width:190px; max-width:240px; padding:4px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;"></select>
           <button class="btn btn-secondary btn-sm" id="btn-armors-set-all-99" type="button">Set Owned to 99</button>
-          <button class="btn btn-gold btn-sm" id="btn-armors-unlock-all" type="button">Unlock All DB Armors</button>
+          <button class="btn btn-gold btn-sm" id="btn-armors-unlock-all" type="button">Grant All DB Armors</button>
           <input type="number" id="armors-add-id" placeholder="ID" min="1" aria-label="Armor ID to add" style="width:72px; padding:5px 8px; background:var(--bg-input); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.82rem;">
           <button class="btn btn-primary btn-sm" id="btn-add-armor-dialog" type="button">+ Add Armor</button>
         </div>
@@ -1179,16 +1581,143 @@
       <!-- Right Detail Panel -->
       <div class="db-detail-panel" id="db-detail-container">
         <div style="text-align:center; padding:64px 20px; color:var(--text-secondary);">
-          <div style="font-size:1rem; font-weight:600; color:var(--text-primary);">No Database Loaded</div>
-          <div style="font-size:0.82rem; margin-top:6px;">Drop <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, or <code>Skills.json</code> from your game's <code>data/</code> directory.</div>
+          <div style="font-size:1rem; font-weight:500; color:var(--text-primary);">No Database Loaded</div>
+          <div style="font-size:0.875rem; margin-top:6px;">Drop <code>Weapons.json</code>, <code>Armors.json</code>, <code>Items.json</code>, or <code>Skills.json</code> from your game's <code>data/</code> directory.</div>
         </div>
       </div>
     </div>
   </div>
 
-</div>
+        </div>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite">Notification</div>
+    </div>
+  </section>
 
-<div class="toast" id="toast" role="status" aria-live="polite">Notification</div>
+  <section class="section bg-mist" id="features" aria-labelledby="features-h">
+    <div class="wrap">
+      <div class="section-head section-head--center">
+        <h2 id="features-h">Engine codecs. <span class="muted">Binary saves and JSON tables.</span></h2>
+      </div>
+      <div class="grid stat-cards">
+        <article class="card card--row">
+          <strong>6 engines</strong>
+          <p>Read MZ, MV, VX Ace, VX, XP, and Naninovel save archives.</p>
+          <div class="panel panel--inset" data-fx="grain-gradient" data-fx-params='{"drift":0}' data-fx-seed="11" role="img" aria-label="Binary and text codec breakdown across MZ deflate, MV LZString, and Ruby Marshal">
+            <div class="stage"><div class="at-rise fit"><div class="d-pane" aria-hidden="true">
+              <h5>Supported save formats</h5>
+              <div class="d-split"><i style="width:45%; background:#c6f19d"></i><i style="width:35%; background:#74a876"></i><i style="width:20%; background:#48694a"></i></div>
+              <div class="d-times"><span>.rmmzsave<b>Deflate</b></span><span>.rpgsave<b>LZString</b></span><span>.rvdata2<b>Marshal 4.8</b></span><span>.sav<b>Naninovel</b></span></div>
+            </div></div></div>
+          </div>
+        </article>
+        <article class="card card--row">
+          <strong>7 tables</strong>
+          <p>Edit weapons, armors, items, skills, enemies, classes, and actors.</p>
+          <div class="panel panel--inset" data-fx="grain-gradient" data-fx-params='{"drift":0}' data-fx-seed="23" role="img" aria-label="Seven database JSON table slots loaded simultaneously for cross-referenced lookups">
+            <div class="stage"><div class="at-rise fit"><div class="d-pane" aria-hidden="true">
+              <h5>Database slots loaded</h5>
+              <div class="d-times"><span>Weapons.json<b>142 rows</b></span><span>Armors.json<b>118 rows</b></span><span>Items.json<b>204 rows</b></span><span>Skills.json<b>310 rows</b></span></div>
+            </div></div></div>
+          </div>
+        </article>
+        <article class="card card--row">
+          <strong>Zero server</strong>
+          <p>Revert individual fields or export raw backups before saving.</p>
+          <div class="panel panel--inset" data-fx="grain-gradient" data-fx-params='{"drift":0}' data-fx-seed="37" role="img" aria-label="Modified save fields queued with original baseline rollback values">
+            <div class="stage"><div class="at-rise fit"><div class="d-pane" aria-hidden="true">
+              <h5>Queued save diff</h5>
+              <div class="d-times"><span>Party Gold<b>+500,000</b></span><span>Actor #1 HP<b>9,999</b></span><span>Switch #014<b>TRUE</b></span><span>Original .bak<b>Ready</b></span></div>
+            </div></div></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section statement" id="moment" data-moment="liquid-type" aria-labelledby="moment-h">
+    <div class="wrap">
+      <h2 class="mo-lt__type" id="moment-h">Save Studio runs in local memory.</h2>
+      <p class="t-lead">Decompress archives, patch actor stats, inspect changes, and export clean save files directly inside this browser tab.</p>
+    </div>
+  </section>
+
+  <section class="section ground-surface bg-dots" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="grid">
+        <div class="span-5 faq-col-left">
+          <div class="section-head">
+            <h2 id="faq-h">Questions. <span class="muted">How local editing works.</span></h2>
+          </div>
+          <div class="ui ui-faq-arch" data-visual role="img" aria-label="Local browser parsing pipeline from save archive through codec decoders to clean file download">
+            <svg viewBox="0 0 420 260" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="6" y="14" width="112" height="58" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.22)"/>
+              <text x="62" y="40" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500" text-anchor="middle">Save Archive</text>
+              <text x="62" y="58" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13" text-anchor="middle">.rmmzsave</text>
+              <line x1="118" y1="43" x2="148" y2="43" stroke="#c6f19d" stroke-width="1.5"/>
+              <rect x="148" y="14" width="124" height="58" rx="4" fill="#1d351e" stroke="#c6f19d"/>
+              <text x="210" y="40" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500" text-anchor="middle">Local Codec</text>
+              <text x="210" y="58" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13" text-anchor="middle">Pako / LZStr</text>
+              <line x1="272" y1="43" x2="302" y2="43" stroke="#c6f19d" stroke-width="1.5"/>
+              <rect x="302" y="14" width="112" height="58" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.22)"/>
+              <text x="358" y="40" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500" text-anchor="middle">Clean Export</text>
+              <text x="358" y="58" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13" text-anchor="middle">Diff + .bak</text>
+              <rect x="6" y="94" width="408" height="72" rx="4" fill="#122413" stroke="rgba(255,255,255,0.14)"/>
+              <text x="22" y="122" fill="#ffffff" font-family="Instrument Sans, sans-serif" font-size="13" font-weight="500">Zero external uploads inside browser tab memory</text>
+              <text x="22" y="146" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13">6 Codecs · 7 JSON Tables · Field Revert</text>
+              <rect x="6" y="184" width="198" height="62" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.14)"/>
+              <text x="22" y="210" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13">MZ · MV · VX Ace</text>
+              <text x="22" y="232" fill="#dce5dc" font-family="Instrument Sans, sans-serif" font-size="13">Instant round-trip check</text>
+              <rect x="216" y="184" width="198" height="62" rx="4" fill="#162a17" stroke="rgba(255,255,255,0.14)"/>
+              <text x="232" y="210" fill="#c6f19d" font-family="DM Mono, monospace" font-size="13">Weapons · Items</text>
+              <text x="232" y="232" fill="#dce5dc" font-family="Instrument Sans, sans-serif" font-size="13">Live cross-table labels</text>
+            </svg>
+          </div>
+        </div>
+        <div class="span-7">
+          <div class="faq">
+            <div class="faq__item">
+              <h3>Which save formats can Save Studio parse?</h3>
+              <p>MZ (.rmmzsave), MV (.rpgsave), VX Ace (.rvdata2), VX (.rvdata), XP (.rxdata), and Naninovel (.sav).</p>
+            </div>
+            <div class="faq__item">
+              <h3>Does Save Studio send files to any server?</h3>
+              <p>No; Pako, LZString, and Ruby Marshal decoding run inside local browser memory.</p>
+            </div>
+            <div class="faq__item">
+              <h3>How do JSON tables label numeric save IDs?</h3>
+              <p>Load Weapons.json, Items.json, Armors.json, or Skills.json to map IDs to item names.</p>
+            </div>
+            <div class="faq__item">
+              <h3>Can Save Studio restore fields before export?</h3>
+              <p>Yes; every modified field supports single-record revert, full reset, and raw .bak export.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing footer--statement" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head section-head--split">
+        <h2 id="close-h">Open a save file now.</h2>
+        <a class="btn btn--primary" href="#studio">Open save file</a>
+      </div>
+      <div class="close__word" aria-hidden="true">SaveStudio</div>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-6 stack-5"><a class="footer__mark" href="#top"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a></div>
+        <div class="span-3 start-7 footer__col"><h3>Workspace</h3><ul><li><a href="#studio">Save Editor</a></li><li><a href="#studio">Database Modder</a></li><li><a href="#features">Supported Formats</a></li></ul></div>
+        <div class="span-3 footer__col"><h3>Project</h3><ul><li><a href="#faq">Questions</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
+      </div>
+      <div class="footer__legal"><span>Save Studio local workbench</span><span><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></span></div>
+    </div>
+  </div>
+</footer>
 
 <!-- Embedded Libraries -->
 <script>// Pako v1.0.11 - Deflate/Inflate for RPG Maker MZ (MIT License)
@@ -1881,6 +2410,30 @@ if (typeof module !== 'undefined') {
 <!-- Application Engine -->
 <script>
 (function() {
+  if (typeof document !== 'undefined' && document.documentElement && document.documentElement.classList) {
+    document.documentElement.classList.add('m-enter');
+    setTimeout(function() { document.documentElement.classList.add('m-enter-done'); }, 700);
+  }
+  if (typeof IntersectionObserver !== 'undefined' && typeof document.querySelectorAll === 'function') {
+    var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav__links .nav__link[href^="#"]'));
+    var secTargets = navLinks.map(function(a) {
+      var id = a.getAttribute('href').slice(1);
+      return { link: a, el: document.getElementById(id) };
+    }).filter(function(item) { return !!item.el; });
+    if (secTargets.length) {
+      var navObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            secTargets.forEach(function(t) {
+              if (t.el === entry.target) t.link.setAttribute('aria-current', 'page');
+              else t.link.removeAttribute('aria-current');
+            });
+          }
+        });
+      }, { rootMargin: '-35% 0px -55% 0px', threshold: 0 });
+      secTargets.forEach(function(t) { navObserver.observe(t.el); });
+    }
+  }
   // App Mode State: 'save' or 'database'
   let currentAppMode = 'save';
 
@@ -5821,6 +6374,9 @@ if (typeof module !== 'undefined') {
 
 })();
 </script>
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
 
 </body>
 </html>

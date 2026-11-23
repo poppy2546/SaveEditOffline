@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-type="software" data-radius="sharp" data-ground="sage" data-buttons="arrow">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-type" content="software">
+<meta name="site-kind" content="software">
+<title>Terms: Save & DB Studio</title>
+<meta name="description" content="Usage notes and local backup responsibility for Save & DB Studio RPG Maker save editor.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<style>
+:root {
+  --p-bg: #0f1f10; --p-surface: #162a17; --p-ink: #ffffff; --p-muted: #9aa39a;
+  --p-accent: #c6f19d; --p-accent-ink: #0f1f10; --p-action: #c6f19d; --p-action-ink: #0f1f10;
+  --p-inv-bg: #ffffff; --p-inv-surface: #ecedec; --p-inv-ink: #0f1f10; --p-inv-muted: #606c60;
+  --p-inv-accent: #0f1f10; --p-inv-accent-ink: #ffffff; --p-inv-action: #0f1f10; --p-inv-action-ink: #ffffff;
+  --font-display: "Instrument Sans", system-ui, sans-serif;
+  --font-text: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.028em;
+  --display-tracking-xl: -0.036em;
+  --display-stretch: 96%;
+  --ly-scale: 1.04;
+}
+.legal-copy { max-width: 66ch; display: grid; gap: var(--s-5); }
+.legal-copy h2 { font-size: var(--t-h3); margin-top: var(--s-4); }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap nav__bar">
+    <a class="nav__logo" href="index.html"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item"><a class="nav__link" href="index.html#studio">Editor</a></div>
+      <div class="nav__item"><a class="nav__link" href="index.html#features">Formats</a></div>
+      <div class="nav__item"><a class="nav__link" href="index.html#faq">Questions</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary" href="index.html#studio">Open save file</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="section" aria-labelledby="terms-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h1 id="terms-h" class="t-h1">Usage terms. <span class="muted">Keep a backup of original saves.</span></h1>
+      </div>
+      <div class="legal-copy">
+        <p class="t-lead">Save Studio runs locally under the repository MIT license as a client-side editor for personal game saves and JSON database tables.</p>
+        <h2>Backups before writing</h2>
+        <p>Keep an unmodified copy of every save file or project JSON before replacing files in your game folder. Save Studio exports clean modified files separately and includes an original backup download option.</p>
+        <h2>Supported formats</h2>
+        <p>Format support covers standard RPG Maker MZ, MV, VX Ace, VX, XP, and Naninovel save archives, plus unencrypted Ren'Py inspection and RPG Maker JSON database files. Games using custom native encryption or anti-tamper plugins may reject edited files.</p>
+        <h2>Warranty</h2>
+        <p>This software is provided as-is without warranty under the MIT license included in the repository.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing footer--statement" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head section-head--split">
+        <h2 id="close-h">Return to the save workbench.</h2>
+        <a class="btn btn--primary" href="index.html#studio">Open save file</a>
+      </div>
+      <div class="close__word" aria-hidden="true">SaveStudio</div>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-6 stack-5"><a class="footer__mark" href="index.html#top"><span class="mark mark--initial" aria-hidden="true">S</span>Save Studio</a></div>
+        <div class="span-3 start-7 footer__col"><h4>Workspace</h4><ul><li><a href="index.html#studio">Save Editor</a></li><li><a href="index.html#studio">Database Modder</a></li><li><a href="index.html#features">Supported Engines</a></li></ul></div>
+        <div class="span-3 footer__col"><h4>Project</h4><ul><li><a href="index.html#faq">FAQ</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
+      </div>
+      <div class="footer__legal"><span>Save Studio local workbench</span><span><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></span></div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
